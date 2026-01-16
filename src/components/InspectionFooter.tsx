@@ -18,7 +18,9 @@ export function InspectionFooter() {
           <div>
             <div className="text-gray-500 font-semibold mb-1">Main</div>
             <div className="flex items-center gap-3">
-              <Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link>
+              <Link to="/" className="text-gray-400 hover:text-white transition-colors">Dashboard</Link>
+              <span className="text-gray-600">|</span>
+              <Link to="/about" className="text-gray-400 hover:text-white transition-colors">About</Link>
               <span className="text-gray-600">|</span>
               <Link to="/login" className="text-gray-400 hover:text-white transition-colors">Login</Link>
             </div>
