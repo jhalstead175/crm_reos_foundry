@@ -79,4 +79,15 @@ export default function FAQ() {
         <details>
           <summary>Is Chronos suitable for teams?</summary>
           <p>
-            Yes. Ch
+            Yes. Chronos is built for teams that need shared clarity.
+            Everyone sees the same timeline, the same tasks, the same history.
+          </p>
+          <p>
+            This reduces the need for status meetings and email chains.
+            The system itself becomes the source of truth.
+          </p>
+        </details>
+      </section>
+    </main>
+  );
+}
