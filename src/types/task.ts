@@ -41,6 +41,26 @@ export type TransactionEvent =
       timestamp: string;
     }
   | {
+      type: "task.auto_created";
+      taskId: string;
+      taskTitle: string;
+      reason: string;
+      transactionId: string;
+      timestamp: string;
+    }
+  | {
+      type: "milestone.reached";
+      title: string;
+      description: string;
+      timestamp: string;
+    }
+  | {
+      type: "deadline.created";
+      title: string;
+      dueDate: string;
+      timestamp: string;
+    }
+  | {
       type: "system";
       title: string;
       timestamp: string;
