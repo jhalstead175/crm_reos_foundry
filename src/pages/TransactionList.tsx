@@ -13,7 +13,7 @@ export default function TransactionList() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-title-1">Transactions</h1>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized">
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button">
             New Transaction
           </button>
         </div>
@@ -22,9 +22,9 @@ export default function TransactionList() {
           <input
             type="search"
             placeholder="Search by address or client..."
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
           />
-          <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input">
             <option>All Status</option>
             <option>Active</option>
             <option>Pending</option>
@@ -37,7 +37,7 @@ export default function TransactionList() {
             <Link
               key={transaction.id}
               to={`/transactions/${transaction.id}`}
-              className="block bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-500 hover:shadow-md transition-all"
+              className="block bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-500 hover:shadow-md motion-card"
             >
               <div className="flex justify-between items-start">
                 <div>

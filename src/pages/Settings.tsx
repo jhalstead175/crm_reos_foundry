@@ -16,7 +16,7 @@ export default function Settings() {
                 id="email"
                 type="email"
                 defaultValue="user@example.com"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
               />
             </div>
             <div>
@@ -27,11 +27,11 @@ export default function Settings() {
                 id="phone"
                 type="tel"
                 defaultValue="(555) 123-4567"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
               />
             </div>
           </div>
-          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized">
+          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button">
             Save Changes
           </button>
         </div>
@@ -47,7 +47,7 @@ export default function Settings() {
               <input
                 id="current-password"
                 type="password"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
               />
             </div>
             <div>
@@ -57,7 +57,7 @@ export default function Settings() {
               <input
                 id="new-password"
                 type="password"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
               />
             </div>
             <div>
@@ -67,11 +67,11 @@ export default function Settings() {
               <input
                 id="confirm-password"
                 type="password"
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
               />
             </div>
           </div>
-          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized">
+          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button">
             Update Password
           </button>
         </div>
@@ -97,7 +97,7 @@ export default function Settings() {
               <span className="text-subheadline text-primary">SMS notifications</span>
             </label>
           </div>
-          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized">
+          <button className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button">
             Save Preferences
           </button>
         </div>
@@ -105,7 +105,7 @@ export default function Settings() {
         {/* Logout */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-title-2 mb-4">Account Actions</h2>
-          <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-subheadline-emphasized">
+          <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-subheadline-emphasized motion-button">
             Log Out
           </button>
         </div>

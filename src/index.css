@@ -130,3 +130,88 @@
     @apply text-gray-500;
   }
 }
+
+@layer utilities {
+  /* Micro-Motion Utilities - Apple-level subtle interactions */
+
+  /* Motion timing functions */
+  :root {
+    --motion-ease-out: cubic-bezier(0.2, 0, 0, 1);
+    --motion-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Button press feedback - subtle scale */
+  .motion-button {
+    transition-property: transform, background-color, color, border-color;
+    transition-duration: 150ms;
+    transition-timing-function: var(--motion-ease-out);
+  }
+
+  .motion-button:active {
+    transform: scale(0.98);
+  }
+
+  /* Tab transitions - smooth underline and color */
+  .motion-tab {
+    transition-property: color, border-color;
+    transition-duration: 200ms;
+    transition-timing-function: var(--motion-ease-in-out);
+  }
+
+  /* Card interactions - subtle elevation */
+  .motion-card {
+    transition-property: border-color, box-shadow, transform;
+    transition-duration: 200ms;
+    transition-timing-function: var(--motion-ease-out);
+  }
+
+  .motion-card:hover {
+    transform: translateY(-1px);
+  }
+
+  /* Focus states - smooth ring appearance */
+  .motion-focus {
+    transition-property: box-shadow, border-color;
+    transition-duration: 150ms;
+    transition-timing-function: var(--motion-ease-out);
+  }
+
+  /* Input interactions */
+  .motion-input {
+    transition-property: border-color, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: var(--motion-ease-out);
+  }
+
+  /* Link/text button interactions */
+  .motion-text {
+    transition-property: color;
+    transition-duration: 150ms;
+    transition-timing-function: var(--motion-ease-out);
+  }
+
+  /* Badge/status transitions */
+  .motion-badge {
+    transition-property: background-color, color;
+    transition-duration: 200ms;
+    transition-timing-function: var(--motion-ease-out);
+  }
+
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .motion-button,
+    .motion-tab,
+    .motion-card,
+    .motion-focus,
+    .motion-input,
+    .motion-text,
+    .motion-badge {
+      transition-duration: 0ms;
+      transform: none !important;
+    }
+
+    .motion-card:hover {
+      transform: none;
+    }
+  }
+}

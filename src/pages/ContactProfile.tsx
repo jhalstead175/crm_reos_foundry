@@ -31,7 +31,7 @@ export default function ContactProfile() {
               <h1 className="text-title-1">{contact.name}</h1>
               <p className="text-subheadline text-secondary mt-1">{contact.role}</p>
             </div>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized">
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button">
               Send Message
             </button>
           </div>
@@ -52,7 +52,7 @@ export default function ContactProfile() {
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
           <h2 className="text-title-2 mb-4">Notes</h2>
           <p className="text-body text-primary">{contact.notes}</p>
-          <button className="mt-4 text-subheadline text-blue-600 hover:text-blue-700">
+          <button className="mt-4 text-subheadline text-blue-600 hover:text-blue-700 motion-text">
             Edit Notes
           </button>
         </div>
