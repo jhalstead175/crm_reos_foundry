@@ -12,6 +12,8 @@ export default function ContactProfile() {
   const [logType, setLogType] = useState<ContactEventType>("call");
   const [logNote, setLogNote] = useState("");
   const [logDirection, setLogDirection] = useState<"inbound" | "outbound">("outbound");
+  const [showFollowUpForm, setShowFollowUpForm] = useState(false);
+  const [followUpDate, setFollowUpDate] = useState("");
 
   useEffect(() => {
     loadContact();
@@ -106,6 +108,32 @@ export default function ContactProfile() {
       setContact({ ...contact, last_contact_date: new Date().toISOString() });
       setLogNote("");
       setShowLogForm(false);
+    }
+  };
+
+  const setFollowUp = async () => {
+    if (!contact || !followUpDate) return;
+
+    try {
+      const { error } = await supabase
+        .from("contacts")
+        .update({ next_follow_up_date: followUpDate })
+        .eq("id", contact.id);
+
+      if (error) throw error;
+
+      // Reload contact
+      await loadContact();
+
+      // Reset form
+      setFollowUpDate("");
+      setShowFollowUpForm(false);
+    } catch (error) {
+      console.error("Error setting follow-up:", error);
+      // In demo mode, just update local state
+      setContact({ ...contact, next_follow_up_date: followUpDate });
+      setFollowUpDate("");
+      setShowFollowUpForm(false);
     }
   };
 
@@ -229,7 +257,7 @@ export default function ContactProfile() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <label className="block text-footnote-emphasized text-secondary">Email</label>
               <p className="mt-1 text-subheadline text-primary">{contact.email || "Not provided"}</p>
@@ -241,6 +269,21 @@ export default function ContactProfile() {
             <div>
               <label className="block text-footnote-emphasized text-secondary">Last Contact</label>
               <p className="mt-1 text-subheadline text-primary">{formatDateShort(contact.last_contact_date)}</p>
+            </div>
+            <div>
+              <label className="block text-footnote-emphasized text-secondary">Next Follow-Up</label>
+              <p
+                className={`mt-1 text-subheadline ${
+                  contact.next_follow_up_date && new Date(contact.next_follow_up_date) < new Date()
+                    ? "text-red-600 font-semibold"
+                    : "text-primary"
+                }`}
+              >
+                {formatDateShort(contact.next_follow_up_date)}
+                {contact.next_follow_up_date && new Date(contact.next_follow_up_date) < new Date() && (
+                  <span className="ml-1">⚠️</span>
+                )}
+              </p>
             </div>
           </div>
         </div>
@@ -274,7 +317,10 @@ export default function ContactProfile() {
           >
             📝 Add Note
           </button>
-          <button className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-md hover:border-accent-primary text-subheadline-emphasized motion-button">
+          <button
+            onClick={() => setShowFollowUpForm(true)}
+            className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-md hover:border-accent-primary text-subheadline-emphasized motion-button"
+          >
             📅 Set Follow-Up
           </button>
           <button className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-md hover:border-accent-primary text-subheadline-emphasized motion-button">
@@ -355,6 +401,60 @@ export default function ContactProfile() {
                   onClick={() => {
                     setShowLogForm(false);
                     setLogNote("");
+                  }}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-subheadline-emphasized motion-button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Set Follow-Up Form */}
+        {showFollowUpForm && (
+          <div className="bg-accent-soft border border-accent-primary rounded-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-title-2">Set Follow-Up Date</h2>
+              <button
+                onClick={() => setShowFollowUpForm(false)}
+                className="text-secondary hover:text-primary"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-subheadline-emphasized text-primary mb-2">
+                  Follow-Up Date
+                </label>
+                <input
+                  type="date"
+                  value={followUpDate}
+                  onChange={(e) => setFollowUpDate(e.target.value)}
+                  min={new Date().toISOString().split("T")[0]}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                />
+                <p className="mt-2 text-footnote text-secondary">
+                  {contact.next_follow_up_date
+                    ? `Current follow-up: ${formatDateShort(contact.next_follow_up_date)}`
+                    : "No follow-up date set"}
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={setFollowUp}
+                  disabled={!followUpDate}
+                  className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized motion-button"
+                >
+                  Set Follow-Up
+                </button>
+                <button
+                  onClick={() => {
+                    setShowFollowUpForm(false);
+                    setFollowUpDate("");
                   }}
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-subheadline-emphasized motion-button"
                 >
