@@ -36,7 +36,9 @@ export function InspectionFooter() {
             <div className="flex items-center gap-3">
               <Link to="/tasks" className="text-gray-400 hover:text-white transition-colors">Tasks</Link>
               <span className="text-gray-600">|</span>
-              <Link to="/contacts/1" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
+              <Link to="/contacts" className="text-gray-400 hover:text-white transition-colors">Contacts</Link>
+              <span className="text-gray-600">|</span>
+              <Link to="/contacts/1" className="text-gray-400 hover:text-white transition-colors">Contact Detail</Link>
             </div>
           </div>
           <div>

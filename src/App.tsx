@@ -4,6 +4,7 @@ import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import TransactionList from "./pages/TransactionList";
 import TransactionDetail from "./pages/TransactionDetail";
+import ContactsList from "./pages/ContactsList";
 import ContactProfile from "./pages/ContactProfile";
 import Settings from "./pages/Settings";
 import TaskBoard from "./pages/TaskBoard";
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/transactions" element={<TransactionList />} />
         <Route path="/transactions/:id" element={<TransactionDetail />} />
+        <Route path="/contacts" element={<ContactsList />} />
         <Route path="/contacts/:id" element={<ContactProfile />} />
         <Route path="/tasks" element={<TaskBoard />} />
         <Route path="/settings" element={<Settings />} />
