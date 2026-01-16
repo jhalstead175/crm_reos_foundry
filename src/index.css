@@ -7,6 +7,17 @@
   :root {
     --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
                    system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+    /* Surface Tokens - Tonal Background System */
+    --surface-app: #F7F8FA;
+    --surface-panel: #FFFFFF;
+    --surface-muted: #F2F4F7;
+    --border-subtle: #E6E8EC;
+
+    /* Accent Tokens - Deep Slate Blue */
+    --accent-primary: #2F3A4A;
+    --accent-muted: #5A6B82;
+    --accent-soft: #E8EDF3;
   }
 
   html {
@@ -18,7 +29,46 @@
 
   body {
     @apply text-gray-900;
+    background-color: var(--surface-app);
     font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  /* Surface utility classes */
+  .bg-surface-app {
+    background-color: var(--surface-app);
+  }
+
+  .bg-surface-panel {
+    background-color: var(--surface-panel);
+  }
+
+  .bg-surface-muted {
+    background-color: var(--surface-muted);
+  }
+
+  .border-surface-subtle {
+    border-color: var(--border-subtle);
+  }
+
+  /* Accent utility classes */
+  .bg-accent-primary {
+    background-color: var(--accent-primary);
+  }
+
+  .bg-accent-soft {
+    background-color: var(--accent-soft);
+  }
+
+  .text-accent-primary {
+    color: var(--accent-primary);
+  }
+
+  .text-accent-muted {
+    color: var(--accent-muted);
+  }
+
+  .border-accent-primary {
+    border-color: var(--accent-primary);
   }
 
   /* Display - 32px / Large hero text */

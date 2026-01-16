@@ -547,14 +547,14 @@ export default function TransactionDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-app flex items-center justify-center">
         <div className="text-subheadline text-secondary">Loading transaction...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-app">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Error Display */}
         {error && (
@@ -570,7 +570,7 @@ export default function TransactionDetail() {
         )}
 
         {/* Transaction Header */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6 mb-6">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h1 className="text-title-1">{transaction.address}</h1>
@@ -603,7 +603,7 @@ export default function TransactionDetail() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`text-subheadline-emphasized pb-2 border-b-2 motion-tab ${
                   activeTab === tab.id
-                    ? "border-blue-600 text-blue-600"
+                    ? "border-accent-primary text-accent-primary"
                     : "border-transparent text-gray-600 hover:text-gray-900"
                 }`}
               >
@@ -614,7 +614,7 @@ export default function TransactionDetail() {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6">
           {activeTab === "timeline" && <TimelineView events={events} />}
           {activeTab === "documents" && <DocumentsView />}
           {activeTab === "tasks" && (
@@ -640,12 +640,12 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
   const getEventDisplay = (event: TransactionEvent) => {
     switch (event.type) {
       case "task.created":
-        return { title: `Task created: ${event.taskTitle}`, badgeText: "task", borderColor: "border-blue-600" };
+        return { title: `Task created: ${event.taskTitle}`, badgeText: "task", borderColor: "border-accent-muted" };
       case "task.status_changed":
         return {
           title: `Task "${event.taskTitle}" moved from ${event.from} to ${event.to}`,
           badgeText: "task",
-          borderColor: "border-blue-600",
+          borderColor: "border-accent-muted",
         };
       case "task.completed":
         return { title: `Task completed: ${event.taskTitle}`, badgeText: "task", borderColor: "border-green-600" };
@@ -693,7 +693,7 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
           const eventId = "timestamp" in event ? event.timestamp + index : index;
 
           return (
-            <div key={eventId} className={`border-l-2 ${display.borderColor || "border-blue-600"} pl-4 pb-4`}>
+            <div key={eventId} className={`border-l-2 ${display.borderColor || "border-accent-soft"} pl-4 pb-4`}>
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <h3 className="text-body-emphasized">{display.title}</h3>
@@ -730,12 +730,12 @@ function DocumentsView() {
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-title-2">Documents</h2>
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button">
+        <button className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button">
           Upload Document
         </button>
       </div>
       {documents.map((doc) => (
-        <div key={doc.id} className="flex justify-between items-center border rounded-lg p-4">
+        <div key={doc.id} className="flex justify-between items-center border border-surface-subtle rounded-lg p-4 bg-surface-panel">
           <div>
             <h3 className="text-body-emphasized">{doc.name}</h3>
             <p className="text-subheadline text-secondary mt-1">
@@ -791,7 +791,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
         <h2 className="text-title-2">Tasks</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button"
+          className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button"
         >
           {showAddForm ? "Cancel" : "Add Task"}
         </button>
@@ -799,7 +799,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
 
       {/* Add Task Form */}
       {showAddForm && (
-        <form onSubmit={handleSubmit} className="border rounded-lg p-4 bg-gray-50 space-y-3">
+        <form onSubmit={handleSubmit} className="border border-surface-subtle rounded-lg p-4 bg-surface-muted space-y-3">
           <div>
             <label htmlFor="task-title" className="block text-subheadline-emphasized text-primary mb-1">
               Task Title
@@ -810,7 +810,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               placeholder="What needs to be done?"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
+              className="w-full px-3 py-2 border border-surface-subtle rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
               required
             />
           </div>
@@ -824,7 +824,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
                 id="task-priority"
                 value={newTaskPriority}
                 onChange={(e) => setNewTaskPriority(e.target.value as TaskPriority)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
+                className="w-full px-3 py-2 border border-surface-subtle rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -841,14 +841,14 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
                 type="date"
                 value={newTaskDueDate}
                 onChange={(e) => setNewTaskDueDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
+                className="w-full px-3 py-2 border border-surface-subtle rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button"
+            className="w-full px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button"
           >
             Create Task
           </button>
@@ -861,7 +861,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
           <p className="text-subheadline text-secondary">No tasks yet. Click "Add Task" to create one.</p>
         ) : (
           tasks.map((task) => (
-            <div key={task.id} className="border rounded-lg p-4 space-y-3">
+            <div key={task.id} className="border border-surface-subtle rounded-lg p-4 space-y-3 bg-surface-panel">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h3 className={`text-body-emphasized ${task.status === "done" ? "line-through text-gray-500" : ""}`}>
@@ -912,7 +912,7 @@ function MessagesView() {
       <h2 className="text-title-2 mb-4">Messages</h2>
       <div className="space-y-3">
         {messages.map((msg) => (
-          <div key={msg.id} className="border rounded-lg p-4">
+          <div key={msg.id} className="border border-surface-subtle rounded-lg p-4 bg-surface-panel">
             <div className="flex justify-between items-start mb-2">
               <span className="text-body-emphasized">{msg.from}</span>
               <span className="text-caption-1 text-tertiary">
@@ -929,7 +929,7 @@ function MessagesView() {
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-body motion-input"
           rows={3}
         />
-        <button className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button">
+        <button className="mt-2 px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button">
           Send Message
         </button>
       </div>

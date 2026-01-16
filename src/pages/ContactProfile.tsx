@@ -19,19 +19,19 @@ export default function ContactProfile() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-app">
       <div className="max-w-5xl mx-auto px-4 py-8">
         {/* Contact Header */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6 mb-6">
           <div className="flex items-start gap-4">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+            <div className="w-16 h-16 bg-accent-primary rounded-full flex items-center justify-center text-white text-2xl font-bold">
               {contact.name.charAt(0)}
             </div>
             <div className="flex-1">
               <h1 className="text-title-1">{contact.name}</h1>
               <p className="text-subheadline text-secondary mt-1">{contact.role}</p>
             </div>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-subheadline-emphasized motion-button">
+            <button className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button">
               Send Message
             </button>
           </div>
@@ -49,16 +49,16 @@ export default function ContactProfile() {
         </div>
 
         {/* Notes Section */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6 mb-6">
           <h2 className="text-title-2 mb-4">Notes</h2>
           <p className="text-body text-primary">{contact.notes}</p>
-          <button className="mt-4 text-subheadline text-blue-600 hover:text-blue-700 motion-text">
+          <button className="mt-4 text-subheadline text-accent-primary hover:text-blue-700 motion-text">
             Edit Notes
           </button>
         </div>
 
         {/* Transactions Section */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6">
           <h2 className="text-title-2 mb-4">Transactions</h2>
           <div className="space-y-3">
             {transactions.map((transaction) => (
