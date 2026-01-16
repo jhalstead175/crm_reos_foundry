@@ -1,7 +1,7 @@
 export default function Settings() {
   return (
     <div className="min-h-screen bg-surface-app">
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
         <h1 className="text-title-1 mb-6">Settings</h1>
 
         {/* Account Information */}

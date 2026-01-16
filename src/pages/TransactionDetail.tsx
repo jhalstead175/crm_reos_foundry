@@ -555,7 +555,7 @@ export default function TransactionDetail() {
 
   return (
     <div className="min-h-screen bg-surface-app">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Error Display */}
         {error && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">

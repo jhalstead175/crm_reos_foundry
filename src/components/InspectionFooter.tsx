@@ -17,28 +17,28 @@ export function InspectionFooter() {
         <nav className="flex gap-8">
           <div>
             <div className="text-gray-500 font-semibold mb-1">Main</div>
-            <div className="flex gap-3">
+            <div className="flex gap-6">
               <Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link>
               <Link to="/login" className="text-gray-400 hover:text-white transition-colors">Login</Link>
             </div>
           </div>
           <div>
             <div className="text-gray-500 font-semibold mb-1">Transactions</div>
-            <div className="flex gap-3">
+            <div className="flex gap-6">
               <Link to="/transactions" className="text-gray-400 hover:text-white transition-colors">List</Link>
               <Link to="/transactions/1" className="text-gray-400 hover:text-white transition-colors">Detail</Link>
             </div>
           </div>
           <div>
             <div className="text-gray-500 font-semibold mb-1">Tools</div>
-            <div className="flex gap-3">
+            <div className="flex gap-6">
               <Link to="/tasks" className="text-gray-400 hover:text-white transition-colors">Tasks</Link>
               <Link to="/contacts/1" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
             </div>
           </div>
           <div>
             <div className="text-gray-500 font-semibold mb-1">Account</div>
-            <div className="flex gap-3">
+            <div className="flex gap-6">
               <Link to="/settings" className="text-gray-400 hover:text-white transition-colors">Settings</Link>
             </div>
           </div>
