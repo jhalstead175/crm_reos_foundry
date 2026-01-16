@@ -1,0 +1,79 @@
+/* =========================
+   Task Board Layout
+   ========================= */
+
+.task-board {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.task-board-header {
+  margin-bottom: 2rem;
+}
+
+/* =========================
+   Columns
+   ========================= */
+
+.task-board-columns {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.task-column {
+  background: var(--color-surface-level-1);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.task-column-header {
+  margin-bottom: 0.75rem;
+}
+
+.task-count {
+  margin-left: 0.5rem;
+  color: var(--color-text-tertiary);
+  font-weight: 400;
+}
+
+/* =========================
+   Column Body
+   ========================= */
+
+.task-column-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+/* =========================
+   Task Card
+   ========================= */
+
+.task-card {
+  background: var(--color-surface-base);
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+/* =========================
+   Task Meta
+   ========================= */
+
+.task-meta {
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* =========================
+   Empty State
+   ========================= */
+
+.task-empty {
+  padding: 1rem 0;
+}

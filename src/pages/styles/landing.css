@@ -1,0 +1,97 @@
+/* ========== Landing Page (White-Glove) ========== */
+
+.landing {
+  --max-width: 1040px;
+
+  padding: 6rem 2rem 8rem;
+  margin: 0 auto;
+  max-width: var(--max-width);
+}
+
+/* ---------- Hero ---------- */
+
+.landing-hero {
+  margin-bottom: 6rem;
+}
+
+.landing-hero h1 {
+  font-size: clamp(2.75rem, 5vw, 3.5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+}
+
+.landing-subhead {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--color-text-muted, #374151);
+  margin-bottom: 1.25rem;
+}
+
+.landing-support {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: var(--color-text-subtle, #4b5563);
+  max-width: 52ch;
+}
+
+/* ---------- CTA ---------- */
+
+.landing-cta {
+  margin-top: 2.75rem;
+
+  appearance: none;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  color: #111827;
+
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+
+  transition: background 120ms ease, border-color 120ms ease;
+}
+
+.landing-cta:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+/* ---------- Sections ---------- */
+
+.landing-section {
+  margin-bottom: 5.5rem;
+}
+
+.landing-section h2 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 1.25rem;
+}
+
+.landing-section p {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #374151;
+  max-width: 65ch;
+  margin-bottom: 0.75rem;
+}
+
+/* ---------- Lists ---------- */
+
+.landing-section ul {
+  margin-top: 1rem;
+  padding-left: 1.25rem;
+}
+
+.landing-section li {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
