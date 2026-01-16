@@ -7,6 +7,7 @@ import TransactionList from "./pages/TransactionList";
 import TransactionDetail from "./pages/TransactionDetail";
 import ContactsList from "./pages/ContactsList";
 import ContactProfile from "./pages/ContactProfile";
+import PropertySearch from "./pages/PropertySearch";
 import Settings from "./pages/Settings";
 import TaskBoard from "./pages/TaskBoard";
 
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/transactions/:id" element={<TransactionDetail />} />
         <Route path="/contacts" element={<ContactsList />} />
         <Route path="/contacts/:id" element={<ContactProfile />} />
+        <Route path="/properties" element={<PropertySearch />} />
         <Route path="/tasks" element={<TaskBoard />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="*" element={<Navigate to="/" replace />} />

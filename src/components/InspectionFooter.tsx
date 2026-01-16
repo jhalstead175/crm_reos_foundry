@@ -40,7 +40,7 @@ export function InspectionFooter() {
               <span className="text-gray-600">|</span>
               <Link to="/contacts" className="text-gray-400 hover:text-white transition-colors">Contacts</Link>
               <span className="text-gray-600">|</span>
-              <Link to="/contacts/1" className="text-gray-400 hover:text-white transition-colors">Contact Detail</Link>
+              <Link to="/properties" className="text-gray-400 hover:text-white transition-colors">Properties</Link>
             </div>
           </div>
           <div>
