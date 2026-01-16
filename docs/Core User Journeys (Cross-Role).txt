@@ -1,0 +1,343 @@
+Core User Journeys (Cross-Role)
+
+Real Estate Transaction CRM: Core End-to-End Journeys
+1. Lead Intake → Closing → Post-Close Follow-up
+Ownership: Realtor (primary), CRM System (automation)
+
+Entry Point
+Digital form submission (website, portal, app)
+
+Manual entry by realtor (referral, open house, past client)
+
+Integration from third-party lead source (Zillow, Realtor.com)
+
+Key Decisions
+Lead qualification criteria match (timeline, budget, motivation)
+
+Assignment to appropriate realtor (specialty, capacity, geography)
+
+Communication cadence establishment (automated vs personal)
+
+Engagement tracking threshold for follow-up intensity
+
+Role Handoffs
+Marketing automation → Realtor (when lead scores above threshold)
+
+Realtor → Transaction Coordinator (once property identified/listed)
+
+Realtor → Post-Close Specialist (at closing)
+
+Data Created/Consumed
+Created: Lead profile, communication log, engagement score, source attribution
+
+Consumed: Market data, realtor performance metrics, response time benchmarks
+
+Moments of Friction to Eliminate
+Manual data re-entry between lead source and CRM
+
+Unclear lead ownership causing delayed response
+
+Lost context between initial contact and transaction start
+
+Inconsistent follow-up timing across team members
+
+2. Buyer Journey
+Ownership: Buyer (actor), Realtor (guide), Mortgage Broker (enabler)
+
+Entry Point
+Pre-approval document upload or mortgage application start
+
+Property search criteria definition
+
+First property tour scheduling
+
+Key Decisions
+Pre-approval amount acceptance and lender selection
+
+Property must-haves vs nice-to-haves refinement
+
+Offer strategy development (price, contingencies, timing)
+
+Inspection objection prioritization and negotiation
+
+Final walkthrough acceptance
+
+Role Handoffs
+Mortgage Broker → Realtor (pre-approval confirmation)
+
+Realtor → Attorney (signed purchase agreement)
+
+Buyer → Insurance Provider (binding request)
+
+Attorney → Title Company (closing package)
+
+Data Created/Consumed
+Created: Saved properties, offer history, inspection reports, contingencies
+
+Consumed: Property listings, market comparables, loan estimates, inspection availability
+
+Moments of Friction to Eliminate
+Repeated document requests from multiple parties
+
+Lack of visibility into offer review timeline
+
+Confusion about contingency deadlines
+
+Last-minute closing cost surprises
+
+Inconsistent communication about next steps
+
+3. Seller Journey
+Ownership: Seller (actor), Realtor (advisor), Subcontractor (preparer)
+
+Entry Point
+Listing agreement signing
+
+Property valuation assessment
+
+Pre-listing preparation checklist
+
+Key Decisions
+Listing price strategy based on market analysis
+
+Repair/improvement investment decisions
+
+Offer evaluation criteria (price, contingencies, closing timeline)
+
+Counter-offer strategy
+
+Post-inspection repair negotiation boundaries
+
+Role Handoffs
+Realtor → Photographer/Stager (listing preparation)
+
+Realtor → Showing Assistant (access coordination)
+
+Seller → Subcontractor (repair authorization)
+
+Realtor → Buyer's Attorney (disclosure delivery)
+
+Data Created/Consumed
+Created: Property disclosures, showing feedback, repair estimates, offer comparisons
+
+Consumed: Market absorption rates, comparable sales, showing analytics, buyer qualification
+
+Moments of Friction to Eliminate
+Unclear showing feedback aggregation
+
+Delayed offer presentation
+
+Manual coordination of repair estimates
+
+Disorganized document disclosure tracking
+
+Last-minute closing delays due to title issues
+
+4. Realtor Transaction Management
+Ownership: Realtor (orchestrator), Transaction Coordinator (executor)
+
+Entry Point
+Mutual acceptance of purchase agreement
+
+Transaction checklist auto-generation
+
+Key Decisions
+Contingency management sequencing (inspection → loan → appraisal)
+
+Communication protocol establishment with all parties
+
+Deadline monitoring and enforcement strategy
+
+Problem escalation path when issues arise
+
+Commission split and disbursement tracking
+
+Role Handoffs
+Realtor → Transaction Coordinator (day-to-day management)
+
+Realtor → Attorney (legal document review)
+
+Realtor → Other Agent (professional courtesy updates)
+
+Listing Agent → Buyer's Agent (key information sharing)
+
+Data Created/Consumed
+Created: Transaction timeline, task assignments, deadline alerts, communication logs
+
+Consumed: Contract terms, contingency statuses, role contact information, document status
+
+Moments of Friction to Eliminate
+Manual deadline tracking across multiple systems
+
+Unclear responsibility assignment for tasks
+
+Inconsistent status updates to clients
+
+Missing document chain-of-custody
+
+Last-minute scramble for missing signatures
+
+5. Attorney Closing Workflow
+Ownership: Closing Attorney (legal authority), Title Company (data source)
+
+Entry Point
+Executed purchase agreement receipt
+
+Title order placement
+
+Key Decisions
+Title issue resolution path (cure vs insurance)
+
+Document exception negotiation
+
+Escrow instruction finalization
+
+Funding release authorization
+
+Recording priority and method
+
+Role Handoffs
+Attorney → Title Company (title search request)
+
+Attorney → Lender (closing disclosure approval)
+
+Attorney → Realtor (closing statement review)
+
+Attorney → Recording Office (document submission)
+
+Data Created/Consumed
+Created: Closing statements, title commitments, settlement statements, escrow instructions
+
+Consumed: Purchase agreement, loan documents, payoff statements, tax information
+
+Moments of Friction to Eliminate
+Incomplete payoff information from existing lenders
+
+Missing signatures on critical documents
+
+Last-minute changes to closing costs
+
+Unclear funding timelines between parties
+
+Manual calculation errors in settlement statements
+
+6. Mortgage & Insurance Coordination
+Ownership: Mortgage Broker (primary), Insurance Provider (parallel), Underwriter (gatekeeper)
+
+Entry Point
+Formal loan application submission
+
+Insurance quote request
+
+Key Decisions
+Loan program selection and locking strategy
+
+Document exception handling approach
+
+Appraisal review and challenge decision
+
+Clear-to-close conditions verification
+
+Insurance binder timing coordination
+
+Role Handoffs
+Mortgage Broker → Processor (document collection)
+
+Processor → Underwriter (file submission)
+
+Underwriter → Attorney (clear-to-close notification)
+
+Insurance Agent → Lender (binder delivery)
+
+Data Created/Consumed
+Created: Loan estimates, closing disclosures, underwriting conditions, commitment letters
+
+Consumed: Borrower financial documents, property details, appraisal reports, title commitments
+
+Moments of Friction to Eliminate
+Repeated document requests from different departments
+
+Unclear underwriting condition status
+
+Appraisal scheduling delays
+
+Insurance binder delivery timing misalignment
+
+Last-minute funding conditions
+
+7. Subcontractor Task Fulfillment
+Ownership: Subcontractor (executor), Realtor/Seller (authorizer), Inspector (validator)
+
+Entry Point
+Repair request assignment after inspection
+
+Pre-listing improvement work order
+
+Key Decisions
+Repair scope and pricing acceptance
+
+Scheduling priority relative to transaction timeline
+
+Quality verification method and acceptance criteria
+
+Invoice submission and payment approval process
+
+Role Handoffs
+Realtor → Subcontractor (work order issuance)
+
+Subcontractor → Inspector (re-inspection request)
+
+Subcontractor → Title Company (lien waiver submission)
+
+Subcontractor → Attorney (invoice for escrow payment)
+
+Data Created/Consumed
+Created: Estimates, work orders, completion photos, invoices, lien waivers
+
+Consumed: Inspection reports, property access instructions, deadline constraints, payment terms
+
+Moments of Friction to Eliminate
+Unclear repair scope leading to change orders
+
+Property access coordination difficulties
+
+Delayed quality verification holding up contingencies
+
+Payment processing delays affecting subcontractor cash flow
+
+Missing lien waivers preventing closing
+
+Cross-Journey Orchestration Principles
+Critical Synchronization Points
+Contract to Contingency: All parties must align on contingency clock start
+
+Inspection to Repair: Repair scope must be agreed before contingency deadline
+
+Appraisal to Renegotiation: Appraisal results may trigger price renegotiation
+
+Clear-to-Close to Scheduling: All parties must coordinate closing date availability
+
+Funding to Recording: Funding must precede recording, recording must precede possession
+
+Data Integrity Requirements
+Single source of truth for deadlines and milestone dates
+
+Document version control with audit trail
+
+Role-based access to sensitive financial information
+
+Automated notification when dependent tasks complete
+
+Friction Elimination Priorities
+Automated deadline propagation when one date changes
+
+Centralized document repository with role-specific views
+
+Status dashboard showing entire transaction from multiple role perspectives
+
+Communication audit trail preventing "he said/she said" disputes
+
+Mobile-friendly task completion for field work (inspections, repairs, showings)
+
+System Imperative: The CRM must make the complex feel coordinated, not chaotic. Every participant should know their responsibility, their timeline, and who to contact when questions arise—without overwhelming them with irrelevant information.
+

@@ -1,0 +1,591 @@
+Object Model (CRM Entities)
+
+Global Navigation Architecture: "Progressive Disclosure Navigation"
+Core Principle
+"Show users only what they need, when they need it. Navigation should adapt to role, context, and transaction phase."
+
+1. Top-Level Navigation (Persistent Across All Screens)
+Primary Zone (Left Rail - Always Visible)
+text
+[Dashboard] → Role-specific landing view
+[Search] → Universal object search (people, properties, transactions)
+[Notifications] → Timeline of relevant updates
+[Help] → Contextual help + quick tutorials
+Context Zone (Center - Adapts to Current Work)
+Dynamically changes based on active object or task:
+
+When viewing a Transaction: [Timeline] [Documents] [Tasks] [Contacts]
+
+When viewing a Property: [Details] [Gallery] [Comparables] [History]
+
+When viewing a Person: [Profile] [Activity] [Documents] [Notes]
+
+Action Zone (Top Right - User-Specific)
+text
+[Quick Create] → Context-aware creation menu
+[User Menu] → Profile, settings, role switching
+[View Toggle] → Density, layout, focus mode
+2. Contextual Navigation Rules
+Rule 1: Object-First Navigation
+text
+Click object (person, property, transaction) → Reveals object-specific navigation
+Leave object context → Returns to primary navigation
+Rule 2: Phase-Based Menu Items
+Transaction menu items appear/disappear based on phase:
+
+Pre-offer: [Comparables] [Market Analysis] [Showing Schedule]
+
+Active: [Timeline] [Contingencies] [Documents] [Communications]
+
+Closing: [Settlement] [Funding] [Recording]
+
+Post-Close: [Follow-up] [Referral] [Archive]
+
+Rule 3: Role-Prioritized Actions
+Each role sees 3-5 most frequent actions first:
+
+Realtor: [New Listing] [Schedule Showing] [Generate Offer]
+
+Buyer: [Save Property] [Ask Question] [Upload Document]
+
+Attorney: [Review Contract] [Update Status] [Request Signature]
+
+Rule 4: Progressive Disclosure
+Less frequent actions live behind "More" menus:
+
+Primary actions: Always visible
+
+Secondary actions: Visible in context
+
+Tertiary actions: Behind "⋯" menu
+
+3. Feature Appearance/Disappearance by Role
+Realtor (Full Navigation)
+Always Visible:
+
+Dashboard (pipeline view)
+
+Transactions (all stages)
+
+Properties (listings + saved)
+
+Contacts (clients + network)
+
+Marketing (campaigns + leads)
+
+Contextual Appearance:
+
+Commission calculator (when viewing transaction)
+
+CMA generator (when viewing property)
+
+Document templates (when creating offer)
+
+Never Shown:
+
+Mortgage application forms
+
+Title search interfaces
+
+Insurance quoting tools
+
+Buyer/Seller (Limited Navigation)
+Always Visible:
+
+My Dashboard (status view)
+
+My Properties (saved/listed)
+
+My Documents
+
+Messages
+
+Contextual Appearance:
+
+Offer forms (when property is in "active" state)
+
+Inspection scheduling (after offer acceptance)
+
+Closing checklist (in final 2 weeks)
+
+Never Shown:
+
+Other clients' information
+
+Realtor commission details
+
+Market analytics tools
+
+Closing Attorney (Focused Navigation)
+Always Visible:
+
+Active Closings
+
+Document Manager
+
+Calendar (recording dates)
+
+Contextual Appearance:
+
+Title search (when opening new closing)
+
+Settlement calculator (when viewing transaction)
+
+Recording status (post-closing)
+
+Never Shown:
+
+Showing schedules
+
+Marketing tools
+
+Lead management
+
+Mortgage Broker (Streamlined Navigation)
+Always Visible:
+
+My Applications
+
+Document Requests
+
+Underwriting Status
+
+Contextual Appearance:
+
+Appraisal ordering (after application submitted)
+
+Clear-to-close checklist (before closing)
+
+Never Shown:
+
+Property management tools
+
+Legal document drafting
+
+Commission tracking
+
+4. Anti-Patterns to Avoid
+Navigation Anti-Patterns
+Never: Hamburger menus on desktop (hidden navigation)
+
+Never: More than 7 top-level items at once
+
+Never: Nested flyout menus more than 2 levels deep
+
+Never: Context switching without clear breadcrumbs
+
+Never: Modal navigation (losing context)
+
+Feature Visibility Anti-Patterns
+Never: Show all features to all users ("toolbar soup")
+
+Never: Hide frequently used features
+
+Never: Change navigation location mid-task
+
+Never: Auto-hide critical navigation during input
+
+Never: Require more than 3 clicks to frequent destinations
+
+Role Management Anti-Patterns
+Never: Show users features they can't access
+
+Never: Require role switching for basic tasks
+
+Never: Create "admin" views that are just all features enabled
+
+Never: Hard-code role permissions in UI instead of data layer
+
+Why This Structure Prevents CRM Bloat
+1. Feature Hiding by Design
+80% of users use 20% of features daily → Show only that 20% prominently
+
+Advanced features exist but don't clutter primary navigation
+
+New features enter via "Labs" section before promotion to main nav
+
+2. Role-Based Feature Allocation
+Mortgage tools don't burden Realtors
+
+Marketing tools don't confuse Buyers
+
+Each role sees a "purpose-built" CRM for their job
+
+3. Contextual Revelation
+Document templates appear when creating documents
+
+CMA tools appear when viewing properties
+
+Closing calculators appear near closing dates
+
+Features appear when needed, disappear when not
+
+4. Progressive Complexity
+New users see basic navigation (3-4 main items)
+
+As they learn, more features become available
+
+Power users can enable "advanced mode" for everything
+
+No one is overwhelmed on day one
+
+5. Metrics-Driven Pruning
+Navigation items track usage frequency
+
+Features used by <5% of role after 90 days get demoted to "More"
+
+Unused features (>6 months) get archived or removed
+
+Navigation evolves based on actual use, not feature checklist
+
+6. Unified Search as Safety Net
+If users can't find something in navigation, they can search
+
+Search results educate about feature location
+
+Navigation can stay lean because search handles edge cases
+
+7. Task-Based Over Function-Based
+"Schedule a showing" not "Calendar module"
+
+"Create an offer" not "Documents module"
+
+"Update closing status" not "Transaction admin"
+
+Users think in tasks, navigation should match
+
+Architecture Promise: "This CRM will never become a cluttered toolbar of every possible feature. Instead, it will feel like a custom-built tool for your specific role and current task, revealing depth only as you're ready for it."
+
+Core Object Model: "Transaction-Centric Relationship Graph"
+Design Principle
+"All objects orbit around Transactions. People interact with Properties through Transactions, creating Documents, Tasks, and Events along the way."
+
+1. People
+Purpose
+Represent all human entities in the ecosystem: clients, professionals, service providers, and contacts.
+
+Key Attributes
+person_id (universal identifier)
+
+role_types[] (multi-role support: can be buyer+agent)
+
+contact_preferences (how/when to contact)
+
+relationship_network (connections to other people)
+
+compliance_flags (KYC, disclosures signed)
+
+Lifecycle Stages
+prospect → active_client → past_client → referral_source
+
+Relationships
+Many-to-many with Transactions (people participate in transactions)
+
+One-to-many with Properties (people own properties)
+
+Many-to-many with People (professional networks, referrals)
+
+One-to-many with Documents (people sign/create documents)
+
+CRUD Permissions
+Create: Any authenticated user (with validation)
+
+Edit: Owner + assigned agents + admins
+
+View: Based on transaction participation and privacy rules
+
+Delete: System admins only (soft delete with archive)
+
+2. Properties
+Purpose
+Physical real estate assets being bought, sold, rented, or managed.
+
+Key Attributes
+property_id (universal identifier)
+
+physical_characteristics (beds, baths, sqft, lot size)
+
+financial_attributes (value, taxes, HOA, rental income)
+
+ownership_history (chain of title)
+
+media_assets (photos, videos, floorplans, 3D tours)
+
+Lifecycle Stages
+pre_listing → active_listing → under_contract → sold → off_market
+
+Relationships
+One-to-many with People (owners, occupants)
+
+One-to-many with Transactions (properties transact)
+
+One-to-many with Documents (deeds, disclosures, inspections)
+
+Many-to-many with Properties (comparables, portfolio groupings)
+
+CRUD Permissions
+Create: Licensed agents + system integrations (MLS)
+
+Edit: Listing agent + owner (limited) + admins
+
+View: Public (basic), Authenticated (detailed), Transaction participants (full)
+
+Delete: System admins only (with legal review)
+
+3. Transactions
+Purpose
+The central unit of work: a real estate deal in progress or completed.
+
+Key Attributes
+transaction_id (universal identifier)
+
+current_phase (lead → listing → contract → closing → post_close)
+
+financial_terms (price, commissions, credits, adjustments)
+
+contingency_status (inspection, financing, appraisal, sale)
+
+timeline_milestones (critical dates and deadlines)
+
+Lifecycle Stages
+lead → qualified → active → pending → closed → archived
+
+Relationships
+Many-to-many with People (all parties involved)
+
+One-to-many with Properties (primary property + comparables)
+
+One-to-many with Documents (all transaction documents)
+
+One-to-many with Tasks (transaction-specific to-dos)
+
+One-to-many with Events (transaction timeline)
+
+One-to-many with Messages (transaction communications)
+
+CRUD Permissions
+Create: Licensed agents + system conversions (from lead)
+
+Edit: Assigned agents + transaction coordinator + limited by phase
+
+View: All transaction participants (role-filtered views)
+
+Delete: Never (transactions archive but never delete for legal reasons)
+
+4. Leads
+Purpose
+Potential future transactions before formal engagement.
+
+Key Attributes
+lead_id (universal identifier)
+
+source_attribution (how/where lead originated)
+
+qualification_score (automated + manual scoring)
+
+engagement_history (interactions and responsiveness)
+
+conversion_prediction (likelihood to transact + timeline)
+
+Lifecycle Stages
+new → contacted → nurturing → qualified → converted → lost
+
+Relationships
+One-to-one with People (lead is a person)
+
+One-to-many with Transactions (lead may convert to multiple transactions over time)
+
+One-to-many with Messages (lead communications)
+
+One-to-many with Events (lead activity)
+
+CRUD Permissions
+Create: Anyone (forms, integrations, manual entry)
+
+Edit: Assigned agent + marketing team
+
+View: Assigned agent + team members + marketing
+
+Delete: Marketing admins (with archive for compliance)
+
+5. Tasks
+Purpose
+Action items that move transactions forward.
+
+Key Attributes
+task_id (universal identifier)
+
+task_type (communication, document, coordination, follow-up)
+
+priority_level (critical, high, medium, low)
+
+dependencies (other tasks that must complete first)
+
+completion_evidence (what proves task is done)
+
+Lifecycle Stages
+pending → assigned → in_progress → completed → verified
+
+Relationships
+Many-to-one with Transactions (most tasks belong to transactions)
+
+Many-to-one with People (assigned to and created by people)
+
+Many-to-one with Properties (property-specific tasks)
+
+One-to-many with Documents (tasks may require document creation/review)
+
+CRUD Permissions
+Create: Any transaction participant
+
+Edit: Creator + assignee + supervisors
+
+View: Transaction participants + anyone mentioned/assigned
+
+Delete: Creator + admins (soft delete with reason log)
+
+6. Documents
+Purpose
+Legal forms, disclosures, contracts, and supporting files.
+
+Key Attributes
+document_id (universal identifier)
+
+document_type (contract, disclosure, addendum, report, etc.)
+
+legal_status (draft, pending_review, executed, archived)
+
+signature_requirements (who must sign + in what order)
+
+version_history (complete audit trail of changes)
+
+Lifecycle Stages
+draft → review → pending_signature → executed → filed
+
+Relationships
+Many-to-one with Transactions (documents belong to transactions)
+
+Many-to-many with People (authors, signers, reviewers)
+
+Many-to-one with Properties (property-specific documents)
+
+One-to-many with Events (document events: created, signed, viewed)
+
+CRUD Permissions
+Create: Licensed agents + attorneys + system templates
+
+Edit: Creators + authorized reviewers (with version control)
+
+View: Transaction participants + legal requirement-based access
+
+Delete: Never (documents preserve indefinitely for legal compliance)
+
+7. Events
+Purpose
+Temporal occurrences in the transaction lifecycle (from Unified Event Model).
+
+Key Attributes
+event_id (universal identifier)
+
+event_timestamp (when it occurred)
+
+event_type (communication, action, milestone, system, decision)
+
+event_context (which phase/context it belongs to)
+
+visibility_rules (who can see this event)
+
+Lifecycle Stages
+scheduled → occurred → logged → processed
+
+Relationships
+Many-to-one with Transactions (events belong to transactions)
+
+Many-to-one with People (actors and subjects)
+
+Many-to-one with Properties (property events)
+
+Many-to-one with Documents (document lifecycle events)
+
+CRUD Permissions
+Create: System automation + manual entry by participants
+
+Edit: Owner + system corrections (with audit trail)
+
+View: Role-filtered based on visibility rules
+
+Delete: Never (events preserve audit trail; can be hidden but not deleted)
+
+8. Messages
+Purpose
+Communications between parties (email, SMS, in-app messages).
+
+Key Attributes
+message_id (universal identifier)
+
+communication_channel (email, sms, in-app, phone_log)
+
+message_direction (inbound, outbound, internal)
+
+delivery_status (sent, delivered, read, failed)
+
+thread_context (conversation threading)
+
+Lifecycle Stages
+composing → sent → delivered → read → archived
+
+Relationships
+Many-to-one with Transactions (most messages relate to transactions)
+
+Many-to-many with People (senders and recipients)
+
+One-to-many with Documents (messages may contain attachments)
+
+One-to-one with Events (every message creates a communication event)
+
+CRUD Permissions
+Create: Any authenticated user (within relationship boundaries)
+
+Edit: Sender (before sending only) + system (delivery status)
+
+View: Sender + recipients + transaction participants (context-based)
+
+Delete: Never (communications preserve for legal compliance; can archive)
+
+Relationship Graph Summary
+text
+TRANSACTION (center)
+    │
+    ├── PERSONS (buyers, sellers, agents, attorneys, lenders)
+    │       └── PEOPLE ↔ PEOPLE (networks, referrals)
+    │
+    ├── PROPERTY (subject property)
+    │       └── PROPERTY ↔ PROPERTY (comparables)
+    │
+    ├── LEAD (source, if applicable)
+    │
+    ├── TASKS (action items)
+    │
+    ├── DOCUMENTS (contracts, forms)
+    │       └── PEOPLE (signers, authors)
+    │
+    ├── EVENTS (timeline)
+    │       └── PEOPLE (actors, participants)
+    │
+    └── MESSAGES (communications)
+            └── PEOPLE (senders, recipients)
+Core Object Principles
+Transaction-Centric: Everything relates back to a transaction
+
+Person-Focused: People are first-class entities, not just contact info
+
+Immutable History: Critical objects never delete, only archive
+
+Role-Filtered Views: Same objects, different visibility per role
+
+Lifecycle Aware: Objects understand their stage and behave accordingly
+
+Relationship-Rich: Objects know their connections to other objects
+
+Model Promise: "This isn't a database of separate tables; it's a living graph of relationships that mirrors how real estate actually works. Every object knows its context, its relationships, and its purpose in moving transactions forward."
+

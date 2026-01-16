@@ -1,0 +1,238 @@
+GOVERNED UPGRADE UX
+
+Capability-Based, Timeline-Safe, Non-Intrusive
+
+1️⃣ UPGRADE UX PRINCIPLES (NON-NEGOTIABLE)
+
+🚫 No blocking workflows
+
+🚫 No surprise limits
+
+🚫 No feature lockouts mid-action
+
+🚫 No pricing banners everywhere
+
+✔ Upgrade only when value is experienced
+
+✔ Upgrade always explains why
+
+✔ Upgrade is reversible
+
+Rule of thumb:
+
+If a user notices pricing before value, the UX failed.
+
+2️⃣ WHERE UPGRADE UX IS ALLOWED (AND WHERE IT IS NOT)
+✅ Allowed Locations
+
+Inline helper copy
+
+Empty states
+
+Soft limits notices
+
+Drawer footers
+
+Settings → Billing (explicit intent)
+
+🚫 Forbidden Locations
+
+Timeline items
+
+Primary action buttons
+
+Modals blocking core actions
+
+Role-based UI branches
+
+Buyer/Seller views
+
+3️⃣ THE CORE UPGRADE PATTERN (CANONICAL)
+Pattern Name
+
+Capability Boundary Notice
+
+Structure
+[Contextual Capability]
+→ Gentle Explanation
+→ Optional Action
+
+
+No popups. No alarms.
+
+4️⃣ CANONICAL EXAMPLES (COPY + BEHAVIOR)
+A️⃣ Transaction Volume Boundary (Foundation → Growth)
+
+When triggered
+
+User exceeds ~20 active transactions (soft)
+
+Where
+
+TransactionsScreen footer
+
+Settings → Account Overview
+
+Copy
+
+“You’re managing a growing number of active transactions.
+Growth helps you keep them organized with milestones and health indicators.”
+
+Actions
+
+[Learn about Growth]
+
+[Upgrade now]
+
+[Dismiss]
+
+🔒 No action is blocked
+🔒 No forced decision
+
+B️⃣ Automation Boundary (Growth → Scale)
+
+When triggered
+
+User attempts to enable automation
+
+Where
+
+Drawer footer (never modal)
+
+Copy
+
+“Automated follow-ups are available on Scale.
+They help reduce manual reminders without losing control.”
+
+Actions
+
+[Try Scale free for 7 days]
+
+[View plans]
+
+🔒 User can still close drawer
+🔒 No automation silently runs
+
+C️⃣ Intelligence Signals Boundary (Growth → Scale)
+
+When triggered
+
+User views Transaction Health badge details
+
+Where
+
+Inline explanation below badge
+
+Copy
+
+“This signal is available on Scale and explains why a deal may be at risk.”
+
+Actions
+
+[Unlock Scale insights]
+
+🔒 No hidden data
+🔒 No misleading previews
+
+5️⃣ SETTINGS → BILLING (EXPLICIT INTENT ONLY)
+This is the only place with full pricing comparison.
+
+Rules
+
+No feature matrices longer than one screen
+
+Capabilities described in plain language
+
+No “recommended” badge
+
+No countdowns
+
+No urgency copy
+
+Structure
+
+Your Current Capability
+→ What You Can Do Today
+→ What You Could Do Next
+→ Upgrade / Downgrade
+
+6️⃣ TRIAL UX (HIGH-CONVERSION, GOVERNED)
+Trial Rules
+
+One-click trial
+
+No credit card change mid-trial
+
+Clear start + end dates
+
+Automatic downgrade (with warning)
+
+Trial Copy
+
+“Try Growth for 14 days.
+You’ll return to Foundation automatically unless you choose otherwise.”
+
+This builds trust.
+
+7️⃣ DOWNGRADE UX (OFTEN IGNORED — CRITICAL)
+Rules
+
+Downgrade always available
+
+No punishment
+
+No data loss
+
+No scary warnings
+
+Copy
+
+“You’ll keep all your data.
+Some advanced capabilities will stop running.”
+
+🔒 Events remain immutable
+🔒 Timeline remains intact
+
+8️⃣ GOVERNANCE ENFORCEMENT CHECKLIST
+
+Before shipping any upgrade-related UI:
+
+☐ No new screen added
+
+☐ No primary workflow blocked
+
+☐ Copy explains value, not price
+
+☐ No plan-based UI forks
+
+☐ AI UX Review approved
+
+Failure = rejection.
+
+9️⃣ WHY THIS UX WORKS (STRATEGICALLY)
+
+Converts after value is felt
+
+Reduces churn from resentment
+
+Encourages organic upgrades
+
+Scales with roadmap
+
+Keeps buyers/sellers invisible to pricing
+
+This is anti-CRM pricing UX — and that’s why it wins.
+
+🏁 FINAL SUMMARY
+
+This upgrade UX:
+
+Feels human
+
+Respects professionals
+
+Preserves governance
+
+Maximizes LTV without manipulation
+
+Is extremely hard for competitors to copy

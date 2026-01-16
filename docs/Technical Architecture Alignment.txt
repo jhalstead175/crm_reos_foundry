@@ -1,0 +1,423 @@
+Technical Architecture Alignment
+
+Scalable Technical Architecture: "Chronos CRM"
+Guiding Principles
+Feature-first, not framework-first: Choose boring, proven technology
+
+Progressive enhancement: Start simple, add complexity only when proven
+
+Transaction isolation: Each transaction is a bounded context
+
+Role-simple, not role-complex: Auth at edge, not in business logic
+
+Frontend Architecture
+Framework & Approach
+Single-Page Application (SPA) using React 18 with TypeScript
+
+Why React: Largest ecosystem, predictable rendering, excellent TypeScript support
+
+No Next.js/Remix: MVP doesn't need SSR, static generation, or complex routing
+
+Vite for build tooling: Faster dev server, simpler config than Webpack
+
+Core Frontend Structure
+text
+src/
+├── /components          # Reusable UI components
+│   ├── /core           # Button, Input, Card, etc.
+│   ├── /domain         # TransactionCard, DocumentPreview, etc.
+│   └── /layout         # Navigation, Sidebar, etc.
+├── /hooks              # Custom React hooks
+├── /lib                # Utilities, API client, auth helpers
+├── /pages              # Screen components (one per MVP screen)
+├── /stores             # Zustand state management
+└── /types              # TypeScript definitions
+State Management
+Zustand for global state (simpler than Redux, scales well)
+
+React Query for server state (caching, background updates)
+
+Local component state for UI-only concerns
+
+Key Decisions
+No CSS-in-JS: Plain CSS with BEM methodology (faster dev, easier maintenance)
+
+No component library: Build our own minimal set (control, consistency)
+
+Client-side routing: React Router 6 (simple, declarative)
+
+Code splitting by route: Each screen loads independently
+
+Performance Baseline
+Initial bundle < 200KB gzipped
+
+Time to Interactive < 3 seconds on 3G
+
+Core interaction latency < 100ms
+
+Backend Architecture
+Core Philosophy
+Monolith first, services when proven. Start with a single Rails/Django app, split only when:
+
+Team size > 20 engineers
+
+Clear domain boundaries emerge
+
+Specific scaling needs (document processing, real-time)
+
+Technology Stack
+Python/Django with Django REST Framework
+
+Why Django: Batteries-included, excellent admin, strong ORM, mature ecosystem
+
+PostgreSQL with JSONB fields for flexible schema evolution
+
+Redis for caching, sessions, and real-time pub/sub
+
+Service Boundaries (Initial Monolith)
+text
+app/
+├── /api                # REST endpoints
+├── /models             # Database models (Django ORM)
+├── /services           # Business logic (transaction coordination)
+├── /automations        # Simple if/then rules
+├── /events             # Event publishing/handling
+├── /utils              # Shared utilities
+└── /management         # Django admin commands
+API Design
+RESTful for CRUD operations (predictable, easy to understand)
+
+GraphQL considered but rejected for MVP (overkill, complexity)
+
+Versioning: URL versioning (/api/v1/transactions)
+
+Pagination: Cursor-based for lists, not offset/limit
+
+Rate limiting: Simple Redis-based per user/IP
+
+Database Schema Principles
+Single transactions table with JSONB for flexible metadata
+
+Event sourcing lite: Append-only events table for audit trail
+
+Soft deletes only: Never hard delete user data
+
+Index strategically: Start with obvious indexes, add based on query patterns
+
+Authentication & Role Enforcement
+Auth Flow
+Email/password only for MVP (no social login)
+
+JWT tokens stored in httpOnly cookies (secure, simple)
+
+Refresh token rotation for security
+
+Role System
+python
+# Simple role hierarchy
+ROLES = {
+    'admin': 100,      # Can do everything
+    'agent': 80,       # Full transaction access
+    'attorney': 60,    # Closing documents only
+    'lender': 50,      # Loan-related items only
+    'client': 30,      # Own transactions only
+    'viewer': 10,      # Read-only access
+}
+Permission Enforcement
+Edge-based, not inline:
+
+python
+# Decorator-based permission checking
+@require_role(['agent', 'admin'])
+def create_transaction(request):
+    # Business logic here, no permission checks needed
+    
+# View-level filtering
+def get_transactions_for_user(user):
+    if user.role == 'agent':
+        return Transaction.objects.filter(participants__user=user)
+    elif user.role == 'client':
+        return Transaction.objects.filter(client=user)
+Key Decisions
+No complex RBAC: Simple role hierarchy meets 90% of needs
+
+No attribute-based access control (ABAC): Too complex for MVP
+
+Transaction participants override roles: If you're in transaction, you get access
+
+Audit all permission failures: Log when users try to access forbidden resources
+
+Event System
+Design: Event Sourcing Lite
+Not full event sourcing, but event-focused architecture:
+
+python
+# Every state change creates an event
+class Event(models.Model):
+    transaction = ForeignKey(Transaction)
+    event_type = CharField(choices=EVENT_TYPES)
+    payload = JSONField()  # What happened
+    metadata = JSONField()  # Who, when, why
+    created_at = DateTimeField(auto_now_add=True)
+Event Types (from Unified Model)
+transaction.created
+
+document.uploaded
+
+message.sent
+
+task.completed
+
+milestone.reached
+
+Event Processing
+python
+# Simple pub/sub with Django signals
+@receiver(post_save, sender=Document)
+def document_created(sender, instance, created, **kwargs):
+    if created:
+        Event.objects.create(
+            transaction=instance.transaction,
+            event_type='document.uploaded',
+            payload={'document_id': instance.id, 'type': instance.document_type}
+        )
+        # Trigger any automations
+        check_automations(instance.transaction, 'document.uploaded')
+Event Consumption
+Timeline generation: Query events, order by timestamp
+
+Notification system: Watch for important events
+
+Analytics: Aggregate events for reporting
+
+Audit trail: Immutable record of what happened
+
+Automation Engine
+Philosophy: "If This, Then That" for Real Estate
+Start with simple, predictable automations. No AI, no machine learning.
+
+Automation Rules Schema
+python
+class AutomationRule(models.Model):
+    trigger_event = CharField()  # 'document.uploaded'
+    trigger_condition = JSONField()  # {"document_type": "inspection_report"}
+    action_type = CharField()  # 'create_task', 'send_notification', 'update_status'
+    action_config = JSONField()  # {"task_title": "Review inspection", "assign_to": "agent"}
+    is_active = BooleanField(default=True)
+Built-in Automations (MVP)
+Offer accepted → Create inspection deadline task
+
+Inspection completed → Create repair negotiation window
+
+All contingencies released → Update status to "pending"
+
+Closing documents signed → Create recording task
+
+Transaction closed → Create post-close follow-up task
+
+Execution Engine
+python
+def execute_automations(transaction, event_type, event_data):
+    rules = AutomationRule.objects.filter(
+        trigger_event=event_type,
+        is_active=True
+    )
+    
+    for rule in rules:
+        if check_conditions(rule.trigger_condition, event_data):
+            execute_action(rule.action_type, rule.action_config, transaction)
+Key Constraints
+No recursion prevention: Automations can't trigger other automations
+
+No external APIs: Only internal actions (no calling third parties)
+
+Manual override: Users can cancel/undo automation actions
+
+Simple conditions only: No complex boolean logic
+
+Audit-Light Logging
+What We Log (Non-Regulatory)
+python
+# Django middleware for request logging
+class AuditMiddleware:
+    def process_request(self, request):
+        if request.user.is_authenticated:
+            AuditLog.objects.create(
+                user=request.user,
+                path=request.path,
+                method=request.method,
+                # Don't log request body (PII risk)
+                ip_address=get_client_ip(request)
+            )
+Log Categories
+Access logs: Who accessed what (for debugging)
+
+Permission failures: Security monitoring
+
+Automation executions: For transparency
+
+Error logs: System issues
+
+Performance logs: Slow queries, high latency endpoints
+
+What We DON'T Log
+Request/response bodies: Too much PII risk
+
+User passwords/keys: Never
+
+Full document contents: Only metadata
+
+Message content: Only sender/receiver/timestamp
+
+Log Storage & Retention
+PostgreSQL for structured logs (searchable)
+
+7-day retention: Enough for debugging, not forever
+
+Anonymize IPs after 24 hours: Privacy protection
+
+No log aggregation service: Simple database queries only
+
+Deployment & Infrastructure
+Initial Setup (MVP)
+Single server: DigitalOcean/AWS EC2 (4GB RAM, 2 vCPU)
+
+PostgreSQL: Managed service (AWS RDS or DigitalOcean Managed DB)
+
+Redis: Managed service (ElastiCache or equivalent)
+
+Storage: S3-compatible for documents (DigitalOcean Spaces)
+
+CDN: Cloudflare for static assets
+
+Deployment Strategy
+Docker containers: For consistency
+
+Docker Compose: For local development
+
+Simple CI/CD: GitHub Actions → Build → Deploy
+
+Blue/green deployment: When traffic justifies it
+
+Monitoring
+Uptime: Basic ping monitoring
+
+Errors: Sentry.io for error tracking
+
+Performance: Datadog if budget allows, otherwise simple metrics
+
+Business metrics: Custom dashboard (transactions created, messages sent, etc.)
+
+Scaling Strategy
+Phase 1: MVP (0-1000 users)
+Single Django monolith
+
+Single PostgreSQL database
+
+Everything on one server
+
+Phase 2: Growth (1000-10,000 users)
+Separate read replicas for PostgreSQL
+
+Background job queue (Celery + Redis)
+
+Separate document processing service if needed
+
+CDN for documents if S3 bandwidth costs rise
+
+Phase 3: Scale (>10,000 users)
+Split by domain: Transactions service, Documents service, Messaging service
+
+Event-driven architecture: Kafka for event bus
+
+Caching layer: Redis cluster
+
+Database sharding: By transaction ID or region
+
+Key Scaling Decisions Deferred
+Microservices: Not until clear domain boundaries
+
+GraphQL: Not until complex query patterns emerge
+
+Real-time features: WebSockets only when proven valuable
+
+Mobile apps: React Native only when web mobile usage > 30%
+
+Development Workflow
+Local Development
+text
+docker-compose up  # Starts PostgreSQL, Redis, Django, React
+Testing Strategy
+Unit tests: Django tests for backend, Jest for frontend
+
+Integration tests: API endpoints with realistic data
+
+No E2E tests initially: Manual testing for MVP
+
+Snapshot testing: For React components
+
+Code Quality
+Pre-commit hooks: Black (Python), Prettier (JS/TS), ESLint
+
+TypeScript strict mode: From day one
+
+Code reviews required: For all changes
+
+Simple documentation: README per module, no over-engineering
+
+Risk Mitigation
+Technical Risks
+PostgreSQL JSONB performance: Monitor query times, add indexes
+
+JWT token invalidation: Short expiry + refresh tokens
+
+File upload security: Virus scanning deferred to Phase 2
+
+Real-time updates: Polling initially, WebSockets later
+
+Business Risks
+Data loss: Daily backups from day one
+
+Security breaches: Simple but secure (HTTPS, password hashing, CSRF protection)
+
+Performance degradation: Monitor key endpoints, add caching
+
+Vendor lock-in: Avoid proprietary services where possible
+
+Why This Architecture Works for MVP
+1. Fast Iteration
+Django admin for quick data fixes
+
+Hot reload for frontend development
+
+Simple deployment (git push → deploy)
+
+2. Predictable Scaling
+Start with monolith, split when needed
+
+Clear upgrade path for each component
+
+No premature optimization
+
+3. Maintainable
+TypeScript + Python = type safety
+
+Simple patterns, no cleverness
+
+Clear separation of concerns
+
+4. Cost Effective
+Low server costs initially
+
+No expensive third-party services
+
+Open source stack
+
+5. Team-Friendly
+Common technologies (React, Django, PostgreSQL)
+
+Easy to hire for
+
+Good documentation available
+
+Architecture Promise: "We'll build something simple that works today and can evolve tomorrow. No over-engineering, no future-proofing, just solid foundations that won't collapse under their own complexity."

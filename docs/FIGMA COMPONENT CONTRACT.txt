@@ -1,0 +1,289 @@
+FIGMA COMPONENT CONTRACT
+
+Real Estate Multi-Party CRM (Non-Visual)
+
+SECTION 1 — PURPOSE & AUTHORITY
+
+1.1 Purpose
+This contract defines the allowed structure of all Figma components used in the CRM.
+Its goal is to:
+
+Prevent visual and structural drift
+
+Enforce UI reuse
+
+Maintain cognitive consistency across roles and workflows
+
+1.2 Authority
+No component may be introduced, modified, or extended unless it complies with this contract.
+
+SECTION 2 — COMPONENT HIERARCHY (MANDATORY)
+
+All Figma components MUST belong to exactly one of the following layers:
+
+L1 — Primitives
+
+Text
+
+Icon
+
+Spacing
+
+Divider
+
+Status indicator
+
+🔒 Rules:
+
+Never context-aware
+
+No business logic
+
+No role variance
+
+L2 — Elements
+
+Examples:
+
+Button
+
+Input
+
+Select
+
+Toggle
+
+Badge
+
+🔒 Rules:
+
+Stateless or minimally stateful
+
+Variants allowed ONLY via tokens
+
+No layout responsibility
+
+L3 — Blocks
+
+Examples:
+
+Card
+
+List Row
+
+Timeline Event
+
+Property Summary
+
+Person Summary
+
+🔒 Rules:
+
+May compose L1 + L2 only
+
+Single responsibility
+
+No cross-object logic
+
+L4 — Sections
+
+Examples:
+
+Activity Timeline
+
+Task Panel
+
+Document Panel
+
+Transaction Summary
+
+🔒 Rules:
+
+Context-aware
+
+Object-bound (Transaction, Property, etc.)
+
+No navigation control
+
+L5 — Screens
+
+Examples:
+
+Transaction View
+
+Lead Detail
+
+Property Overview
+
+🔒 Rules:
+
+No new visual primitives
+
+Must be assembled entirely from L3 + L4
+
+No component logic inside screens
+
+❌ Fail Condition
+Any component that spans multiple layers.
+
+SECTION 3 — NAMING CONVENTIONS (STRICT)
+
+All components MUST follow this pattern:
+
+[LAYER] / [OBJECT] / [PURPOSE] / [VARIANT]
+
+Examples:
+
+Block / Transaction / Summary / Default
+
+Element / Button / Primary / Disabled
+
+Section / Timeline / Activity / Compact
+
+❌ Prohibited:
+
+Creative names
+
+Role names in component names
+
+Visual adjectives (“Fancy”, “Clean”)
+
+SECTION 4 — VARIANTS & TOKENS
+4.1 Allowed Variant Axes
+
+State (default, hover, active, disabled)
+
+Density (compact, standard)
+
+Emphasis (primary, secondary, muted)
+
+❌ Disallowed:
+
+Role-based variants
+
+Feature-based variants
+
+One-off overrides
+
+4.2 Token Discipline
+
+Components may ONLY vary via:
+
+Spacing tokens
+
+Typography intent tokens
+
+Color intent tokens
+
+Never hardcode values.
+
+SECTION 5 — COMPOSITION RULES
+
+5.1 Downward Dependency Only
+
+L5 may reference L4
+
+L4 may reference L3
+
+L3 may reference L2
+
+L2 may reference L1
+
+❌ No lateral or upward dependency.
+
+5.2 No Visual Overrides in Screens
+Screens may not override:
+
+Padding
+
+Typography
+
+Color
+
+Layout behavior
+
+If override is required → component must be extended at its native layer.
+
+SECTION 6 — ROLE & STATE HANDLING
+
+6.1 Role Differences
+
+Roles affect visibility, not structure
+
+Never fork components by role
+
+Role logic lives in data, not design
+
+6.2 States
+Every component must define:
+
+Empty
+
+Loading (if async)
+
+Error (if actionable)
+
+No “happy path only” components allowed.
+
+SECTION 7 — EXTENSION PROCESS (CONTROLLED)
+To introduce a new component:
+
+Identify the correct layer
+
+Attempt reuse first
+
+Document why reuse fails
+
+Propose new component with:
+
+Purpose
+
+Scope
+
+Expected reuse
+
+Obtain governance approval
+
+SECTION 8 — DESIGN REVIEW CHECKLIST
+
+Before handoff, designers must confirm:
+
+☐ Component layer is correct
+
+☐ Naming convention followed
+
+☐ Variants are allowed
+
+☐ No visual overrides
+
+☐ Reuse evaluated
+
+☐ States included
+
+🚫 Failure = Rework Required
+
+SECTION 9 — HANDOFF TO ENGINEERING
+
+Each Figma component must include:
+
+Component name
+
+Layer
+
+Purpose
+
+Expected props / inputs
+
+States
+
+Reuse candidates
+
+This allows 1:1 mapping to frontend components.
+
+SECTION 10 — ENFORCEMENT
+
+Components violating this contract are rejected
+
+Legacy components must be refactored
+
+No “temporary” exceptions without sunset date

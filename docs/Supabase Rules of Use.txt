@@ -1,0 +1,291 @@
+SUPABASE RULES OF USE
+
+Governed Real Estate CRM
+
+1️⃣ PURPOSE OF THIS DOCUMENT
+
+This document defines how Supabase may and may not be used in this product.
+
+Supabase is:
+
+✔ Infrastructure
+
+✔ Persistence
+
+✔ Authentication (identity only)
+
+✔ Storage
+
+✔ Optional realtime transport
+
+Supabase is NOT:
+
+🚫 Business logic
+
+🚫 UX decision-maker
+
+🚫 Workflow engine
+
+🚫 RBAC authority
+
+🚫 Product brain
+
+Any use outside these rules is a governance violation.
+
+2️⃣ AUTHENTICATION RULES (STRICT)
+Allowed
+
+Use Supabase Auth to authenticate users
+
+Accept JWTs as proof of identity only
+
+Use auth.uid() to map to internal users table
+
+Forbidden
+
+🚫 Storing roles in JWT claims
+
+🚫 Trusting provider metadata for permissions
+
+🚫 Branching UI logic based on token contents
+
+Canonical Rule
+
+The /me view is the sole authority for role and org.
+
+3️⃣ AUTHORIZATION & RLS RULES
+What RLS IS For
+
+Hard security boundaries
+
+Org isolation
+
+Ownership enforcement
+
+Preventing accidental data leaks
+
+What RLS IS NOT For
+
+🚫 Workflow enforcement
+
+🚫 Business rules
+
+🚫 Conditional UX logic
+
+🚫 Task logic
+
+🚫 Timeline logic
+
+RLS Complexity Rule
+
+If a policy takes more than ~10 lines or requires comments to understand, it is too complex and must be redesigned.
+
+4️⃣ DATA ACCESS PATTERN (MANDATORY)
+All Data Access Must Follow:
+Frontend Screen
+→ Domain Service
+→ Supabase Query
+→ RLS Safety Net
+
+
+🚫 No direct Supabase calls from:
+
+Components
+
+Blocks
+
+Sections
+
+Utilities
+
+5️⃣ EVENT-FIRST IMMUTABILITY (NON-NEGOTIABLE)
+Events Table Rules
+
+Events are append-only
+
+No updates
+
+No deletes
+
+No backfills
+
+No “fixing” data in place
+
+Correct Way to Correct History
+
+Create a new event that explains or supersedes the old one.
+
+6️⃣ TASKS ARE EVENTS (FOREVER)
+Rules
+
+There is no tasks table
+
+There is no task_status
+
+There is no is_overdue column
+
+All task behavior is:
+
+Derived
+
+Deterministic
+
+Computed at read-time
+
+Any attempt to add a task table is an automatic rejection.
+
+7️⃣ SCHEMA CHANGE RULES
+Allowed
+
+Additive changes (new tables, new columns)
+
+New indexes
+
+New views
+
+Forbidden
+
+🚫 Renaming columns in-place
+
+🚫 Changing meaning of existing fields
+
+🚫 Removing columns without migration plan
+
+🚫 “Temporary” schema hacks
+
+Migration Rule
+
+Every schema change requires a migration file and governance review.
+
+8️⃣ REALTIME RULES (IF / WHEN ENABLED)
+Allowed
+
+Broadcasting new events
+
+Timeline live updates
+
+Read-only subscriptions
+
+Forbidden
+
+🚫 Writing data via realtime
+
+🚫 Business logic in realtime handlers
+
+🚫 Realtime as a requirement for correctness
+
+Realtime must be optional sugar, not a dependency.
+
+9️⃣ STORAGE RULES (DOCUMENTS)
+Allowed
+
+Transaction-scoped documents
+
+Signed URLs
+
+Server-mediated uploads
+
+Forbidden
+
+🚫 Public buckets
+
+🚫 Direct client uploads without checks
+
+🚫 Storing non-transaction artifacts
+
+🔟 PERFORMANCE & QUERY RULES
+Required
+
+Indexed created_at
+
+Paginated timeline queries
+
+Explicit filters (person_id, transaction_id)
+
+Forbidden
+
+🚫 “SELECT *” in production services
+
+🚫 Unbounded timeline queries
+
+🚫 Client-side security filtering
+
+1️⃣1️⃣ ENVIRONMENT DISCIPLINE
+Rules
+
+Separate Supabase projects for:
+
+local
+
+staging
+
+production
+
+No shared keys
+
+No prod data in dev
+
+Violation = immediate incident.
+
+1️⃣2️⃣ AI & AUTOMATION RULES
+AI Agents
+
+Must follow same rules as humans
+
+May not create or alter RLS policies
+
+May not modify migrations without approval
+
+Generated SQL
+
+Must be reviewed
+
+Must be readable
+
+Must align with contracts
+
+1️⃣3️⃣ FAILURE MODES (AUTO-BLOCK)
+
+The following are automatic governance failures:
+
+🚫 Adding roles to JWT
+🚫 Adding task tables
+🚫 Encoding workflow in RLS
+🚫 Bypassing /me
+🚫 Direct Supabase calls from UI components
+🚫 Mutating events
+
+1️⃣4️⃣ ENFORCEMENT
+Enforcement Mechanisms
+
+PR checklist
+
+AI UX Governance Agent
+
+Migration review
+
+Founder veto
+
+No exceptions without:
+
+Written justification
+
+Sunset date
+
+Explicit approval
+
+🏁 SUMMARY
+
+These rules ensure:
+
+Supabase stays an accelerator, not a liability
+
+Your architecture remains intelligible
+
+RBAC stays enforceable
+
+UX remains coherent
+
+AI agents remain safe to use
+
+This is how you scale without losing control.

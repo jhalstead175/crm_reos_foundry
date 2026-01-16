@@ -1,0 +1,527 @@
+MVP Screen Inventory
+
+Minimum Screen Inventory for MVP
+Core Principle
+"One screen per core user task. No dashboard widgets. No 'settings' screens. Only what's needed to move transactions forward."
+
+1. Login / Role Selection
+Purpose
+Authenticate user and set role context for entire session.
+
+Primary User
+All users (Agents, Buyers, Sellers, etc.)
+
+Core Actions
+Email/password login
+
+Role selection (if user has multiple roles)
+
+Password reset flow
+
+Reused Components
+Form inputs (email, password)
+
+Button component
+
+Error message display
+
+Out of Scope
+Social login (Google, Facebook)
+
+Two-factor authentication
+
+"Remember me" functionality
+
+Onboarding tutorials
+
+2. Transaction List View
+Purpose
+See all transactions you're involved in, filtered by status.
+
+Primary User
+Agents (primary), Attorneys, Mortgage Brokers
+
+Core Actions
+Filter by status (Active, Pending, Closed)
+
+Search by address or client name
+
+Create new transaction
+
+Click to enter transaction detail
+
+Reused Components
+Card component (for each transaction)
+
+Filter controls
+
+Search input
+
+"New" button
+
+Out of Scope
+Custom saved views
+
+Bulk actions
+
+Drag-and-drop reordering
+
+Advanced sorting options
+
+Export to CSV/Excel
+
+3. Transaction Detail View
+Purpose
+Single source of truth for everything about a transaction.
+
+Primary User
+All transaction participants (role-specific views)
+
+Core Actions
+View transaction timeline
+
+Add new events/tasks
+
+Upload/view documents
+
+Send messages to participants
+
+Update transaction status
+
+Reused Components
+Timeline component
+
+Document list
+
+Message thread
+
+Participant avatars
+
+Status badge
+
+Out of Scope
+Custom field configuration
+
+Transaction cloning
+
+Advanced permission editing
+
+Audit trail visualization
+
+Related transactions linking
+
+4. Timeline / Event Log
+Purpose
+Chronological view of everything that's happened and needs to happen.
+
+Primary User
+Agents (primary), all participants for their events
+
+Core Actions
+Scroll through chronological events
+
+Filter by event type (Communication, Action, Milestone)
+
+Add new event (with type, description, participants)
+
+Mark task as complete
+
+Set/update deadlines
+
+Reused Components
+Timeline item component
+
+Event type icons
+
+Date picker
+
+Participant selector
+
+Out of Scope
+Gantt chart view
+
+Dependency mapping
+
+Resource allocation
+
+Time tracking
+
+Calendar integration (sync)
+
+5. Document Hub
+Purpose
+All transaction documents in one organized place.
+
+Primary User
+Agents (primary), all participants for their documents
+
+Core Actions
+View document list (filtered by type/status)
+
+Upload new document
+
+Preview document (PDF/images)
+
+Send for signature (basic integration)
+
+Download/print document
+
+Reused Components
+Document card component
+
+File uploader
+
+PDF viewer component
+
+Status badges
+
+Out of Scope
+Document editing (Word/PDF editor)
+
+Version comparison
+
+Advanced e-signature workflows
+
+Document templates library
+
+Bulk document operations
+
+6. Message Center
+Purpose
+All communication about a transaction in one thread.
+
+Primary User
+All transaction participants
+
+Core Actions
+View message thread (chronological)
+
+Send new message (email/SMS from system)
+
+Reply to existing message
+
+Add attachment to message
+
+Mark message as read/unread
+
+Reused Components
+Message bubble component
+
+Rich text editor (basic)
+
+Attachment thumbnail
+
+Participant selector
+
+Out of Scope
+Separate email client
+
+SMS-only conversations
+
+Voice call recording/transcription
+
+Advanced formatting options
+
+Scheduled message sending
+
+7. Participant Management
+Purpose
+See and manage everyone involved in a transaction.
+
+Primary User
+Agent (primary), Transaction Coordinator
+
+Core Actions
+View list of participants (with roles)
+
+Add new participant (from contacts or new)
+
+Assign/change roles
+
+Remove participant (with audit trail)
+
+View participant contact info
+
+Reused Components
+Contact card component
+
+Role badges
+
+Modal forms
+
+Search/select component
+
+Out of Scope
+Bulk participant import
+
+Advanced permission schemas
+
+Participant performance metrics
+
+Network/referral tracking
+
+Contact tagging/categorization
+
+8. Lead Capture Form
+Purpose
+Simple form for new leads to enter the system.
+
+Primary User
+Prospective clients (public), Agents (manual entry)
+
+Core Actions
+Enter contact info (name, email, phone)
+
+Select interest (buying, selling, both)
+
+Enter basic criteria (location, budget)
+
+Submit form
+
+Receive confirmation
+
+Reused Components
+Form inputs
+
+Progress indicator
+
+Button component
+
+Success/error messages
+
+Out of Scope
+Multi-step wizard
+
+Property search integration
+
+Mortgage calculator
+
+Saved searches
+
+Lead source tracking pixels
+
+9. Contact Profile
+Purpose
+Basic information about a person (client or professional).
+
+Primary User
+Agents (primary), other participants in shared transactions
+
+Core Actions
+View contact info and notes
+
+See transactions they're involved in
+
+Add/edit basic info
+
+Add notes about contact
+
+Send message to contact
+
+Reused Components
+Info card component
+
+Transaction list (mini)
+
+Notes component
+
+Message button
+
+Out of Scope
+Full CRM contact management
+
+Activity feed across all transactions
+
+Social media integration
+
+Contact scoring
+
+Marketing list management
+
+10. Task Board
+Purpose
+Simple view of what needs to be done (deadline-focused).
+
+Primary User
+Agents (primary), assigned task owners
+
+Core Actions
+View tasks by due date
+
+Filter by status (todo, doing, done)
+
+Mark task as complete
+
+Add new task
+
+Assign task to participant
+
+Reused Components
+Task card component
+
+Status badges
+
+Date picker
+
+Assignee selector
+
+Out of Scope
+Subtasks
+
+Recurring tasks
+
+Task dependencies
+
+Time estimates
+
+Progress tracking
+
+11. Property Quick View
+Purpose
+Basic property information when referenced in transaction.
+
+Primary User
+All transaction participants
+
+Core Actions
+View property details (address, beds/baths, sqft)
+
+See listing photos (if available)
+
+View property history (previous transactions)
+
+Add property to transaction
+
+Reused Components
+Property card component
+
+Image gallery (basic)
+
+Info table component
+
+Out of Scope
+Full property search
+
+Market analysis
+
+Comparable properties
+
+Virtual tours
+
+Neighborhood data
+
+12. Settings (Minimal)
+Purpose
+Basic user preferences and account management.
+
+Primary User
+All authenticated users
+
+Core Actions
+Update email/phone
+
+Change password
+
+Set notification preferences (on/off only)
+
+Log out
+
+Reused Components
+Form inputs
+
+Toggle switches
+
+Button component
+
+Out of Scope
+Team management
+
+Billing/payment
+
+API keys
+
+Advanced notification rules
+
+Custom field configuration
+
+Navigation & Screen Relationships
+text
+Login → Role Selection → Transaction List
+     ↓
+Transaction List → Transaction Detail (main hub)
+                       ↓
+               ├── Timeline/Events
+               ├── Document Hub
+               ├── Message Center
+               ├── Participant Management
+               └── Task Board
+
+Transaction Detail → Contact Profile (when clicking participant)
+Transaction Detail → Property Quick View (when clicking property)
+
+Lead Capture Form → Creates new Transaction → Goes to Transaction List
+Explicitly Out of Scope for MVP
+No Separate Modules For:
+Dashboard/Home Screen (Transaction List is the home)
+
+Calendar View (Timeline shows chronological, not calendar)
+
+Reporting/Analytics (Transaction List shows status, that's it)
+
+Marketing Tools (No email campaigns, social media, etc.)
+
+Mobile App (Responsive web only)
+
+Admin Panel (No user management beyond participant adding)
+
+Integrations Hub (No third-party app connections)
+
+Template Library (No saved message/document templates)
+
+Workflow Builder (No automation rule creation)
+
+Search Portal (No property search for buyers)
+
+No Advanced Features:
+Bulk operations (do things one at a time)
+
+Custom views/filters (pre-defined filters only)
+
+Export functionality (view in app only)
+
+Offline mode (online required)
+
+Keyboard shortcuts (mouse/touch only)
+
+Dark mode (light mode only)
+
+Multi-language (English only)
+
+Accessibility beyond basic standards
+
+MVP Screen Philosophy
+Each screen serves exactly one purpose from the core journeys:
+
+Lead → Transaction (Lead Capture Form → Transaction Detail)
+
+Manage Transaction (Transaction Detail with all sub-views)
+
+Coordinate with Others (Message Center, Participant Management)
+
+Track Progress (Timeline, Task Board)
+
+Handle Documents (Document Hub)
+
+What makes this "minimum":
+
+No dashboard means no decision about "what to show"
+
+No calendar means no date management complexity
+
+No reporting means no metric definition complexity
+
+No settings means no configuration complexity
+
+No integrations means no API complexity
+
+The test: Can a new user sign up and manage a real transaction in under 15 minutes? If yes, MVP achieved.

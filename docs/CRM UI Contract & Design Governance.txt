@@ -1,0 +1,266 @@
+UI Contract for Real Estate CRM SaaS
+1. Layout Primitives
+Panels:
+
+Three-tier hierarchy: Primary (full-screen), Section (page subdivision), Contextual (toolbar/sidebar)
+
+Panels must be programmatically identified as one of these tiers
+
+Primary panels occupy 100% of viewport width; Section panels are responsive but maintain 32px margins; Contextual panels overlay content
+
+Cards:
+
+Represent discrete entities (contact, property, transaction, task)
+
+Must contain exactly one primary action and 0-3 secondary actions
+
+Cannot nest cards within cards
+
+Always include a visual or textual method to identify card type
+
+Lists:
+
+Two types: Navigational (select leads to detail view) and Action (each item has independent actions)
+
+Navigational lists must maintain selection state
+
+Action lists must visually differentiate from navigational lists
+
+Infinite scroll prohibited; pagination required beyond 50 items
+
+Timelines:
+
+Chronological display of events, communications, or status changes
+
+Must support filtering by event type
+
+Cannot combine user-generated content with system events without clear differentiation
+
+Must display in reverse chronological order by default
+
+2. Navigation Rules
+Primary Navigation:
+
+Persistent across all screens
+
+Maximum 7 top-level items
+
+Must support keyboard navigation with consistent tab order
+
+Current location must be indicated with two independent visual cues (color + shape/position)
+
+Contextual Navigation:
+
+Appears only when relevant to current task
+
+Must dismiss when primary context changes
+
+Cannot contain essential functionality unavailable elsewhere
+
+Maximum depth: 2 levels
+
+Breadcrumbs:
+
+Required for all screens more than one click from primary navigation
+
+Must be clickable to previous levels
+
+Must reflect actual user path, not just hierarchy
+
+3. Information Density Guidelines
+Three Density Levels:
+
+Sparse (Dashboard/Overview): Maximum 3 information units per screen section
+
+Standard (Working Views): 5-7 information units per screen section
+
+Dense (Search/Comparison): 10+ information units with clear visual grouping
+
+Density Controls:
+
+Users must be able to change density between Standard and Dense
+
+Sparse is reserved for specific screen types
+
+Each density level must maintain minimum touch target of 32px
+
+White space reduction must not reduce scannability below 85% as measured by eye-tracking proxy metrics
+
+4. State Handling
+Empty States:
+
+Must explain why content is absent
+
+Must provide at least one action to populate
+
+Cannot use only icons; must include text explanation
+
+Should educate rather than apologize
+
+Loading States:
+
+Must show progress indication for operations > 500ms
+
+Skeleton screens required for full-page loads
+
+Must differentiate between data loading and action processing
+
+Cancellation must be available for operations > 5 seconds
+
+Error States:
+
+Must differentiate between system errors, validation errors, and user errors
+
+Must provide recovery path, not just error message
+
+Technical details must be available but hidden behind "Show details"
+
+Must persist long enough for user to read (minimum 5 seconds or until dismissal)
+
+Success States:
+
+Must be subtle and non-disruptive
+
+Must disappear automatically after 3 seconds
+
+Must not require dismissal for workflow continuation
+
+Should indicate what was successful, not just generic confirmation
+
+5. Interaction Rules
+Clicks/Taps:
+
+Single interaction performs primary action
+
+Must provide visual feedback within 100ms
+
+Long press (≥1 second) reveals secondary actions if available
+
+Right-click/context menu must mirror long-press functionality
+
+Modals:
+
+Only for actions requiring immediate attention before continuation
+
+Must include escape path (X button + ESC key + click outside)
+
+Cannot stack more than 2 modals
+
+Must not exceed 50% viewport height on mobile
+
+Drawers:
+
+For supplementary actions that don't require full context switch
+
+Must slide from edges only (left, right, bottom)
+
+Must include handle or clear dismissal control
+
+Content must be scrollable independently of main content
+
+Form Interactions:
+
+Inline validation only after field blur or form submission
+
+Submit button must change state (loading → success/error)
+
+Multi-step forms must show progress and allow backward navigation
+
+6. Prohibited UI Patterns
+Never Implement:
+
+Infinite nested modals/drawers
+
+Auto-playing media without user initiation
+
+Scroll hijacking or custom scrollbars
+
+Content that moves/disappears while user is interacting
+
+"Mystery meat" navigation (unlabeled icons)
+
+Confirmation dialogs for routine, reversible actions
+
+Drag-and-drop as only method for reordering
+
+Permanent hover states on touch devices
+
+Custom right-click behavior that blocks browser defaults
+
+Modals on page load (except legal requirements)
+
+Conditional Prohibitions:
+
+Tabs may contain only related content; no mixed contexts
+
+Accordions may not nest more than 2 levels
+
+Tooltips must not contain essential information
+
+Notifications must not appear below content
+
+7. Accessibility Baseline
+Screen Readers:
+
+All interactive elements must have programmatic labels
+
+Live regions for dynamic content updates
+
+Landmark roles (main, navigation, banner, complementary) on all screens
+
+Page titles must update on navigation
+
+Keyboard Navigation:
+
+Logical tab order following visual layout
+
+Visible focus indicator with minimum 3:1 contrast ratio
+
+All functionality available via keyboard
+
+Skip links at beginning of each page
+
+Visual Accessibility:
+
+Text contrast ratio minimum 4.5:1 (7:1 for critical information)
+
+No information conveyed by color alone
+
+Resizable text up to 200% without loss of functionality
+
+Motion reduction preference respected
+
+Cognitive Considerations:
+
+Consistent navigation patterns across all screens
+
+Action labels must use verbs, not just icons
+
+Error messages must suggest solutions
+
+Timeouts > 15 seconds must provide warning and extension option
+
+Enforcement & Governance
+This contract is enforced through:
+
+Component Library Requirements - All UI components must document which contract rules they implement
+CRM UI Contract & Design Governance
+
+Code Review Checklist - Mandatory accessibility and interaction pattern review
+
+Automated Testing - Contrast ratios, keyboard navigation, and ARIA attribute verification
+
+Design System Tokens - All spacing, timing, and sizing values controlled through tokens
+
+Quarterly Audit - Manual review of 10% of screens for contract compliance
+
+Violations require:
+
+Severity 1 (Accessibility/Data loss): Immediate fix, no deployment
+
+Severity 2 (Usability): Fixed within sprint
+
+Severity 3 (Consistency): Added to backlog for next major release
+
+Contract Principle: "The interface should reveal complexity only as needed, guiding users through real estate workflows without exposing system complexity."
+

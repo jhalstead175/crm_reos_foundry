@@ -1,0 +1,340 @@
+Competitive Decomposition (Ylopo, Sisu, FUB)
+
+Competitive Analysis & MVP Synthesis
+Ylopo
+Core Features
+AI-powered lead generation (Facebook ads + landing pages)
+
+Predictive lead scoring & automated nurturing
+
+CRM with basic task management
+
+Integrated chat & SMS
+
+Listing alerts & property portal
+
+Basic reporting & analytics
+
+Differentiators
+Social media ads optimization (their original strength)
+
+Predictive analytics for lead conversion likelihood
+
+Automated retargeting across platforms
+
+"Smart Assistant" that suggests next best actions
+
+Native Facebook/Instagram integration
+
+UX Failures
+Feature sprawl: Too many half-baked tools
+
+Poor navigation: Features hidden in illogical places
+
+Over-automation: Users feel they're not in control
+
+Notification overload: Constant "AI suggestions" become noise
+
+Mobile experience: Desktop-first, mobile as afterthought
+
+Tolerated vs Hated
+Tolerate:
+
+Clunky interface (if leads keep coming)
+
+Steep learning curve (for "AI magic")
+
+Occasional bugs in automation
+
+Hate:
+
+Lead quality issues ("lots of leads, few closings")
+
+Black box algorithms (can't see why AI does what it does)
+
+Contract lock-ins (annual commitments for unproven value)
+
+Customer support delays (automation-first, human support last)
+
+Data export limitations (vendor lock-in strategy)
+
+Sisu (Keller Williams)
+Core Features
+KW command center integration
+
+Lead capture from websites & social
+
+Basic lead scoring & routing
+
+Task management & reminders
+
+Email & SMS templates
+
+Market reports & CMA tools
+
+Basic transaction management
+
+Differentiators
+Deep KW ecosystem integration (single sign-on, data sync)
+
+Command center as "single pane of glass" for KW agents
+
+Team management tools built for KW team structures
+
+KW training content integration
+
+Company-branded mobile app
+
+UX Failures
+KW-centric myopia: Works poorly for non-KW users
+
+Inconsistent updates: Some modules feel abandoned
+
+Navigation confusion: Different mental models across tools
+
+Poor customization: "KW way or the highway"
+
+Legacy code feel: Slow, clunky interactions
+
+Tolerated vs Hated
+Tolerate:
+
+Limited features outside KW ecosystem
+
+Basic design aesthetic
+
+Occasional syncing delays
+
+Hate:
+
+Mandatory KW ecosystem (can't use standalone)
+
+Limited API access (walls around KW garden)
+
+Team management complexity (over-engineered for solos)
+
+Mobile app limitations (feature gaps vs desktop)
+
+KW politics influence (features driven by corporate, not users)
+
+Follow Up Boss
+Core Features
+Multi-source lead capture (Zillow, Realtor.com, etc.)
+
+Lead routing & assignment rules
+
+SMS/email/phone call logging
+
+Basic task & pipeline management
+
+Team performance tracking
+
+Zapier integrations
+
+Basic reporting
+
+Differentiators
+Lead routing mastery (their original core competency)
+
+Multi-user team coordination (clear handoff rules)
+
+Simple, fast interface (compared to bloated CRMs)
+
+Solid API & integrations (plays well with others)
+
+Reliable, not flashy (does core things well)
+
+UX Failures
+Transaction management weakness (great at leads, weak at closings)
+
+Reporting limitations (basic but not insightful)
+
+No native document management (third-party integrations only)
+
+Limited automation building (if/then rules are basic)
+
+Mobile app gaps (better on desktop)
+
+Tolerated vs Hated
+Tolerate:
+
+Basic visual design (utilitarian but works)
+
+Limited customization (opinionated workflows)
+
+Manual data entry in some areas
+
+Hate:
+
+Transaction "cliff" (great until offer accepted, then falls apart)
+
+Limited analytics (can't answer "why" questions)
+
+Integration complexity (need Zapier/API work for advanced flows)
+
+Notification management (all-or-nothing approach)
+
+Document handling (external tools required)
+
+Synthesis: The 80/20 MVP
+Core Problem These Solve
+Agents need: More quality leads → Nurture them efficiently → Close transactions smoothly → Get repeat/referral business
+
+What actually matters:
+
+Lead capture that works (quality over quantity)
+
+Simple lead follow-up (not complex nurturing)
+
+Transaction coordination (not just tracking)
+
+Team handoffs (clean, not messy)
+
+Basic reporting (what's working, what's not)
+
+MVP Feature Set (20% complexity, 80% value)
+1. Unified Inbox (Replace: Separate email/SMS/chat apps)
+All communications in one chronological view
+
+Role-based visibility (agent sees all, client sees their thread)
+
+Smart templates with one-click insertion
+
+Send later scheduling (but no complex automation)
+
+Why it works: 80% of communication management is seeing everything in one place
+
+2. Smart Lead Router (Replace: Complex scoring/routing rules)
+Simple rules: "New lead → assign to agent with fewest leads this week"
+
+Manual override: "Click to assign to specific agent"
+
+Lead source tracking: "Zillow vs website vs referral"
+
+Basic lead info capture: "Name, phone, email, source, notes"
+
+Why it works: Agents don't need AI scoring; they need fair distribution and source tracking
+
+3. Transaction Timeline (Replace: Complex pipeline management)
+Visual timeline of key dates (inspection, appraisal, closing)
+
+Automated deadline calculations: "Inspection due 7 days after acceptance"
+
+Simple status: "Pre-offer → Active → Pending → Closed"
+
+Document checklist: "What's signed, what's pending"
+
+Why it works: Transactions are chronological; manage them that way
+
+4. Role-Based Task Board (Replace: Complex project management)
+Simple Kanban: "To Do → Doing → Done"
+
+Role-specific views: "Agent tasks vs Buyer tasks vs Attorney tasks"
+
+Deadline-focused: "Sort by due date, not priority"
+
+One-click completion: "Mark done with evidence (photo, document, note)"
+
+Why it works: Real estate tasks are deadline-driven, not complex dependencies
+
+5. Document Hub (Replace: Separate doc management)
+Transaction-centric organization: "All docs for this deal in one place"
+
+Version control with audit trail: "Who changed what when"
+
+Simple e-signature integration: "Send for signature, track completion"
+
+Role-based access: "Buyer sees their docs, agent sees all"
+
+Why it works: Documents belong to transactions, not to some abstract "doc library"
+
+6. Single Metric Dashboard (Replace: Complex analytics)
+One number that matters: "Pipeline value" or "Days to close"
+
+Lead source ROI: "Which sources actually close?"
+
+Team performance: "Who's following up fastest?"
+
+Transaction health: "How many are on track vs delayed?"
+
+Why it works: Agents need 1-3 metrics to manage by, not 30 charts
+
+The 80/20 Architecture
+What We EXCLUDE (The 80% Complexity)
+No AI lead scoring (agents know quality when they talk to leads)
+
+No complex automation workflows (simple if/then only)
+
+No social media ad management (use dedicated tools)
+
+No CMA/market report generators (use MLS tools)
+
+No team hierarchy management (flat teams only)
+
+No training/content libraries (external resources)
+
+No complex permissions systems (3 roles: admin, agent, client)
+
+No custom reporting builders (pre-built reports only)
+
+No mobile-specific features (responsive web app only)
+
+No third-party app marketplace (focus on core integrations)
+
+What We DO BETTER (The 20% That Matters)
+Transactions, not just leads: Most CRMs fail after offer acceptance
+
+Role-based simplicity: Each role sees only what they need
+
+Unified timeline: One chronological view of entire deal
+
+Deadline management: Automated calculations, clear visibility
+
+Communication context: All messages attached to transactions
+
+The Core Insight
+Real estate agents don't need more features; they need fewer decisions.
+
+Current tools ask agents to:
+
+Configure lead scoring algorithms
+
+Build automation workflows
+
+Design custom reports
+
+Manage team permissions hierarchies
+
+Choose between 15 notification types
+
+Our MVP asks agents to:
+
+Which transaction are you working on?
+
+What needs to happen next?
+
+Who's responsible?
+
+When is it due?
+
+Implementation Principles
+1. Transaction-First Design
+Every screen answers: "What transaction is this for?"
+
+2. Role-Specific Simplification
+Buyers see: "Your documents, your deadlines, your messages"
+Agents see: "All transactions, all deadlines, team messages"
+Attorneys see: "Your closings, your documents, your signatures"
+
+3. Deadline-Driven Workflow
+Not "manage tasks" but "meet deadlines"
+
+4. Communication in Context
+Not "send an email" but "update the buyer about inspection"
+
+5. Progressive Disclosure
+Start with 5 features, reveal more as needed (not all on day one)
+
+MVP Promise: "We don't manage your leads, nurture your prospects, automate your marketing, analyze your market, train your team, or optimize your social media. We do one thing: help you move transactions from offer to closing without dropping the ball. Everything in our product serves that single purpose."
+
+Result: An agent can learn it in 15 minutes, use it daily without training, and actually close more deals because they're not managing software—they're managing transactions.

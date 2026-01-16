@@ -1,0 +1,275 @@
+PRICING & PACKAGING STRATEGY
+
+Capability-Based (Not Feature-Based)
+
+1️⃣ PRICING PHILOSOPHY (NON-NEGOTIABLE)
+What You Are Selling
+
+You are not selling features.
+You are selling operational capability.
+
+“What can this user do end-to-end?”
+
+This matches:
+
+Your event-first model
+
+Your timeline mental model
+
+Your post-GA roadmap
+
+What You Explicitly Avoid
+
+❌ Per-feature paywalls
+
+❌ Nickel-and-diming seats
+
+❌ Hidden limits
+
+❌ Pricing that forces UX forks
+
+2️⃣ PRICING UNIT (CRITICAL DECISION)
+Primary Unit: Per Realtor / Agent
+
+One paid seat = one primary operator
+
+All secondary roles are free when invited
+
+Why this works
+
+Matches real value creation
+
+Avoids charging buyers/sellers
+
+Encourages collaboration (network effect)
+
+Secondary Limits (Soft, Not Hard)
+
+Used only to guide upgrades, not block usage:
+
+Active transactions
+
+Automation volume
+
+Advanced insights
+
+No sudden cut-offs.
+
+3️⃣ CORE PACKAGES (GA)
+🟢 Foundation
+
+“Your daily operating system”
+
+Target
+
+Solo agents
+
+Small teams testing a switch from FUB
+
+Price
+
+$39 / agent / month
+
+Capabilities
+
+People & leads
+
+Unified timeline
+
+Tasks (derived)
+
+Transactions (core)
+
+Documents (basic)
+
+Beta onboarding flow
+
+Limits (soft)
+
+~20 active transactions
+
+No automation
+
+No advanced insights
+
+Positioning
+
+“Everything you need to work deals without chaos.”
+
+🔵 Growth
+
+“From activity → execution”
+
+Target
+
+Producing agents
+
+Teams that would otherwise buy Sisu
+
+Price
+
+$79 / agent / month
+
+Capabilities
+
+All Foundation
+
+Transaction milestones
+
+Health indicators
+
+Accountability views
+
+Lead ingestion (Ylopo Phase B1)
+
+Attribution events
+
+Limits (soft)
+
+~50 active transactions
+
+Light automation (event-based)
+
+Standard support
+
+Positioning
+
+“Know where every deal stands — before it stalls.”
+
+🟣 Scale
+
+“Operate like a brokerage without the overhead”
+
+Target
+
+High-volume agents
+
+Teams / brokerages
+
+Price
+
+$149 / agent / month
+
+Capabilities
+
+All Growth
+
+Automated follow-ups (guarded)
+
+Multi-party collaboration (expanded)
+
+Secure document workflows
+
+Intelligence signals (read-only)
+
+Priority support
+
+Limits (soft)
+
+~150 active transactions
+
+Automation volume caps (fair use)
+
+Positioning
+
+“Run transactions at scale, without hiring an ops team.”
+
+4️⃣ WHAT IS ALWAYS FREE (IMPORTANT)
+
+To fuel adoption and network effects:
+
+Buyers
+
+Sellers
+
+Attorneys
+
+Lenders
+
+Insurance
+
+Subcontractors
+
+They:
+
+Never pay
+
+Never see pricing
+
+Never hit paywalls
+
+This is a strategic moat.
+
+5️⃣ ADD-ONS (LATER, OPTIONAL)
+
+Add-ons are capability extensions, not feature unlocks.
+
+Examples:
+
+AI Insights Pack (advisor-grade summaries)
+
+Advanced Automations
+
+Compliance / Audit Export (future)
+
+Never required for core workflows.
+
+6️⃣ UPGRADE TRIGGERS (NATURAL, NOT FORCED)
+
+You don’t push upgrades with banners.
+You let friction speak for itself.
+
+Examples:
+
+“You have 42 active transactions. Growth supports this cleanly.”
+
+“This automation requires Growth or higher.”
+
+Always:
+
+Explain why
+
+Show value
+
+Offer trial upgrade
+
+7️⃣ TRIAL STRATEGY (HIGH CONVERSION)
+Recommended
+
+14-day full-capability trial
+
+Starts at Growth tier
+
+Why:
+
+Let users feel the difference vs FUB/Sisu
+
+Downgrade friction-free if needed
+
+8️⃣ ENTERPRISE / BROKERAGE PRICING (LATER)
+
+Handled as:
+
+Volume discounts
+
+Centralized billing
+
+SLA commitments
+
+Do NOT create a separate UX.
+Same product, same mental model.
+
+9️⃣ INTERNAL SALES TALK TRACK (IMPORTANT)
+
+“We don’t charge for features.
+We charge for how much operational responsibility you want us to carry.”
+
+This frames upgrades as relief, not cost.
+
+🔒 GOVERNANCE CHECK
+Rule	Status
+No UX forks by plan	✅
+No RBAC distortion	✅
+Capability-aligned	✅
+Roadmap-consistent	✅
+Investor-credible	✅

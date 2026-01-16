@@ -1,0 +1,297 @@
+UI CONTRACT COMPLIANCE CHECKLIST
+
+(Mandatory Before Merge / Release)
+
+SECTION 1 — CONTEXT & INTENT (REQUIRED)
+
+1.1 Feature Name
+
+☐ Clearly named and scoped
+
+1.2 Primary User Role
+
+☐ Realtor
+
+☐ Buyer
+
+☐ Seller
+
+☐ Closing Attorney
+
+☐ Mortgage / Finance
+
+☐ Insurance
+
+☐ Subcontractor
+
+1.3 Secondary Roles (if any)
+
+☐ Explicitly listed
+
+☐ Justified (why cross-role access is necessary)
+
+1.4 Core User Problem
+
+☐ Stated in one sentence
+
+☐ Tied to an approved journey or lifecycle stage
+
+❌ FAIL CONDITIONS
+
+Vague role targeting
+
+“Everyone needs this” justification
+
+SECTION 2 — GOVERNANCE ALIGNMENT
+
+2.1 Product Constitution
+
+☐ Aligned with stated product purpose
+
+☐ Does not introduce a new product category
+
+2.2 Non-Goals Check
+
+☐ Does NOT attempt to become:
+
+☐ Accounting software
+
+☐ Document management system
+
+☐ Marketing automation platform
+
+☐ Compliance / audit system
+
+2.3 UX Philosophy Compliance
+
+☐ Timeline/event-driven
+
+☐ Progressive disclosure
+
+☐ Cognitive load minimized
+
+❌ FAIL CONDITIONS
+
+Dashboard sprawl
+
+Feature parity justification (“X has this”)
+
+SECTION 3 — UI CONTRACT COMPLIANCE
+
+3.1 Layout Primitives Used
+
+☐ Approved Panel
+
+☐ Card
+
+☐ List
+
+☐ Timeline
+
+☐ Modal / Drawer
+
+3.2 New UI Pattern?
+
+☐ NO → Reused existing primitive
+
+☐ YES → Formal justification attached
+
+☐ Why reuse failed
+
+☐ What pattern is replaced
+
+☐ Governance approval obtained
+
+3.3 Navigation Rules
+
+☐ Does not add new top-level navigation
+
+☐ Appears only in correct context
+
+☐ Removed when context no longer applies
+
+❌ FAIL CONDITIONS
+
+New top-level nav without approval
+
+One-off UI patterns
+
+SECTION 4 — ROLE & DATA BOUNDARIES
+
+4.1 Data Visibility
+
+☐ Minimum necessary data only
+
+☐ No cross-role leakage
+
+☐ Sensitive data masked or abstracted
+
+4.2 Action Authority
+
+☐ Only correct roles can act
+
+☐ Ownership is explicit
+
+☐ No ambiguous permissions
+
+4.3 Collaboration Touchpoints
+
+☐ Explicitly intentional
+
+☐ Logged as events
+
+☐ No hidden side effects
+
+❌ FAIL CONDITIONS
+
+“Read-only but editable later” hacks
+
+Implicit permissions
+
+SECTION 5 — OBJECT & EVENT MODEL CONSISTENCY
+
+5.1 Objects Touched
+
+☐ People
+
+☐ Property
+
+☐ Transaction
+
+☐ Lead
+
+☐ Task
+
+☐ Document
+
+☐ Event
+
+☐ Message
+
+5.2 Lifecycle Alignment
+
+☐ Feature tied to a specific lifecycle stage
+
+☐ Does not bypass lifecycle rules
+
+5.3 Event Generation
+
+☐ Action creates an event
+
+☐ Event owner defined
+
+☐ Event visibility rules respected
+
+❌ FAIL CONDITIONS
+
+Silent state changes
+
+Orphaned data
+
+SECTION 6 — STATES & FAILURE MODES
+
+6.1 States Handled
+
+☐ Empty
+
+☐ Loading
+
+☐ Success
+
+☐ Error
+
+6.2 Error Philosophy
+
+☐ Clear, human-readable errors
+
+☐ Recovery path provided
+
+☐ No dead ends
+
+❌ FAIL CONDITIONS
+
+“Something went wrong” errors
+
+Blocking failures without guidance
+
+SECTION 7 — REUSE & SIMPLICITY CHECK
+
+7.1 Component Reuse
+
+☐ Existing components reused
+
+☐ No duplicate logic
+
+7.2 Screen Count
+
+☐ Does not add a new screen unless unavoidable
+
+☐ Screen justified vs extending existing one
+
+7.3 Configuration Discipline
+
+☐ No over-configuration
+
+☐ Defaults are sensible and minimal
+
+❌ FAIL CONDITIONS
+
+Settings sprawl
+
+Feature flags without sunset plan
+
+SECTION 8 — MVP & SCOPE DISCIPLINE
+
+8.1 MVP Alignment
+
+☐ Required for MVP
+
+☐ OR explicitly tagged as Post-MVP
+
+8.2 Competitive Justification
+
+☐ Solves real pain (not checkbox parity)
+
+☐ Simpler than competitor equivalent
+
+❌ FAIL CONDITIONS
+
+“Nice to have” features
+
+Premature optimization
+
+SECTION 9 — ACCESSIBILITY & QUALITY
+
+9.1 Accessibility Baseline
+
+☐ Keyboard navigable
+
+☐ Screen-reader compatible
+
+☐ Contrast compliant
+
+9.2 Performance
+
+☐ No unnecessary re-renders
+
+☐ Efficient data loading
+
+SECTION 10 — FINAL SIGN-OFF
+
+10.1 Checklist Completion
+
+☐ All sections passed
+
+10.2 Exceptions
+
+☐ None
+
+☐ Documented & approved
+
+10.3 Governance Approval
+
+☐ UX Governor
+
+☐ Product Architect
+
+🚫 NO APPROVAL = NO MERGE

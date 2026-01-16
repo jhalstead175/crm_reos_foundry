@@ -1,0 +1,204 @@
+REOS Foundry CRM — Supabase SQL Schema (v1.0)
+0. Extensions (Required)
+-- UUID generation
+create extension if not exists "uuid-ossp";
+
+-- JSON utilities
+create extension if not exists "pgcrypto";
+
+1. Transactions (Root Aggregate)
+create table transactions (
+  id uuid primary key default uuid_generate_v4(),
+  type text not null,
+  created_by uuid not null,
+  created_at timestamptz not null default now()
+);
+
+
+Governance Notes
+
+❌ No status fields
+
+❌ No role fields
+
+✅ Exists only to anchor events
+
+2. People (Role Assignment per Transaction)
+create table people (
+  id uuid primary key default uuid_generate_v4(),
+  transaction_id uuid not null references transactions(id) on delete cascade,
+  role text not null,
+  name text not null,
+  email text,
+  phone text,
+  created_at timestamptz not null default now()
+);
+
+
+Rules
+
+Same user may appear multiple times across transactions
+
+Role is contextual, not global
+
+3. Events (System Spine — Append Only)
+create table events (
+  id uuid primary key default uuid_generate_v4(),
+  transaction_id uuid not null references transactions(id) on delete cascade,
+  type text not null,
+  actor_role text not null,
+  actor_id uuid not null,
+  payload jsonb not null default '{}',
+  created_at timestamptz not null default now()
+);
+
+-- Hard protection: prevent updates
+create or replace function prevent_event_update()
+returns trigger as $$
+begin
+  raise exception 'Events are immutable';
+end;
+$$ language plpgsql;
+
+create trigger no_event_updates
+before update or delete on events
+for each row execute function prevent_event_update();
+
+
+Critical Guarantees
+
+❌ UPDATE
+
+❌ DELETE
+
+✅ INSERT ONLY
+
+Corrections = new event
+
+4. Documents (Always Event-Linked)
+create table documents (
+  id uuid primary key default uuid_generate_v4(),
+  transaction_id uuid not null references transactions(id) on delete cascade,
+  event_id uuid not null references events(id),
+  storage_path text not null,
+  doc_type text not null,
+  uploaded_by uuid not null,
+  created_at timestamptz not null default now()
+);
+
+
+Rule
+
+No orphan documents
+
+Every document explains why it exists (event)
+
+5. Tasks (Derived from Events)
+create table tasks (
+  id uuid primary key default uuid_generate_v4(),
+  transaction_id uuid not null references transactions(id) on delete cascade,
+  origin_event_id uuid not null references events(id),
+  assigned_role text not null,
+  due_at timestamptz,
+  completed_event_id uuid references events(id),
+  created_at timestamptz not null default now()
+);
+
+
+Rule
+
+Tasks never “complete themselves”
+
+Completion = presence of a completion event
+
+6. Messages (Conversation, Not Email)
+create table messages (
+  id uuid primary key default uuid_generate_v4(),
+  transaction_id uuid not null references transactions(id) on delete cascade,
+  event_id uuid not null references events(id),
+  sender_role text not null,
+  body text not null,
+  created_at timestamptz not null default now()
+);
+
+7. Derived Views (Read Models)
+Transaction Summary (Rebuildable)
+create view transaction_summary as
+select
+  t.id as transaction_id,
+  t.type,
+  t.created_at,
+  max(e.created_at) as last_activity_at
+from transactions t
+left join events e on e.transaction_id = t.id
+group by t.id;
+
+Timeline Projection (Ordered, Filterable)
+create view timeline_projection as
+select
+  e.id,
+  e.transaction_id,
+  e.type,
+  e.actor_role,
+  e.payload,
+  e.created_at
+from events e
+order by e.created_at asc;
+
+8. Row Level Security (RLS)
+Enable RLS
+alter table transactions enable row level security;
+alter table people enable row level security;
+alter table events enable row level security;
+alter table documents enable row level security;
+alter table tasks enable row level security;
+alter table messages enable row level security;
+
+Basic Access Policy (MVP)
+
+Users may access transactions only if they are a participant
+
+create policy "participants can view transactions"
+on transactions
+for select
+using (
+  exists (
+    select 1 from people
+    where people.transaction_id = transactions.id
+      and people.id = auth.uid()
+  )
+);
+
+Event Insert Policy (Role-Based, MVP)
+create policy "participants can create events"
+on events
+for insert
+with check (
+  exists (
+    select 1 from people
+    where people.transaction_id = events.transaction_id
+      and people.id = auth.uid()
+  )
+);
+
+
+(Fine-grained event-type role enforcement happens in the API layer next)
+
+9. Hard Governance Guarantees (Why This Works)
+Risk	Prevented By
+Status drift	No status fields
+Timeline inconsistency	Append-only events
+Role-based data forks	Shared event truth
+Accidental mutation	DB triggers
+CRM bloat	No free-form entities
+10. What This Enables Immediately
+
+FUB-style “activity” → actual event truth
+
+Sisu-style pipeline → derived projection
+
+Ylopo-style automation → event listeners
+
+Auditable, defensible transaction history
+
+Rebuildable UI at any time

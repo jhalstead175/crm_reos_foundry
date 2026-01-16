@@ -1,0 +1,309 @@
+REOS Foundry CRM
+Canonical Architecture Specification (v1.0)
+
+This is the source of truth. Everything else (code, UI, integrations) conforms to this.
+
+1. System Spine (Non-Negotiable)
+
+Architecture Pattern:
+
+Event-sourced, transaction-centric CRM with role-adaptive projections
+
+Primary Truth:
+
+Immutable Event Log
+
+No screen-driven state
+
+No role-specific data forks
+
+No mutable “status” fields as authority
+
+2. Technology Stack (Locked)
+Frontend
+
+Next.js (App Router)
+
+TypeScript
+
+Server Components where possible
+
+Client Components only for interaction-heavy blocks
+
+Tailwind or equivalent utility layer (governed)
+
+Backend / Data
+
+Supabase
+
+Postgres (primary datastore)
+
+Auth
+
+Row Level Security (RLS)
+
+Storage (documents)
+
+Server Logic (Thin Layer)
+
+Next.js Route Handlers or Edge Functions for:
+
+Stripe webhooks
+
+PDF generation
+
+Email orchestration
+
+Event validation
+
+No “business logic backend.”
+Business rules live at the event boundary.
+
+3. Core Domain Model
+Authoritative Tables
+transactions
+
+id
+
+created_at
+
+created_by
+
+type (resale, new build, etc.)
+
+Contains no status fields.
+
+events (append-only)
+
+id
+
+transaction_id
+
+type
+
+actor_role
+
+actor_id
+
+payload (JSONB, validated by event type)
+
+created_at
+
+Rules
+
+❌ UPDATE
+
+❌ DELETE
+
+✅ INSERT ONLY
+
+Corrections = new event.
+
+people
+
+id
+
+transaction_id
+
+role
+
+name
+
+email
+
+phone
+
+documents
+
+id
+
+transaction_id
+
+event_id
+
+storage_path
+
+doc_type
+
+uploaded_by
+
+created_at
+
+tasks
+
+id
+
+transaction_id
+
+origin_event_id
+
+assigned_role
+
+due_at
+
+completed_event_id
+
+Derived / Read Models (Non-Authoritative)
+
+transaction_summary
+
+timeline_projection
+
+role_dashboard_views
+
+These are:
+
+Materialized views or cached queries
+
+Rebuildable at any time
+
+Never written to directly by UI
+
+4. Event Types (Initial Set)
+
+Examples (expandable, governed):
+
+TransactionCreated
+
+OfferSubmitted
+
+OfferAccepted
+
+InspectionOrdered
+
+InspectionCompleted
+
+EarnestMoneyReceived
+
+DocumentUploaded
+
+TaskCompleted
+
+TransactionClosed
+
+Each event type has:
+
+Strict payload schema
+
+Role permissions for creation, not existence
+
+5. Role & Permission Model
+Core Principle
+
+Roles affect what you can DO and SEE — never what exists
+
+All events exist for a transaction
+
+Visibility = query filtering + projection rules
+
+Creation = enforced at event API
+
+Examples:
+
+Buyer cannot create CommissionAdjusted
+
+Agent can
+
+Admin can see all
+
+Buyer never sees pricing or monetization events
+
+This directly enforces your pricing & upgrade governance.
+
+6. API Contract (Event-First)
+Write
+POST /api/events
+
+
+Payload:
+
+transaction_id
+
+type
+
+payload
+
+Server:
+
+Validates role
+
+Validates payload schema
+
+Inserts event
+
+Read
+GET /api/transactions
+GET /api/transactions/:id
+GET /api/transactions/:id/timeline
+
+
+Returns:
+
+Derived projections only
+
+Never raw mutation endpoints
+
+7. UI Architecture (Governed)
+Component Hierarchy (Enforced)
+/ui/primitives
+/ui/elements
+/ui/blocks
+/ui/sections
+/ui/screens
+
+
+Rules:
+
+No role-specific components
+
+No screen logic inside blocks
+
+Blocks may consume projections only
+
+Screens assemble blocks only
+
+8. Repo Structure (Initial)
+/apps/web
+  /app
+    /auth
+    /transactions
+    /admin
+  /ui
+  /lib
+    /events
+    /projections
+    /auth
+  /types
+  /styles
+
+9. Branding
+
+Primary mark: REOS Foundry “R”
+
+Neutral, professional palette
+
+No agent-gimmick UI
+
+Calm, transaction-serious tone
+
+10. MVP Milestone #1 (What I Build First)
+
+Deliverable: Working vertical slice
+
+Auth
+
+Create Transaction
+
+Append Event
+
+Read Timeline
+
+Role-filtered view
+
+This proves:
+
+Event spine
+
+UI governance
+
+Role projection logic

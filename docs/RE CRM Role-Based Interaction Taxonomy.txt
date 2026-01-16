@@ -1,0 +1,37 @@
+Real Estate CRM Role-Based Interaction Taxonomy
+Role	Primary Goals	Allowed Actions	Data Visibility Boundaries	Collaboration Touchpoints	Explicit Exclusions
+Realtor:	
+Close transactions; Manage client relationships; Coordinate deal pipeline	Create/edit listings; Schedule showings; Generate offer documents; Track milestones; Communicate with all parties	Full visibility of own clients & listings; Limited view of other agents' active listings (MLS-style); No view of other agents' private notes or financials	Buyers/Sellers (primary), Mortgage Brokers (pre-approval, updates), Closing Attorneys (contracts, deadlines), Insurance Providers (bind dates)	Cannot view other agents' commission agreements; Cannot edit signed contracts; No direct subcontractor hiring without client approval
+Buyer:	
+Find suitable property; Secure financing; Close on purchase	Search listings; Save favorites; Schedule tours via agent; Submit offers electronically; Upload pre-approval docs; Sign documents digitally	Own saved properties; Own offer history; Property details (non-owner contact); Timeline of own transaction; No seller motivations or financials	Realtor (primary), Mortgage Broker (documentation), Closing Attorney (signings)	Cannot see seller contact info directly; No view of competing offers; No access to seller disclosure notes prior to contract
+Seller:	
+Maximize sale price; Minimize time on market; Coordinate move	Create/edit listing info; Review offers; Select offer; Schedule inspections/appraisals; Upload disclosures	Own property analytics; Offer details (price, contingencies); Buyer pre-approval status; No buyer full financial details	Realtor (primary), Closing Attorney (documents), Subcontractors (repairs, with agent coordination)	Cannot see buyer's personal financial details beyond pre-approval letter; No direct negotiation with buyer without agent
+Closing Attorney:	
+Ensure legal compliance; Facilitate title transfer; Manage escrow	Upload contracts; Add closing documents; Request signatures; Disburse funds; Record deeds	Contract documents; Title reports; Closing statements; Wire instructions; No party personal financial accounts beyond required for closing	Realtors (contract revisions), Mortgage Brokers (funding confirmation), Sellers/Buyers (signature requests)	Cannot disburse funds without authorization; No editing of purchase price or material terms; No access to early negotiation notes
+Mortgage Broker / Finance:	
+Secure loan approval; Meet closing deadlines	Upload/pre-populate loan applications; Request documents from buyer; Update approval status; Share closing cost estimates	Buyer financial documents; Credit reports; Appraisal reports; Loan estimate details; No seller financials unrelated to transaction	Realtor (approval updates), Buyer (document requests), Closing Attorney (funding details)	Cannot share buyer's full credit report with realtor; No direct contact with appraisers to influence value; No editing of contract terms
+Insurance Providers:	
+Bind policies; Ensure coverage deadlines	Upload quotes; Bind policies; Share certificates of insurance	Property details for quoting; Closing date; Buyer/seller contact info for policy; No financial details beyond premium	Realtor (coordination), Buyer/Seller (policy selection), Closing Attorney (proof of coverage)	Cannot access full property inspection reports unless provided; No marketing to other parties in transaction
+Subcontractors:	
+Complete tasks; Submit invoices; Coordinate access	View assigned work orders; Update task status; Upload completion photos; Submit invoices	Property address; Access instructions; Scope of work; No client contact info beyond necessary scheduling	Realtor (scheduling, approvals), Seller (access, if pre-authorized)	No access to transaction financials or documents; Cannot modify listing details; No direct client contact unless explicitly allowed
+Narrative: How Role Isolation Prevents Complexity
+A real estate transaction involves multiple stakeholders with competing sensitivities: financial privacy, negotiation leverage, legal compliance, and operational coordination. Without strict role isolation, the CRM becomes a tangled web where:
+
+Information overload occurs when parties see irrelevant data (e.g., a subcontractor viewing loan details).
+
+Privacy violations risk legal exposure (e.g., accidental sharing of financial documents).
+
+Negotiation integrity is compromised if buyers see seller motivations or competing offers.
+
+Accountability blurring happens when roles overstep (e.g., a mortgage broker editing contract terms).
+
+This taxonomy enforces need-to-know visibility and action-based permissions. For example:
+
+Buyers see listings and their own progress, but not the seller’s bottom line.
+
+Realtors orchestrate but cannot access raw credit reports or disburse funds.
+
+Attorneys see documents needed for closing but not early negotiation notes.
+
+By isolating roles, the CRM reduces cognitive load, maintains transaction security, and ensures each party operates within their professional lane—turning a complex multi-party process into a streamlined, secure workflow where collaboration happens only at defined touchpoints with controlled data exchange. This prevents the system from becoming a chaotic, high-risk data free-for-all.
+

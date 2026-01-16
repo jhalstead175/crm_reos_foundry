@@ -1,0 +1,217 @@
+First: Lock the Spine (Architecture Decision)
+
+I’m making the call unless you object:
+
+✅ Chosen Architecture (Recommended & Consistent with Your Docs)
+
+Supabase-first, event-driven CRM
+
+Why this fits your governance best:
+
+Your Integration Map explicitly centers Supabase (auth, Postgres, storage, RLS)
+
+Your event/timeline model maps perfectly to Postgres + append-only tables
+
+Faster MVP without sacrificing seriousness
+
+Clean separation between data truth and derived UI views
+
+Easy Stripe, email, PDF, webhook integration later
+
+Final stack:
+
+Backend core: Supabase (Postgres, Auth, RLS, Storage)
+
+Server logic (thin): Node/Edge functions only where needed
+(PDF gen, email orchestration, Stripe webhooks)
+
+Frontend: React (Next.js or Vite-based SPA)
+
+Design system: Your governed component hierarchy → enforced in code
+
+Branding: REOS Foundry R logo as primary mark
+
+This replaces FUB + Sisu + Ylopo without recreating their mistakes.
+
+🧠 System Philosophy (What Makes This Different)
+
+This CRM has one truth:
+
+Everything is an event.
+Screens are projections.
+Roles filter meaning, not data.
+
+From your docs, we will strictly enforce:
+
+❌ No mutable “status fields” as primary truth
+
+❌ No role-specific components
+
+❌ No screen-driven logic
+
+✅ Append-only event log
+
+✅ Derived summaries for speed
+
+✅ Progressive disclosure by role
+
+This is how we beat competitors after offer acceptance—where they collapse.
+
+🧱 Canonical Domain Model (Locked)
+
+From your Object Model + Event Model, these are non-negotiable primitives:
+
+Core Entities
+
+Transaction
+
+Person (Agent, Buyer, Seller, Lender, Attorney, etc.)
+
+Event (immutable, append-only)
+
+Task
+
+Document
+
+Message
+
+TimelineProjection (derived, not authoritative)
+
+No entity may update “state” directly.
+State is always inferred from events.
+
+🧭 Event Model (The Heart of the System)
+Event Table (Append-Only)
+
+Each event has:
+
+id
+
+transaction_id
+
+type (OfferSubmitted, InspectionOrdered, EarnestMoneyReceived…)
+
+actor_role
+
+actor_id
+
+payload (strictly typed per event)
+
+created_at
+
+Rules (Enforced in Code + DB)
+
+❌ No deletes
+
+❌ No updates
+
+✅ Corrections are new events
+
+✅ Role visibility handled at query/view level
+
+This directly implements your “Sisu killer” timeline doctrine.
+
+🧑‍⚖️ Role Governance (Strict)
+
+From your Role-Based Interaction Taxonomy:
+
+Roles filter interpretation, not storage
+
+Same transaction, same events
+
+Different views, same truth
+
+Example:
+
+Agent sees “Inspection Due”
+
+Buyer sees “Next Step: Home Inspection”
+
+Admin sees “InspectionOrdered → PendingResult”
+
+No branching logic. No forks.
+
+🎨 UI Governance → Enforced, Not Suggested
+
+We will codify your rules into the repo itself:
+
+Component Hierarchy (Mandatory)
+/primitives
+/elements
+/blocks
+/sections
+/screens
+
+Enforcement
+
+PR template = UI Contract Compliance Checklist
+
+Merge blocked if:
+
+New component violates reuse threshold
+
+Role-specific component is introduced
+
+Naming deviates from contract
+
+Screen bypasses event model
+
+Your governance docs become engineering law, not design theory.
+
+🧪 MVP Build Sequence (Exactly as Written)
+Phase 1 — Walking Skeleton
+
+Auth
+
+Transaction list
+
+Transaction detail (read-only)
+
+Event timeline (raw)
+
+Phase 2 — Transaction Core
+
+Event creation (offers, docs, tasks)
+
+Timeline projections
+
+Role-based views
+
+Phase 3 — Collaboration
+
+Documents
+
+Messaging
+
+Tasks
+
+Phase 4 — Monetization & Integrations
+
+Stripe
+
+Email
+
+PDF generation
+
+No MLS. No AI. No scope creep.
+
+🎯 What I’ll Do Next (Immediately)
+Step 1 (Next Message)
+
+I will deliver:
+
+1-page Canonical Architecture Spec
+
+Final ERD (event-first)
+
+API contract outline
+
+Repo structure
+
+Step 2
+
+Frontend app shell with REOS “R” branding
+
+Supabase schema (events, transactions, RLS)
+
+First working vertical slice

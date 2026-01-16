@@ -1,0 +1,337 @@
+THIRD-PARTY INTEGRATION MAP
+
+Governed Real Estate CRM
+
+🟢 TIER 1 — REQUIRED FOR GA (FOUNDATIONAL)
+
+These are infrastructure-grade dependencies. You cannot realistically ship GA without them.
+
+1️⃣ Supabase (Core Backend)
+
+Category: Backend, Auth, DB, Storage
+Status: REQUIRED
+You already approved this
+
+Used for
+
+Auth (identity only)
+
+Postgres database
+
+Row Level Security (safety net)
+
+File storage (documents)
+
+Optional realtime later
+
+Governance Rules
+
+Supabase = infrastructure only
+
+No business logic
+
+No RBAC in JWTs
+
+/me view is authoritative
+
+✅ Approved and locked
+
+2️⃣ Email Service (Transactional)
+
+Examples: Resend (recommended), Postmark, SendGrid
+Category: System messaging
+Status: REQUIRED
+
+Used for
+
+Invite emails
+
+Login links (if magic link enabled)
+
+System notifications (non-marketing)
+
+Why Resend is a good fit
+
+Simple API
+
+Great deliverability
+
+No marketing bloat
+
+Developer-friendly
+
+Governance Rules
+
+🚫 No drip campaigns
+
+🚫 No marketing automation
+
+✔ Emails must correspond to explicit user actions
+
+✔ Email sends logged as events
+
+✅ Resend strongly recommended
+
+3️⃣ PDF Generation
+
+Examples: PDFKit, Puppeteer, DocRaptor
+Category: Document generation
+Status: REQUIRED (lightweight)
+
+Used for
+
+Transaction summaries
+
+Deal timelines (export)
+
+Audit-style summaries (later)
+
+Governance Rules
+
+PDFs are derived views, not records
+
+No document editing inside PDFs
+
+PDFs never become the source of truth
+
+Recommendation
+
+Start with server-side HTML → PDF
+
+Avoid heavy SaaS PDF vendors early
+
+🟡 TIER 2 — STRONGLY RECOMMENDED (POST-GA / EARLY SCALE)
+
+These materially improve product value but should be added after GA stability.
+
+4️⃣ Telephony / SMS
+
+Examples: Twilio, Telnyx
+Category: Communications
+Status: STRONGLY RECOMMENDED
+
+Used for
+
+Call logging
+
+SMS follow-ups
+
+Optional voice agent (future)
+
+Governance Rules
+
+Calls/messages generate events
+
+No hidden automations
+
+No outbound spam
+
+User explicitly initiates or enables
+
+Twilio vs Telnyx
+
+Twilio = easiest
+
+Telnyx = cheaper, more control
+
+🟡 Add after beta validation
+
+5️⃣ Calendar Integration
+
+Examples: Google Calendar, Microsoft Outlook
+Category: Scheduling
+Status: STRONGLY RECOMMENDED
+
+Used for
+
+Logging meetings
+
+Avoiding double entry
+
+Syncing inspection dates
+
+Governance Rules
+
+Calendar events → timeline events
+
+Sync is optional, not required
+
+Never overwrite user calendars silently
+
+6️⃣ Payment & Billing
+
+Examples: Stripe
+Category: Monetization
+Status: REQUIRED FOR GA monetization
+
+Used for
+
+Subscriptions
+
+Trials
+
+Upgrades/downgrades
+
+Governance Rules
+
+Stripe handles money, not access logic
+
+Capability checks remain internal
+
+No pricing logic in frontend components
+
+✅ Stripe is the clear choice
+
+🟠 TIER 3 — DOMAIN-SPECIFIC (MLS, REAL ESTATE DATA)
+
+These are strategic and should be introduced only when they support a clear workflow.
+
+7️⃣ MLS / Listing Data
+
+Examples:
+
+MLS Grid
+
+Bridge Interactive
+
+Trestle
+
+RESO Web API providers
+
+Category: Real estate data
+Status: DEFERRED (IMPORTANT)
+
+Used for
+
+Auto-creating properties
+
+Reducing manual data entry
+
+Listing context
+
+Why this is tricky
+
+Licensing varies by MLS
+
+Legal agreements required
+
+Data fragmentation
+
+Governance Rules
+
+MLS data is reference data only
+
+Never authoritative over user-entered data
+
+Imported data generates events (“Listing imported”)
+
+🟠 Add after core workflow proves sticky
+
+8️⃣ Mapping / Geocoding
+
+Examples: Google Maps, Mapbox
+Category: Visualization
+Status: OPTIONAL
+
+Used for
+
+Property location
+
+Distance context
+
+Visual cues
+
+Governance Rules
+
+Maps are informational only
+
+No map-driven workflows
+
+No geofencing logic
+
+🔵 TIER 4 — INTELLIGENCE & AUTOMATION (LATER)
+
+Only after real usage data exists.
+
+9️⃣ AI / LLM Providers
+
+Examples: OpenAI, Anthropic
+Category: Intelligence
+Status: DEFERRED
+
+Used for
+
+Weekly summaries
+
+Deal risk explanations
+
+Advisor-grade insights
+
+Governance Rules
+
+AI outputs are explanations, not actions
+
+AI never mutates data
+
+AI suggestions are logged as events
+
+10️⃣ Automation / Workflow Engine
+
+Examples: Temporal, Trigger.dev
+Category: Automation
+Status: FUTURE
+
+Used for
+
+Guarded follow-ups
+
+Delayed checks
+
+SLA reminders
+
+Governance Rules
+
+Automation emits events
+
+Automation never runs silently
+
+Human override always possible
+
+🔴 EXPLICITLY NOT NEEDED (BY DESIGN)
+
+These are intentional exclusions that protect your product.
+
+Integration	Why Not
+HubSpot	CRM bloat
+Marketo	Marketing automation creep
+Zapier (early)	Logic sprawl
+Slack (early)	Context fragmentation
+Accounting software	Scope violation
+e-Signature (DocuSign)	Premature complexity
+🧠 SUMMARY TABLE
+Category	Required	Recommended	Deferred
+Backend/Auth	Supabase	—	—
+Email	Resend	—	—
+Billing	Stripe	—	—
+PDF	PDFKit	—	—
+Telephony	—	Twilio	—
+Calendar	—	Google/Microsoft	—
+MLS	—	—	Yes
+AI	—	—	Yes
+🏁 EXECUTIVE TAKEAWAY
+
+You do not need 20 integrations to win.
+
+You need:
+
+3–5 rock-solid ones at GA
+
+A clear governance stance
+
+A refusal to let integrations dictate UX
+
+This plan keeps you:
+✔ Focused
+✔ Defensible
+✔ Fast
+✔ Hard to copy

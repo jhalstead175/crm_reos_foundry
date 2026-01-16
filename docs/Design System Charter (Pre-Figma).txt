@@ -1,0 +1,250 @@
+Design System Charter
+System Name: Helios Realty Design System (HRDS)
+Purpose: To unify the experience of managing complex real estate transactions across all platforms
+Philosophy: "Professional clarity over decorative delight. Every interface element should accelerate deal velocity."
+
+1. Design Tokens: The Atomic Foundation
+Typography Tokens
+Hierarchy & Intent:
+
+text-headline: For primary page titles and critical workflow identification
+
+text-subtitle: For section grouping and secondary context
+
+text-body-{size}: For transactional content, contracts, and descriptions
+
+text-label: For form fields, interactive elements, and metadata
+
+text-caption: For legal disclaimers, timestamps, and auxiliary information
+
+text-code: For property IDs, MLS numbers, and technical references
+
+Governance Principle: Type conveys information hierarchy, not brand personality. Readability trumps expression.
+
+Spacing Tokens
+Scale & Relationship:
+
+space-micro: For intimate relationships (icon to label, checkbox to text)
+
+space-tight: For related elements within the same component
+
+space-base: Standard separation between distinct but related items
+
+space-loose: For separating distinct sections or card groups
+
+space-section: Between major workflow sections
+
+space-page: For framing content within viewport
+
+Governance Principle: Spacing is relational arithmetic, not arbitrary. Use tokens to maintain proportional relationships across all screens.
+
+Color Intent Tokens
+Semantic, Not Decorative:
+
+color-primary-action: One primary action per screen maximum
+
+color-secondary-action: All other interactive elements
+
+color-destructive-action: Irreversible or data-loss actions
+
+color-success: Completed milestones, closed deals
+
+color-warning: Attention required before proceeding
+
+color-error: Blocking issues requiring immediate resolution
+
+color-info: Supplemental information, status indicators
+
+color-surface-{level}: For layering information hierarchy
+
+color-text-{emphasis}: For readability against surfaces
+
+color-data-{category}: For visualizing deal stages, financial ranges, or risk levels
+
+Governance Principle: Color is functional first. Every color token must have a consistent behavioral expectation.
+
+2. Component Hierarchy
+2.1 Three-Tier Architecture
+text
+Atoms → Molecules → Organisms → Templates → Pages
+Atoms: Basic HTML elements with HRDS tokens applied (Button, Input, Badge)
+Molecules: Functional combinations of atoms (Search bar, Property card, Date range picker)
+Organisms: Complex assemblies with business logic (Offer workflow, Contact manager, Transaction timeline)
+Templates: Page layouts with placeholder organisms
+Pages: Fully realized templates with actual data and business context
+
+2.2 Specialization by Domain
+Certain organisms are real-estate specific and treated as first-class citizens:
+
+TransactionPipeline: Visualizes deal stages across roles
+
+DocumentSigningFlow: Manages multi-party signature workflows
+
+CommissionCalculator: Domain-specific tool with industry rules
+
+PropertyComparisonTable: Specialized data visualization
+
+3. Naming Conventions
+3.1 Component Naming: {Domain}-{Function}-{Variant}
+Domain Prefix: transaction-, property-, contact-, document-, communication-
+
+Function: What it does (card, form, list, viewer, editor)
+
+Variant: Visual or behavioral variation (compact, expanded, readonly)
+
+Examples:
+
+transaction-timeline-compact
+
+property-card-expanded
+
+document-signer-readonly
+
+3.2 Token Naming: {category}-{property}-{variant}
+Category: color, spacing, typography, radius, shadow
+
+Property: What it affects (background, text, border, padding)
+
+Variant: Scale or intent (primary, small, tight, danger)
+
+Examples:
+
+color-background-success
+
+spacing-padding-tight
+
+typography-headline-large
+
+3.3 File Structure
+text
+/components
+  /atoms
+    /button
+      button.primary.js
+      button.secondary.js
+      button.test.js
+      button.stories.js
+  /molecules
+    /property-card
+      index.js (exports all variants)
+      property-card.base.js
+      property-card.compact.js
+4. Responsive Behavior Principles
+4.1 Content-First Breakpoints
+We define breakpoints by content necessity, not device sizes:
+
+breakpoint-tight: When horizontal space compromises readability
+
+breakpoint-stacked: When components must switch to vertical layout
+
+breakpoint-dense: When information density can increase safely
+
+breakpoint-expanded: When additional contextual information can be revealed
+
+4.2 Progressive Disclosure
+Mobile First: Design for core task completion on smallest viewport
+
+Add Context: As space increases, reveal supporting information
+
+Maintain Priority: Primary action never moves or becomes hidden
+
+Preserve Relationships: Connected elements maintain visual proximity
+
+4.3 Adaptive, Not Just Responsive
+Data Tables: Switch from horizontal scroll to card stack at breakpoint-stacked
+
+Transaction Views: Timeline shifts from horizontal to vertical at breakpoint-tight
+
+Comparison Tools: Side-by-side becomes sequential comparison
+
+Navigation: Primary actions remain accessible via bottom bar on mobile
+
+Governance Principle: The user's task should dictate layout changes, not arbitrary screen widths.
+
+5. Motion & Feedback Philosophy
+5.1 Motion with Purpose
+Three Categories of Motion:
+
+Functional: Helps user understand state changes (drawer slides, modal appearances)
+
+Progressive: Guides through multi-step workflows (form steps, wizard transitions)
+
+Feedback: Confirms user actions (button presses, successful saves)
+
+Motion Rules:
+
+Duration never exceeds 300ms for functional motion
+
+Easing curves match physical metaphor (enter: ease-out, exit: ease-in)
+
+No motion without user intent or system necessity
+
+Respect reduced-motion preferences at OS level
+
+5.2 Feedback Hierarchy
+Immediate (<100ms): Visual state change on interaction (button press)
+Fast (<500ms): Inline validation, auto-save confirmation
+Deliberate (1-3s): Complex operation progress, multi-step processes
+Persistent: Requires user acknowledgment (errors, warnings)
+
+Feedback Principle: The weight of feedback should match the consequence of the action.
+
+6. When to Extend vs Reuse Components
+6.1 The Extension Decision Tree
+text
+Is the desired behavior >80% similar to existing component?
+    ├── Yes → Extend with variant
+    │       ├── Does it require new business logic?
+    │       │   ├── Yes → Create domain-specific variant
+    │       │   └── No → Create visual variant only
+    │       └── Document usage patterns
+    │
+    └── No → Consider new component
+            ├── Will this be used in ≥3 distinct contexts?
+            │   ├── Yes → Create new base component
+            │   └── No → Create one-off implementation (rare)
+            └── New component must follow naming conventions
+6.2 Extension Criteria
+Extend when:
+
+Visual style differs but behavior identical (e.g., button color variant)
+
+Minor functionality addition (e.g., input with icon)
+
+Domain-specific data visualization using existing patterns
+
+Responsive behavior variations of same component
+
+Create new when:
+
+Interaction pattern differs fundamentally (click vs drag)
+
+Data model requires different API structure
+
+Accessibility considerations demand different markup
+
+Performance characteristics differ significantly
+
+6.3 The Variant Scale
+text
+Level 1: CSS-only variant (different appearance)
+Level 2: Minor prop addition (icon, helper text)
+Level 3: Behavioral variant (controlled vs uncontrolled)
+Level 4: Domain-specific variant (adds business logic)
+Level 5: New component (distinct interaction model)
+Governance Rule: Progress beyond Level 3 requires Design System Team review.
+
+Charter Amendments & Evolution
+This charter may be amended quarterly based on:
+
+Usage Analytics: Component adoption and variant utilization
+
+Accessibility Audits: WCAG compliance testing results
+
+Performance Metrics: Bundle size impact of new patterns
+
+User Feedback: Pain points in real estate workflow tasks
+
+Amendment Process: Proposal → 30-day review period → 2/3 Design System Team approval → Update charter version.
+
+Final Principle: "A design system for real estate must be as reliable as a title search, as clear as a property disclosure, and as efficient as a well-run closing."
