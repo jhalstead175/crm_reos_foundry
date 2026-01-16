@@ -50,4 +50,34 @@ export default function HowItWorks() {
         <h2>3. Tasks are derived, not managed</h2>
         <p>
           Tasks in Chronos are not standalone objects.
-          They are consequenc
+          They are consequences of events.
+        </p>
+        <p>
+          When something happens that creates work,
+          a task appears automatically.
+          When the work is done, the task is marked complete
+          and preserved in history.
+        </p>
+        <p>
+          You don't manage tasks. You do them.
+        </p>
+      </section>
+
+      {/* STEP 4 */}
+      <section className="how-section">
+        <h2>4. Clarity compounds over time</h2>
+        <p>
+          Because nothing is overwritten,
+          Chronos becomes more useful the longer it runs.
+        </p>
+        <p>
+          Patterns emerge. Context accumulates.
+          The system gets smarter without needing to be told.
+        </p>
+        <p>
+          This is the opposite of CRM entropy.
+        </p>
+      </section>
+    </main>
+  );
+}

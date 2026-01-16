@@ -1,168 +1,304 @@
-import React, { useState } from "react";
-import "./styles/task-board.css";
-
-import { Event } from "../lib/events";
-import { deriveTasksFromEvents, TaskStatus } from "../lib/tasks";
-import { NarrativeHeader } from "../components/NarrativeHeader";
-
-/* =====================================================
-   Initial Mock Events
-   ===================================================== */
-
-const INITIAL_EVENTS: Event[] = [
-  {
-    id: "e1",
-    type: "offer.accepted",
-    timestamp: "2026-01-10T10:00:00Z",
-    actor: "Agent",
-  },
-  {
-    id: "e2",
-    type: "inspection.completed",
-    timestamp: "2026-01-12T15:30:00Z",
-    actor: "Inspector",
-  },
-  {
-    id: "e3",
-    type: "document.uploaded",
-    timestamp: "2026-01-13T09:00:00Z",
-    actor: "Buyer",
-    payload: {
-      documentType: "addendum",
-    },
-  },
-];
-
-/* =====================================================
-   Column Definition
-   ===================================================== */
-
-const columns: { key: TaskStatus; label: string }[] = [
-  { key: "todo", label: "To Do" },
-  { key: "doing", label: "Doing" },
-  { key: "done", label: "Done" },
-];
-
-/* =====================================================
-   Task Board Screen
-   ===================================================== */
+import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import type { TransactionTask, TaskPriority } from "../types/task";
+import { supabase } from "../lib/supabase";
 
 export default function TaskBoard() {
-  /**
-   * Event log lives here (for now).
-   * In production, this will come from the backend
-   * and be append-only.
-   */
-  const [events, setEvents] = useState<Event[]>(INITIAL_EVENTS);
+  const [allTasks, setAllTasks] = useState<TransactionTask[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Tasks are always derived.
-   */
-  const tasks = deriveTasksFromEvents(events);
+  // Mock transaction mapping for display
+  const transactionNames: Record<string, string> = {
+    "1": "123 Main St",
+    "2": "456 Oak Ave",
+    "3": "789 Elm Blvd",
+  };
 
-  /**
-   * Emit task.completed event
-   */
-  function completeTask(taskId: string) {
-    const completionEvent: Event = {
-      id: `e-${Date.now()}`,
-      type: "task.completed",
-      timestamp: new Date().toISOString(),
-      actor: "You",
-      payload: {
-        taskId,
-      },
+  // Load all tasks from Supabase on mount
+  useEffect(() => {
+    async function loadAllTasks() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const { data, error: tasksError } = await supabase
+          .from("transaction_tasks")
+          .select("*")
+          .order("created_at", { ascending: false });
+
+        if (tasksError) throw tasksError;
+
+        // Transform DB data to frontend format
+        const transformedTasks: TransactionTask[] = (data || []).map((row: any) => ({
+          id: row.id,
+          transactionId: row.transaction_id,
+          title: row.title,
+          status: row.status,
+          priority: row.priority as TaskPriority,
+          dueDate: row.due_date,
+          assignee: row.assignee,
+          createdAt: row.created_at,
+        }));
+
+        setAllTasks(transformedTasks);
+      } catch (err) {
+        console.error("Error loading tasks:", err);
+        setError("Failed to load tasks");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadAllTasks();
+  }, []);
+
+  // Realtime subscriptions for live task updates
+  useEffect(() => {
+    // Subscribe to all task changes (INSERT and UPDATE)
+    const tasksChannel = supabase
+      .channel("all_transaction_tasks")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "transaction_tasks",
+        },
+        (payload) => {
+          const row = payload.new;
+          const newTask: TransactionTask = {
+            id: row.id,
+            transactionId: row.transaction_id,
+            title: row.title,
+            status: row.status,
+            priority: row.priority as TaskPriority,
+            dueDate: row.due_date,
+            assignee: row.assignee,
+            createdAt: row.created_at,
+          };
+
+          // Add if not already present
+          setAllTasks((prev) => {
+            const exists = prev.some((t) => t.id === newTask.id);
+            return exists ? prev : [...prev, newTask];
+          });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "transaction_tasks",
+        },
+        (payload) => {
+          const row = payload.new;
+          const updatedTask: TransactionTask = {
+            id: row.id,
+            transactionId: row.transaction_id,
+            title: row.title,
+            status: row.status,
+            priority: row.priority as TaskPriority,
+            dueDate: row.due_date,
+            assignee: row.assignee,
+            createdAt: row.created_at,
+          };
+
+          // Merge by id (replace matching task)
+          setAllTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+        }
+      )
+      .subscribe();
+
+    // Cleanup on unmount
+    return () => {
+      tasksChannel.unsubscribe();
     };
+  }, []);
 
-    setEvents((prev) => [...prev, completionEvent]);
+  // Group tasks by status
+  const columns = [
+    {
+      id: "todo",
+      title: "To Do",
+      tasks: allTasks.filter((t) => t.status === "todo"),
+    },
+    {
+      id: "in_progress",
+      title: "In Progress",
+      tasks: allTasks.filter((t) => t.status === "in_progress"),
+    },
+    {
+      id: "done",
+      title: "Done",
+      tasks: allTasks.filter((t) => t.status === "done"),
+    },
+  ];
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-red-100 text-red-700";
+      case "medium":
+        return "bg-yellow-100 text-yellow-700";
+      case "low":
+        return "bg-blue-100 text-blue-700";
+      default:
+        return "bg-gray-100 text-gray-700";
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-subheadline text-secondary">Loading tasks...</div>
+      </div>
+    );
   }
 
-return (
-  <main className="task-board motion-fade-in">
-    {/* Narrative context */}
-    <NarrativeHeader events={events} tasks={tasks} />
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h1 className="text-title-1">Task Board</h1>
+            <p className="text-subheadline text-secondary mt-1">
+              View-only aggregation • Edit tasks in transaction detail
+            </p>
+          </div>
+        </div>
 
-    {/* Header */}
-    <header className="task-board-header stack">
-      <h1 className="text-headline">Task Board</h1>
-      <p className="text-subtitle">
-        What needs attention, based on what’s happened so far.
-      </p>
-    </header>
+        {/* Error Display */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-subheadline text-red-800">{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="mt-2 text-footnote text-red-600 hover:text-red-800 motion-text"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
 
-      {/* Columns */}
-      <section className="task-board-columns">
-        {columns.map((column) => {
-          const columnTasks = tasks.filter(
-            (task) => task.status === column.key
-          );
+        {/* Read-only Notice */}
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-subheadline text-primary">
+            <span className="text-body-emphasized">Read-only view:</span> Tasks can only be created
+            or modified within their transaction. Click any task to navigate to its transaction.
+          </p>
+        </div>
 
-          return (
-            <div key={column.key} className="task-column">
+        {/* Kanban Board */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {columns.map((column) => (
+            <div key={column.id} className="flex flex-col">
               {/* Column Header */}
-              <div className="task-column-header">
-                <h2 className="text-label">
-                  {column.label}
-                  <span className="task-count">
-                    {columnTasks.length}
+              <div className="bg-white rounded-t-lg border-x border-t border-gray-200 p-4">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-title-3">{column.title}</h2>
+                  <span className="text-caption-1 px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                    {column.tasks.length}
                   </span>
-                </h2>
+                </div>
               </div>
 
-              {/* Column Body */}
-              <div className="task-column-body">
-                {columnTasks.length === 0 ? (
-                  <div className="task-empty stack-tight">
-                    <p className="text-body">
-                      Nothing here yet.
-                    </p>
-                    <p className="text-caption">
-                      Tasks appear automatically as events occur.
-                    </p>
-                  </div>
+              {/* Column Content */}
+              <div className="flex-1 bg-gray-100 rounded-b-lg border-x border-b border-gray-200 p-4 space-y-3 min-h-[400px]">
+                {column.tasks.length === 0 ? (
+                  <p className="text-subheadline text-secondary">No tasks</p>
                 ) : (
-                  columnTasks.map((task) => (
-                    <div key={task.id} className="task-card">
-                      <div className="stack-tight">
-                        <p className="text-body">
-                          {task.title}
-                        </p>
+                  column.tasks.map((task) => (
+                    <Link
+                      key={task.id}
+                      to={`/transactions/${task.transactionId}`}
+                      className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-500 hover:shadow-md motion-card"
+                    >
+                      {/* Task Header */}
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-body-emphasized flex-1">{task.title}</h3>
+                        <span
+                          className={`text-caption-1 px-2 py-0.5 rounded ${getPriorityColor(
+                            task.priority
+                          )}`}
+                        >
+                          {task.priority}
+                        </span>
+                      </div>
 
-                        {(task.dueDate || task.assignee) && (
-                          <div className="task-meta">
-                            {task.dueDate && (
-                              <span className="text-caption">
-                                {task.dueDate}
-                              </span>
-                            )}
-                            {task.assignee && (
-                              <span className="text-caption">
-                                Assigned to {task.assignee}
-                              </span>
-                            )}
+                      {/* Task Meta */}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <svg
+                            className="w-4 h-4 text-gray-500"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                            />
+                          </svg>
+                          <span className="text-subheadline text-secondary">
+                            {transactionNames[task.transactionId] || `Transaction ${task.transactionId}`}
+                          </span>
+                        </div>
+
+                        {task.dueDate && (
+                          <div className="flex items-center gap-2">
+                            <svg
+                              className="w-4 h-4 text-gray-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                              />
+                            </svg>
+                            <span className="text-subheadline text-secondary">
+                              Due {new Date(task.dueDate).toLocaleDateString()}
+                            </span>
                           </div>
                         )}
 
-                        {/* Completion Action */}
-                        {task.status !== "done" && (
-                          <div>
-                            <button
-                              className="text-label"
-                              onClick={() => completeTask(task.id)}
+                        {task.assignee && (
+                          <div className="flex items-center gap-2">
+                            <svg
+                              className="w-4 h-4 text-gray-500"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
                             >
-                              Mark complete
-                            </button>
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                              />
+                            </svg>
+                            <span className="text-subheadline text-secondary">
+                              {task.assignee.name}
+                            </span>
                           </div>
                         )}
                       </div>
-                    </div>
+                    </Link>
                   ))
                 )}
               </div>
             </div>
-          );
-        })}
-      </section>
-    </main>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
