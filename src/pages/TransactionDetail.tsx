@@ -1,59 +1,19 @@
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { TransactionTask, TransactionEvent, TaskStatus, TaskPriority } from "../types/task";
+import { supabase } from "../lib/supabase";
 
 type TabType = "timeline" | "documents" | "tasks" | "messages";
 
 export default function TransactionDetail() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<TabType>("timeline");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Task and event state
-  const [tasks, setTasks] = useState<TransactionTask[]>([
-    {
-      id: "1",
-      transactionId: id!,
-      title: "Schedule home inspection",
-      status: "todo",
-      priority: "high",
-      dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "2",
-      transactionId: id!,
-      title: "Review purchase agreement",
-      status: "done",
-      priority: "medium",
-      dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  ]);
-
-  const [events, setEvents] = useState<TransactionEvent[]>([
-    { type: "system", title: "Transaction created", timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString() },
-    { type: "milestone", title: "Initial offer submitted", timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString() },
-    {
-      type: "task.created",
-      taskId: "1",
-      taskTitle: "Schedule home inspection",
-      transactionId: id!,
-      timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      type: "task.created",
-      taskId: "2",
-      taskTitle: "Review purchase agreement",
-      transactionId: id!,
-      timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      type: "task.completed",
-      taskId: "2",
-      taskTitle: "Review purchase agreement",
-      timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  ]);
+  const [tasks, setTasks] = useState<TransactionTask[]>([]);
+  const [events, setEvents] = useState<TransactionEvent[]>([]);
 
   // Mock transaction data
   const transaction = {
@@ -71,10 +31,114 @@ export default function TransactionDetail() {
     { id: "messages", label: "Messages" },
   ];
 
+  // Load tasks and events from Supabase on mount
+  useEffect(() => {
+    async function loadTransactionData() {
+      if (!id) return;
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Load tasks
+        const { data: tasksData, error: tasksError } = await supabase
+          .from("transaction_tasks")
+          .select("*")
+          .eq("transaction_id", id);
+
+        if (tasksError) throw tasksError;
+
+        // Load events
+        const { data: eventsData, error: eventsError } = await supabase
+          .from("transaction_events")
+          .select("*")
+          .eq("transaction_id", id)
+          .order("created_at", { ascending: false });
+
+        if (eventsError) throw eventsError;
+
+        // Transform DB data to frontend format
+        const transformedTasks: TransactionTask[] = (tasksData || []).map((row: any) => ({
+          id: row.id,
+          transactionId: row.transaction_id,
+          title: row.title,
+          status: row.status as TaskStatus,
+          priority: row.priority as TaskPriority,
+          dueDate: row.due_date,
+          assignee: row.assignee,
+          createdAt: row.created_at,
+        }));
+
+        const transformedEvents: TransactionEvent[] = (eventsData || []).map((row: any) => {
+          const payload = row.payload;
+          const baseEvent = {
+            timestamp: row.created_at,
+          };
+
+          switch (row.type) {
+            case "task.created":
+              return {
+                ...baseEvent,
+                type: "task.created" as const,
+                taskId: payload.taskId,
+                taskTitle: payload.title,
+                transactionId: row.transaction_id,
+              };
+            case "task.status_changed":
+              return {
+                ...baseEvent,
+                type: "task.status_changed" as const,
+                taskId: payload.taskId,
+                taskTitle: payload.title,
+                from: payload.from,
+                to: payload.to,
+              };
+            case "task.completed":
+              return {
+                ...baseEvent,
+                type: "task.completed" as const,
+                taskId: payload.taskId,
+                taskTitle: payload.title,
+              };
+            case "system":
+              return {
+                ...baseEvent,
+                type: "system" as const,
+                title: payload.title,
+              };
+            case "milestone":
+              return {
+                ...baseEvent,
+                type: "milestone" as const,
+                title: payload.title,
+              };
+            default:
+              return {
+                ...baseEvent,
+                type: "system" as const,
+                title: "Unknown event",
+              };
+          }
+        });
+
+        setTasks(transformedTasks);
+        setEvents(transformedEvents);
+      } catch (err) {
+        console.error("Error loading transaction data:", err);
+        setError("Failed to load transaction data");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadTransactionData();
+  }, [id]);
+
   // Add task handler
-  const handleAddTask = (title: string, priority: TaskPriority, dueDate?: string) => {
+  const handleAddTask = async (title: string, priority: TaskPriority, dueDate?: string) => {
+    const tempId = Date.now().toString();
     const newTask: TransactionTask = {
-      id: Date.now().toString(),
+      id: tempId,
       transactionId: id!,
       title,
       status: "todo",
@@ -83,58 +147,173 @@ export default function TransactionDetail() {
       createdAt: new Date().toISOString(),
     };
 
+    // Optimistic update
     setTasks((prev) => [...prev, newTask]);
 
-    // Emit event
     const event: TransactionEvent = {
       type: "task.created",
-      taskId: newTask.id,
-      taskTitle: newTask.title,
+      taskId: tempId,
+      taskTitle: title,
       transactionId: id!,
       timestamp: new Date().toISOString(),
     };
     setEvents((prev) => [...prev, event]);
+
+    try {
+      // Persist to Supabase
+      const { data: taskData, error: taskError } = await supabase
+        .from("transaction_tasks")
+        .insert({
+          transaction_id: id,
+          title,
+          status: "todo",
+          priority,
+          due_date: dueDate || null,
+          assignee: null,
+        })
+        .select()
+        .single();
+
+      if (taskError) throw taskError;
+
+      // Update with real ID from DB
+      setTasks((prev) =>
+        prev.map((t) => (t.id === tempId ? { ...t, id: taskData.id } : t))
+      );
+
+      // Persist event
+      await supabase.from("transaction_events").insert({
+        transaction_id: id,
+        type: "task.created",
+        payload: {
+          taskId: taskData.id,
+          taskTitle: title,
+          transactionId: id!,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    } catch (err) {
+      console.error("Error creating task:", err);
+      // Rollback optimistic update
+      setTasks((prev) => prev.filter((t) => t.id !== tempId));
+      setEvents((prev) => prev.filter((e) => e.type !== "task.created" || e.taskId !== tempId));
+      setError("Failed to create task");
+    }
   };
 
   // Change task status handler
-  const handleStatusChange = (taskId: string, newStatus: TaskStatus) => {
-    setTasks((prev) =>
-      prev.map((task) => {
-        if (task.id === taskId) {
-          const oldStatus = task.status;
+  const handleStatusChange = async (taskId: string, newStatus: TaskStatus) => {
+    const task = tasks.find((t) => t.id === taskId);
+    if (!task) return;
 
-          // Emit status change event
-          const event: TransactionEvent = {
-            type: "task.status_changed",
+    const oldStatus = task.status;
+
+    // Optimistic update
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t))
+    );
+
+    const statusChangeEvent: TransactionEvent = {
+      type: "task.status_changed",
+      taskId: task.id,
+      taskTitle: task.title,
+      from: oldStatus,
+      to: newStatus,
+      timestamp: new Date().toISOString(),
+    };
+    setEvents((prev) => [...prev, statusChangeEvent]);
+
+    if (newStatus === "done") {
+      const completeEvent: TransactionEvent = {
+        type: "task.completed",
+        taskId: task.id,
+        taskTitle: task.title,
+        timestamp: new Date().toISOString(),
+      };
+      setEvents((prev) => [...prev, completeEvent]);
+    }
+
+    try {
+      // Persist status change to Supabase
+      const { error: updateError } = await supabase
+        .from("transaction_tasks")
+        .update({ status: newStatus })
+        .eq("id", taskId);
+
+      if (updateError) throw updateError;
+
+      // Persist events
+      const eventsToInsert = [
+        {
+          transaction_id: id!,
+          type: "task.status_changed",
+          payload: {
             taskId: task.id,
             taskTitle: task.title,
             from: oldStatus,
             to: newStatus,
             timestamp: new Date().toISOString(),
-          };
-          setEvents((prevEvents) => [...prevEvents, event]);
+          },
+        },
+      ];
 
-          // If moving to done, also emit completed event
-          if (newStatus === "done") {
-            const completeEvent: TransactionEvent = {
-              type: "task.completed",
-              taskId: task.id,
-              taskTitle: task.title,
-              timestamp: new Date().toISOString(),
-            };
-            setEvents((prevEvents) => [...prevEvents, completeEvent]);
-          }
+      if (newStatus === "done") {
+        eventsToInsert.push({
+          transaction_id: id!,
+          type: "task.completed",
+          payload: {
+            taskId: task.id,
+            taskTitle: task.title,
+            timestamp: new Date().toISOString(),
+          } as any,
+        });
+      }
 
-          return { ...task, status: newStatus };
-        }
-        return task;
-      })
-    );
+      await supabase.from("transaction_events").insert(eventsToInsert);
+    } catch (err) {
+      console.error("Error updating task status:", err);
+      // Rollback optimistic update
+      setTasks((prev) =>
+        prev.map((t) => (t.id === taskId ? { ...t, status: oldStatus } : t))
+      );
+      setEvents((prev) =>
+        prev.filter(
+          (e) =>
+            !(
+              (e.type === "task.status_changed" || e.type === "task.completed") &&
+              e.taskId === taskId &&
+              e.timestamp === statusChangeEvent.timestamp
+            )
+        )
+      );
+      setError("Failed to update task status");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-subheadline text-secondary">Loading transaction...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Error Display */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-subheadline text-red-800">{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="mt-2 text-footnote text-red-600 hover:text-red-800 motion-text"
+            >
+              Dismiss
+            </button>
+          </div>
+        )}
+
         {/* Transaction Header */}
         <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
           <div className="flex justify-between items-start mb-4">
@@ -214,26 +393,30 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
   return (
     <div className="space-y-4">
       <h2 className="text-title-2 mb-4">Timeline</h2>
-      {sortedEvents.map((event, index) => {
-        const display = getEventDisplay(event);
-        const eventId = "timestamp" in event ? event.timestamp + index : index;
+      {sortedEvents.length === 0 ? (
+        <p className="text-subheadline text-secondary">No events yet.</p>
+      ) : (
+        sortedEvents.map((event, index) => {
+          const display = getEventDisplay(event);
+          const eventId = "timestamp" in event ? event.timestamp + index : index;
 
-        return (
-          <div key={eventId} className="border-l-2 border-blue-600 pl-4 pb-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-body-emphasized">{display.title}</h3>
-                <p className="text-subheadline text-secondary mt-1">
-                  {new Date(event.timestamp).toLocaleString()}
-                </p>
+          return (
+            <div key={eventId} className="border-l-2 border-blue-600 pl-4 pb-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-body-emphasized">{display.title}</h3>
+                  <p className="text-subheadline text-secondary mt-1">
+                    {new Date(event.timestamp).toLocaleString()}
+                  </p>
+                </div>
+                <span className="text-caption-1 px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                  {display.badgeText}
+                </span>
               </div>
-              <span className="text-caption-1 px-2 py-1 bg-gray-100 text-gray-700 rounded">
-                {display.badgeText}
-              </span>
             </div>
-          </div>
-        );
-      })}
+          );
+        })
+      )}
     </div>
   );
 }
@@ -375,41 +558,45 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
 
       {/* Task List */}
       <div className="space-y-3">
-        {tasks.map((task) => (
-          <div key={task.id} className="border rounded-lg p-4 space-y-3">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h3 className={`text-body-emphasized ${task.status === "done" ? "line-through text-gray-500" : ""}`}>
-                  {task.title}
-                </h3>
-                <div className="flex items-center gap-3 mt-2">
-                  <span className={`text-caption-1 px-2 py-0.5 rounded ${getPriorityColor(task.priority)}`}>
-                    {task.priority}
-                  </span>
-                  {task.dueDate && (
-                    <span className="text-subheadline text-secondary">
-                      Due {new Date(task.dueDate).toLocaleDateString()}
+        {tasks.length === 0 ? (
+          <p className="text-subheadline text-secondary">No tasks yet. Click "Add Task" to create one.</p>
+        ) : (
+          tasks.map((task) => (
+            <div key={task.id} className="border rounded-lg p-4 space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <h3 className={`text-body-emphasized ${task.status === "done" ? "line-through text-gray-500" : ""}`}>
+                    {task.title}
+                  </h3>
+                  <div className="flex items-center gap-3 mt-2">
+                    <span className={`text-caption-1 px-2 py-0.5 rounded ${getPriorityColor(task.priority)}`}>
+                      {task.priority}
                     </span>
-                  )}
+                    {task.dueDate && (
+                      <span className="text-subheadline text-secondary">
+                        Due {new Date(task.dueDate).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Status Control */}
-            <div className="flex items-center gap-2">
-              <span className="text-subheadline text-secondary">Status:</span>
-              <select
-                value={task.status}
-                onChange={(e) => onStatusChange(task.id, e.target.value as TaskStatus)}
-                className="px-3 py-1 border border-gray-300 rounded-md text-subheadline focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
-              >
-                <option value="todo">To Do</option>
-                <option value="in_progress">In Progress</option>
-                <option value="done">Done</option>
-              </select>
+              {/* Status Control */}
+              <div className="flex items-center gap-2">
+                <span className="text-subheadline text-secondary">Status:</span>
+                <select
+                  value={task.status}
+                  onChange={(e) => onStatusChange(task.id, e.target.value as TaskStatus)}
+                  className="px-3 py-1 border border-gray-300 rounded-md text-subheadline focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
+                >
+                  <option value="todo">To Do</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="done">Done</option>
+                </select>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
