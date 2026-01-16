@@ -1,9 +1,9 @@
 /* ========== Landing Page (White-Glove) ========== */
 
 .landing {
-  --max-width: 1040px;
+  --max-width: 1152px;
 
-  padding: 6rem 2rem 5rem;
+  padding: 6rem 3rem 5rem;
   padding-bottom: calc(5rem + 50px); /* Extra padding for fixed footer */
   margin: 0 auto;
   max-width: var(--max-width);

@@ -10,7 +10,7 @@ export default function TransactionList() {
 
   return (
     <div className="min-h-screen bg-surface-app">
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-title-1">Transactions</h1>
           <button className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button">

@@ -20,7 +20,7 @@ export default function ContactProfile() {
 
   return (
     <div className="min-h-screen bg-surface-app">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Contact Header */}
         <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6 mb-6">
           <div className="flex items-start gap-4">
