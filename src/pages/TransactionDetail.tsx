@@ -174,7 +174,7 @@ export default function TransactionDetail() {
           table: "transaction_events",
           filter: `transaction_id=eq.${id}`,
         },
-        (payload) => {
+        (payload: any) => {
           const row = payload.new;
           const eventPayload = row.payload;
 
@@ -284,7 +284,7 @@ export default function TransactionDetail() {
           table: "transaction_tasks",
           filter: `transaction_id=eq.${id}`,
         },
-        (payload) => {
+        (payload: any) => {
           const row = payload.new;
           const newTask: TransactionTask = {
             id: row.id,
@@ -314,7 +314,7 @@ export default function TransactionDetail() {
           table: "transaction_tasks",
           filter: `transaction_id=eq.${id}`,
         },
-        (payload) => {
+        (payload: any) => {
           const row = payload.new;
           const updatedTask: TransactionTask = {
             id: row.id,

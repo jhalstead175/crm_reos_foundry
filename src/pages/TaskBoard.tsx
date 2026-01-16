@@ -65,7 +65,7 @@ export default function TaskBoard() {
           schema: "public",
           table: "transaction_tasks",
         },
-        (payload) => {
+        (payload: any) => {
           const row = payload.new;
           const newTask: TransactionTask = {
             id: row.id,
@@ -92,7 +92,7 @@ export default function TaskBoard() {
           schema: "public",
           table: "transaction_tasks",
         },
-        (payload) => {
+        (payload: any) => {
           const row = payload.new;
           const updatedTask: TransactionTask = {
             id: row.id,
