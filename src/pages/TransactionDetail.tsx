@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import type { TransactionTask, TransactionEvent, TaskStatus, TaskPriority } from "../types/task";
 import { supabase } from "../lib/supabase";
+import { executeAutomationRules, persistAutomationActions } from "../lib/automation";
 
 type TabType = "timeline" | "documents" | "tasks" | "messages";
 
@@ -15,12 +16,13 @@ export default function TransactionDetail() {
   const [tasks, setTasks] = useState<TransactionTask[]>([]);
   const [events, setEvents] = useState<TransactionEvent[]>([]);
 
-  // Mock transaction data
+  // Transaction state (mock for MVP - would load from DB in production)
+  const [transactionStatus, setTransactionStatus] = useState("Active");
   const transaction = {
     id,
     address: "123 Main St",
     type: "Purchase",
-    status: "Active",
+    status: transactionStatus,
     createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   };
 
@@ -99,6 +101,29 @@ export default function TransactionDetail() {
                 type: "task.completed" as const,
                 taskId: payload.taskId,
                 taskTitle: payload.title,
+              };
+            case "task.auto_created":
+              return {
+                ...baseEvent,
+                type: "task.auto_created" as const,
+                taskId: payload.taskId,
+                taskTitle: payload.taskTitle || payload.title,
+                reason: payload.reason,
+                transactionId: row.transaction_id,
+              };
+            case "milestone.reached":
+              return {
+                ...baseEvent,
+                type: "milestone.reached" as const,
+                title: payload.title,
+                description: payload.description,
+              };
+            case "deadline.created":
+              return {
+                ...baseEvent,
+                type: "deadline.created" as const,
+                title: payload.title,
+                dueDate: payload.dueDate,
               };
             case "system":
               return {
@@ -181,6 +206,32 @@ export default function TransactionDetail() {
                 type: "task.completed" as const,
                 taskId: eventPayload.taskId,
                 taskTitle: eventPayload.taskTitle || eventPayload.title,
+                timestamp: row.created_at,
+              };
+              break;
+            case "task.auto_created":
+              newEvent = {
+                type: "task.auto_created" as const,
+                taskId: eventPayload.taskId,
+                taskTitle: eventPayload.taskTitle || eventPayload.title,
+                reason: eventPayload.reason,
+                transactionId: row.transaction_id,
+                timestamp: row.created_at,
+              };
+              break;
+            case "milestone.reached":
+              newEvent = {
+                type: "milestone.reached" as const,
+                title: eventPayload.title,
+                description: eventPayload.description,
+                timestamp: row.created_at,
+              };
+              break;
+            case "deadline.created":
+              newEvent = {
+                type: "deadline.created" as const,
+                title: eventPayload.title,
+                dueDate: eventPayload.dueDate,
                 timestamp: row.created_at,
               };
               break;
@@ -425,6 +476,24 @@ export default function TransactionDetail() {
       }
 
       await supabase.from("transaction_events").insert(eventsToInsert);
+
+      // Trigger automation rules if task was completed
+      if (newStatus === "done") {
+        const updatedTasks = tasks.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t));
+        const automationActions = executeAutomationRules({
+          type: "task_completed",
+          transactionId: id!,
+          tasks: updatedTasks,
+        });
+
+        if (automationActions.length > 0) {
+          const { createdTasks, createdEvents } = await persistAutomationActions(automationActions, id!);
+
+          // Update local state with automated tasks and events
+          setTasks((prev) => [...prev, ...createdTasks]);
+          setEvents((prev) => [...prev, ...createdEvents]);
+        }
+      }
     } catch (err) {
       console.error("Error updating task status:", err);
       // Rollback optimistic update
@@ -442,6 +511,37 @@ export default function TransactionDetail() {
         )
       );
       setError("Failed to update task status");
+    }
+  };
+
+  // Change transaction status handler (triggers automation)
+  const handleTransactionStatusChange = async (newStatus: string) => {
+    const previousStatus = transactionStatus;
+
+    // Optimistic update
+    setTransactionStatus(newStatus);
+
+    try {
+      // Trigger automation rules for status change
+      const automationActions = executeAutomationRules({
+        type: "status_change",
+        transactionStatus: newStatus,
+        previousStatus,
+        transactionId: id!,
+      });
+
+      if (automationActions.length > 0) {
+        const { createdTasks, createdEvents } = await persistAutomationActions(automationActions, id!);
+
+        // Update local state with automated tasks and events
+        setTasks((prev) => [...prev, ...createdTasks]);
+        setEvents((prev) => [...prev, ...createdEvents]);
+      }
+    } catch (err) {
+      console.error("Error changing transaction status:", err);
+      // Rollback
+      setTransactionStatus(previousStatus);
+      setError("Failed to change transaction status");
     }
   };
 
@@ -478,9 +578,21 @@ export default function TransactionDetail() {
                 {transaction.type} • Created {new Date(transaction.createdAt).toLocaleDateString()}
               </p>
             </div>
-            <span className="px-3 py-1 bg-green-100 text-green-800 text-footnote rounded-full">
-              {transaction.status}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-subheadline text-secondary">Status:</span>
+              <select
+                value={transaction.status}
+                onChange={(e) => handleTransactionStatusChange(e.target.value)}
+                className="px-3 py-1 bg-green-100 text-green-800 text-footnote rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-green-500 motion-input"
+              >
+                <option value="Active">Active</option>
+                <option value="Under Contract">Under Contract</option>
+                <option value="Contingency Period">Contingency Period</option>
+                <option value="Clear to Close">Clear to Close</option>
+                <option value="Closed">Closed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
           </div>
 
           {/* Tab Navigation */}
@@ -528,20 +640,45 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
   const getEventDisplay = (event: TransactionEvent) => {
     switch (event.type) {
       case "task.created":
-        return { title: `Task created: ${event.taskTitle}`, badgeText: "task" };
+        return { title: `Task created: ${event.taskTitle}`, badgeText: "task", borderColor: "border-blue-600" };
       case "task.status_changed":
         return {
           title: `Task "${event.taskTitle}" moved from ${event.from} to ${event.to}`,
           badgeText: "task",
+          borderColor: "border-blue-600",
         };
       case "task.completed":
-        return { title: `Task completed: ${event.taskTitle}`, badgeText: "task" };
+        return { title: `Task completed: ${event.taskTitle}`, badgeText: "task", borderColor: "border-green-600" };
+      case "task.auto_created":
+        return {
+          title: `🤖 System created task: ${event.taskTitle}`,
+          subtitle: event.reason,
+          badgeText: "automation",
+          badgeColor: "bg-purple-100 text-purple-800",
+          borderColor: "border-purple-600",
+        };
+      case "milestone.reached":
+        return {
+          title: `🎯 Milestone: ${event.title}`,
+          subtitle: event.description,
+          badgeText: "milestone",
+          badgeColor: "bg-green-100 text-green-800",
+          borderColor: "border-green-600",
+        };
+      case "deadline.created":
+        return {
+          title: `⏰ Deadline set: ${event.title}`,
+          subtitle: `Due ${new Date(event.dueDate).toLocaleDateString()}`,
+          badgeText: "deadline",
+          badgeColor: "bg-orange-100 text-orange-800",
+          borderColor: "border-orange-600",
+        };
       case "system":
-        return { title: event.title, badgeText: "system" };
+        return { title: event.title, badgeText: "system", borderColor: "border-gray-600" };
       case "milestone":
-        return { title: event.title, badgeText: "milestone" };
+        return { title: event.title, badgeText: "milestone", borderColor: "border-green-600" };
       default:
-        return { title: "Unknown event", badgeText: "unknown" };
+        return { title: "Unknown event", badgeText: "unknown", borderColor: "border-gray-600" };
     }
   };
 
@@ -556,15 +693,22 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
           const eventId = "timestamp" in event ? event.timestamp + index : index;
 
           return (
-            <div key={eventId} className="border-l-2 border-blue-600 pl-4 pb-4">
+            <div key={eventId} className={`border-l-2 ${display.borderColor || "border-blue-600"} pl-4 pb-4`}>
               <div className="flex justify-between items-start">
-                <div>
+                <div className="flex-1">
                   <h3 className="text-body-emphasized">{display.title}</h3>
+                  {display.subtitle && (
+                    <p className="text-subheadline text-secondary mt-1">{display.subtitle}</p>
+                  )}
                   <p className="text-subheadline text-secondary mt-1">
                     {new Date(event.timestamp).toLocaleString()}
                   </p>
                 </div>
-                <span className="text-caption-1 px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                <span
+                  className={`text-caption-1 px-2 py-1 rounded ${
+                    display.badgeColor || "bg-gray-100 text-gray-700"
+                  }`}
+                >
                   {display.badgeText}
                 </span>
               </div>
