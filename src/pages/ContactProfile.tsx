@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import type { Contact, ContactEvent, ContactEventType, LeadScore, ContactStatus, ContactSource } from "../types/contact";
 
@@ -666,6 +666,40 @@ export default function ContactProfile() {
           </div>
         )}
 
+        {/* Transactions Section */}
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6 mb-6">
+          <h2 className="text-title-2 mb-4">Transactions</h2>
+          <div className="space-y-3">
+            {mockTransactions.map((transaction) => (
+              <Link
+                key={transaction.id}
+                to={`/transactions/${transaction.id}`}
+                className="flex items-center justify-between p-4 rounded-lg border border-surface-subtle hover:border-accent-primary transition-colors"
+              >
+                <div>
+                  <div className="text-subheadline-emphasized text-primary">
+                    {transaction.address}
+                  </div>
+                  <div className="text-footnote text-secondary mt-1">
+                    Role: {transaction.role}
+                  </div>
+                </div>
+                <span
+                  className={`px-3 py-1 rounded-full text-footnote ${
+                    transaction.status === "Active"
+                      ? "bg-green-100 text-green-800"
+                      : transaction.status === "Closed"
+                      ? "bg-gray-100 text-gray-800"
+                      : "bg-blue-100 text-blue-800"
+                  }`}
+                >
+                  {transaction.status}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
         {/* Communication Timeline */}
         <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6">
           <h2 className="text-title-2 mb-4">Communication History</h2>
@@ -751,4 +785,9 @@ const mockEvents: ContactEvent[] = [
     payload: { note: "Asked about showing availability for this weekend." },
     created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
   },
+];
+
+const mockTransactions = [
+  { id: "1", address: "123 Main St", status: "Active", role: "Buyer" },
+  { id: "2", address: "789 Elm Blvd", status: "Closed", role: "Buyer" },
 ];

@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import type { TransactionTask, TransactionEvent, TaskStatus, TaskPriority } from "../types/task";
 import { supabase } from "../lib/supabase";
@@ -592,6 +592,29 @@ export default function TransactionDetail() {
                 <option value="Closed">Closed</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
+            </div>
+          </div>
+
+          {/* Primary Contact */}
+          <div className="border-t border-surface-subtle pt-4 mt-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-accent-primary rounded-full flex items-center justify-center text-white font-bold">
+                J
+              </div>
+              <div className="flex-1">
+                <div className="text-subheadline-emphasized text-primary">
+                  Primary Contact: John Doe
+                </div>
+                <div className="text-footnote text-secondary">
+                  john.doe@example.com • (555) 123-4567
+                </div>
+              </div>
+              <Link
+                to="/contacts/1"
+                className="px-3 py-1 text-accent-primary hover:text-blue-700 text-footnote border border-accent-primary rounded-md hover:bg-accent-soft transition-colors"
+              >
+                View Profile →
+              </Link>
             </div>
           </div>
 
