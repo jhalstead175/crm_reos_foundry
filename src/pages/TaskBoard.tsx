@@ -151,14 +151,14 @@ export default function TaskBoard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-app flex items-center justify-center">
         <div className="text-subheadline text-secondary">Loading tasks...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-app">
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
@@ -196,7 +196,7 @@ export default function TaskBoard() {
           {columns.map((column) => (
             <div key={column.id} className="flex flex-col">
               {/* Column Header */}
-              <div className="bg-white rounded-t-lg border-x border-t border-gray-200 p-4">
+              <div className="bg-surface-panel rounded-t-lg border-x border-t border-surface-subtle p-4">
                 <div className="flex justify-between items-center">
                   <h2 className="text-title-3">{column.title}</h2>
                   <span className="text-caption-1 px-2 py-1 bg-gray-100 text-gray-700 rounded">
@@ -206,7 +206,7 @@ export default function TaskBoard() {
               </div>
 
               {/* Column Content */}
-              <div className="flex-1 bg-gray-100 rounded-b-lg border-x border-b border-gray-200 p-4 space-y-3 min-h-[400px]">
+              <div className="flex-1 bg-surface-muted rounded-b-lg border-x border-b border-surface-subtle p-4 space-y-3 min-h-[400px]">
                 {column.tasks.length === 0 ? (
                   <p className="text-subheadline text-secondary">No tasks</p>
                 ) : (
@@ -214,7 +214,7 @@ export default function TaskBoard() {
                     <Link
                       key={task.id}
                       to={`/transactions/${task.transactionId}`}
-                      className="block bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-500 hover:shadow-md motion-card"
+                      className="block bg-surface-panel rounded-lg border border-surface-subtle p-4 hover:border-accent-primary hover:shadow-md motion-card"
                     >
                       {/* Task Header */}
                       <div className="flex justify-between items-start mb-2">
