@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "../lib/supabase";
-import type { Contact, ContactEvent, ContactEventType, LeadScore, ContactStatus } from "../types/contact";
+import type { Contact, ContactEvent, ContactEventType, LeadScore, ContactStatus, ContactSource } from "../types/contact";
 
 export default function ContactProfile() {
   const { id } = useParams<{ id: string }>();
@@ -14,6 +14,16 @@ export default function ContactProfile() {
   const [logDirection, setLogDirection] = useState<"inbound" | "outbound">("outbound");
   const [showFollowUpForm, setShowFollowUpForm] = useState(false);
   const [followUpDate, setFollowUpDate] = useState("");
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [editData, setEditData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    lead_score: "C" as LeadScore,
+    source: "Other" as ContactSource,
+    status: "New Lead" as ContactStatus,
+    notes: "",
+  });
 
   useEffect(() => {
     loadContact();
@@ -134,6 +144,44 @@ export default function ContactProfile() {
       setContact({ ...contact, next_follow_up_date: followUpDate });
       setFollowUpDate("");
       setShowFollowUpForm(false);
+    }
+  };
+
+  const openEditForm = () => {
+    if (!contact) return;
+    setEditData({
+      name: contact.name,
+      email: contact.email || "",
+      phone: contact.phone || "",
+      lead_score: contact.lead_score,
+      source: contact.source,
+      status: contact.status,
+      notes: contact.notes || "",
+    });
+    setShowEditForm(true);
+  };
+
+  const saveContact = async () => {
+    if (!contact) return;
+
+    try {
+      const { error } = await supabase
+        .from("contacts")
+        .update(editData)
+        .eq("id", contact.id);
+
+      if (error) throw error;
+
+      // Reload contact
+      await loadContact();
+
+      // Close form
+      setShowEditForm(false);
+    } catch (error) {
+      console.error("Error saving contact:", error);
+      // In demo mode, just update local state
+      setContact({ ...contact, ...editData });
+      setShowEditForm(false);
     }
   };
 
@@ -323,7 +371,10 @@ export default function ContactProfile() {
           >
             📅 Set Follow-Up
           </button>
-          <button className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-md hover:border-accent-primary text-subheadline-emphasized motion-button">
+          <button
+            onClick={openEditForm}
+            className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-md hover:border-accent-primary text-subheadline-emphasized motion-button"
+          >
             ✏️ Edit Contact
           </button>
         </div>
@@ -456,6 +507,148 @@ export default function ContactProfile() {
                     setShowFollowUpForm(false);
                     setFollowUpDate("");
                   }}
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-subheadline-emphasized motion-button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Contact Form */}
+        {showEditForm && (
+          <div className="bg-accent-soft border border-accent-primary rounded-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-title-2">Edit Contact</h2>
+              <button
+                onClick={() => setShowEditForm(false)}
+                className="text-secondary hover:text-primary"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-subheadline-emphasized text-primary mb-2">
+                  Name *
+                </label>
+                <input
+                  type="text"
+                  value={editData.name}
+                  onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                />
+              </div>
+
+              {/* Email & Phone */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={editData.email}
+                    onChange={(e) => setEditData({ ...editData, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                  />
+                </div>
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={editData.phone}
+                    onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                  />
+                </div>
+              </div>
+
+              {/* Lead Score, Status, Source */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Lead Score
+                  </label>
+                  <select
+                    value={editData.lead_score}
+                    onChange={(e) => setEditData({ ...editData, lead_score: e.target.value as LeadScore })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="A">A - Hot</option>
+                    <option value="B">B - Warm</option>
+                    <option value="C">C - Medium</option>
+                    <option value="D">D - Cool</option>
+                    <option value="F">F - Cold</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={editData.status}
+                    onChange={(e) => setEditData({ ...editData, status: e.target.value as ContactStatus })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="New Lead">New Lead</option>
+                    <option value="Nurturing">Nurturing</option>
+                    <option value="Hot">Hot</option>
+                    <option value="Under Contract">Under Contract</option>
+                    <option value="Closed">Closed</option>
+                    <option value="Dead">Dead</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Source
+                  </label>
+                  <select
+                    value={editData.source}
+                    onChange={(e) => setEditData({ ...editData, source: e.target.value as ContactSource })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary"
+                  >
+                    <option value="Website">Website</option>
+                    <option value="Zillow">Zillow</option>
+                    <option value="Realtor.com">Realtor.com</option>
+                    <option value="Referral">Referral</option>
+                    <option value="Past Client">Past Client</option>
+                    <option value="Cold Call">Cold Call</option>
+                    <option value="Open House">Open House</option>
+                    <option value="Social Media">Social Media</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-subheadline-emphasized text-primary mb-2">
+                  Notes
+                </label>
+                <textarea
+                  value={editData.notes}
+                  onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={saveContact}
+                  disabled={!editData.name.trim()}
+                  className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized motion-button"
+                >
+                  Save Changes
+                </button>
+                <button
+                  onClick={() => setShowEditForm(false)}
                   className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-subheadline-emphasized motion-button"
                 >
                   Cancel
