@@ -134,6 +134,161 @@ export default function TransactionDetail() {
     loadTransactionData();
   }, [id]);
 
+  // Realtime subscriptions for live updates
+  useEffect(() => {
+    if (!id) return;
+
+    // Subscribe to new events (timeline updates)
+    const eventsChannel = supabase
+      .channel(`transaction_events:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "transaction_events",
+          filter: `transaction_id=eq.${id}`,
+        },
+        (payload) => {
+          const row = payload.new;
+          const eventPayload = row.payload;
+
+          // Transform to frontend format
+          let newEvent: TransactionEvent | null = null;
+
+          switch (row.type) {
+            case "task.created":
+              newEvent = {
+                type: "task.created" as const,
+                taskId: eventPayload.taskId,
+                taskTitle: eventPayload.taskTitle || eventPayload.title,
+                transactionId: row.transaction_id,
+                timestamp: row.created_at,
+              };
+              break;
+            case "task.status_changed":
+              newEvent = {
+                type: "task.status_changed" as const,
+                taskId: eventPayload.taskId,
+                taskTitle: eventPayload.taskTitle || eventPayload.title,
+                from: eventPayload.from,
+                to: eventPayload.to,
+                timestamp: row.created_at,
+              };
+              break;
+            case "task.completed":
+              newEvent = {
+                type: "task.completed" as const,
+                taskId: eventPayload.taskId,
+                taskTitle: eventPayload.taskTitle || eventPayload.title,
+                timestamp: row.created_at,
+              };
+              break;
+            case "system":
+              newEvent = {
+                type: "system" as const,
+                title: eventPayload.title,
+                timestamp: row.created_at,
+              };
+              break;
+            case "milestone":
+              newEvent = {
+                type: "milestone" as const,
+                title: eventPayload.title,
+                timestamp: row.created_at,
+              };
+              break;
+          }
+
+          if (newEvent) {
+            // Dedupe: only add if not already present (by timestamp + taskId or title)
+            setEvents((prev) => {
+              const isDuplicate = prev.some((e) => {
+                if (e.timestamp === newEvent!.timestamp) {
+                  if ("taskId" in e && "taskId" in newEvent!) {
+                    return e.taskId === newEvent!.taskId;
+                  }
+                  if ("title" in e && "title" in newEvent!) {
+                    return e.title === newEvent!.title;
+                  }
+                }
+                return false;
+              });
+
+              return isDuplicate ? prev : [...prev, newEvent!];
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    // Subscribe to task changes (INSERT and UPDATE)
+    const tasksChannel = supabase
+      .channel(`transaction_tasks:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "transaction_tasks",
+          filter: `transaction_id=eq.${id}`,
+        },
+        (payload) => {
+          const row = payload.new;
+          const newTask: TransactionTask = {
+            id: row.id,
+            transactionId: row.transaction_id,
+            title: row.title,
+            status: row.status as TaskStatus,
+            priority: row.priority as TaskPriority,
+            dueDate: row.due_date,
+            assignee: row.assignee,
+            createdAt: row.created_at,
+          };
+
+          // Merge by id (replace temp id or add new)
+          setTasks((prev) => {
+            const exists = prev.some((t) => t.id === newTask.id);
+            if (exists) return prev;
+            // Remove any temp tasks and add the real one
+            return [...prev.filter((t) => !t.id.startsWith(Date.now().toString().slice(0, -3))), newTask];
+          });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "transaction_tasks",
+          filter: `transaction_id=eq.${id}`,
+        },
+        (payload) => {
+          const row = payload.new;
+          const updatedTask: TransactionTask = {
+            id: row.id,
+            transactionId: row.transaction_id,
+            title: row.title,
+            status: row.status as TaskStatus,
+            priority: row.priority as TaskPriority,
+            dueDate: row.due_date,
+            assignee: row.assignee,
+            createdAt: row.created_at,
+          };
+
+          // Merge by id (replace matching task)
+          setTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+        }
+      )
+      .subscribe();
+
+    // Cleanup on unmount
+    return () => {
+      eventsChannel.unsubscribe();
+      tasksChannel.unsubscribe();
+    };
+  }, [id]);
+
   // Add task handler
   const handleAddTask = async (title: string, priority: TaskPriority, dueDate?: string) => {
     const tempId = Date.now().toString();

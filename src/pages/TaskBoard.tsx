@@ -53,6 +53,70 @@ export default function TaskBoard() {
     loadAllTasks();
   }, []);
 
+  // Realtime subscriptions for live task updates
+  useEffect(() => {
+    // Subscribe to all task changes (INSERT and UPDATE)
+    const tasksChannel = supabase
+      .channel("all_transaction_tasks")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "transaction_tasks",
+        },
+        (payload) => {
+          const row = payload.new;
+          const newTask: TransactionTask = {
+            id: row.id,
+            transactionId: row.transaction_id,
+            title: row.title,
+            status: row.status,
+            priority: row.priority as TaskPriority,
+            dueDate: row.due_date,
+            assignee: row.assignee,
+            createdAt: row.created_at,
+          };
+
+          // Add if not already present
+          setAllTasks((prev) => {
+            const exists = prev.some((t) => t.id === newTask.id);
+            return exists ? prev : [...prev, newTask];
+          });
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "transaction_tasks",
+        },
+        (payload) => {
+          const row = payload.new;
+          const updatedTask: TransactionTask = {
+            id: row.id,
+            transactionId: row.transaction_id,
+            title: row.title,
+            status: row.status,
+            priority: row.priority as TaskPriority,
+            dueDate: row.due_date,
+            assignee: row.assignee,
+            createdAt: row.created_at,
+          };
+
+          // Merge by id (replace matching task)
+          setAllTasks((prev) => prev.map((t) => (t.id === updatedTask.id ? updatedTask : t)));
+        }
+      )
+      .subscribe();
+
+    // Cleanup on unmount
+    return () => {
+      tasksChannel.unsubscribe();
+    };
+  }, []);
+
   // Group tasks by status
   const columns = [
     {

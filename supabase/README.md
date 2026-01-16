@@ -60,7 +60,24 @@ This will create:
 - Indexes for performance
 - Row Level Security policies
 
-### 4. Verify Setup
+### 4. Enable Realtime (Required for Live Updates)
+
+Enable Realtime for live cross-tab and multi-user sync:
+
+1. Go to your Supabase project dashboard
+2. Navigate to **Database** → **Replication**
+3. Find the tables `transaction_tasks` and `transaction_events`
+4. Enable Realtime for both tables by toggling the switch
+
+**What this enables:**
+- Live task updates across multiple browser tabs
+- Real-time timeline synchronization
+- Multi-user collaboration without page refresh
+- Task Board auto-updates when tasks change
+
+**Note:** Realtime is table-level, not row-level. No additional SQL needed.
+
+### 5. Verify Setup
 
 Run this query to verify tables exist:
 
@@ -134,10 +151,21 @@ Verify your `VITE_SUPABASE_ANON_KEY` is correct and hasn't expired.
 2. Verify RLS policies are enabled
 3. Ensure you're authenticated (future: add auth flow)
 
+### Realtime not working
+
+1. Verify Realtime is enabled for both tables in Database → Replication
+2. Check browser console for connection errors
+3. Ensure `.env` has correct Supabase URL and anon key
+4. Try refreshing the page - Realtime reconnects automatically
+
+**Note:** If Realtime disconnects, the app continues working normally. Manual refresh restores state.
+
 ## Architecture Notes
 
 - **Frontend is mutation authority**: All changes originate in React components
 - **Supabase is source of record**: Persists state, doesn't decide state
 - **Events are append-only**: Never updated or deleted
 - **Optimistic updates**: UI updates immediately, DB sync follows
+- **Realtime subscriptions**: Live updates across tabs and users, with deduplication
 - **Transaction-bound**: All tasks belong to exactly one transaction
+- **Graceful degradation**: App works offline (minus realtime), state restored on refresh
