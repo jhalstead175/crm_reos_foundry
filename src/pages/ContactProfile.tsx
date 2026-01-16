@@ -1,0 +1,80 @@
+import { useParams } from "react-router-dom";
+
+export default function ContactProfile() {
+  const { id } = useParams<{ id: string }>();
+
+  // Mock contact data
+  const contact = {
+    id,
+    name: "John Doe",
+    email: "john.doe@example.com",
+    phone: "(555) 123-4567",
+    role: "Buyer",
+    notes: "Prequalified for $500K. Looking for 3BR/2BA in downtown area.",
+  };
+
+  const transactions = [
+    { id: "1", address: "123 Main St", status: "Active", role: "Buyer" },
+    { id: "2", address: "789 Elm Blvd", status: "Closed", role: "Buyer" },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Contact Header */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <div className="flex items-start gap-4">
+            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+              {contact.name.charAt(0)}
+            </div>
+            <div className="flex-1">
+              <h1 className="text-2xl font-bold">{contact.name}</h1>
+              <p className="text-sm text-gray-600 mt-1">{contact.role}</p>
+            </div>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              Send Message
+            </button>
+          </div>
+
+          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <p className="mt-1 text-sm text-gray-900">{contact.email}</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Phone</label>
+              <p className="mt-1 text-sm text-gray-900">{contact.phone}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Notes Section */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4">Notes</h2>
+          <p className="text-sm text-gray-700">{contact.notes}</p>
+          <button className="mt-4 text-sm text-blue-600 hover:text-blue-700">
+            Edit Notes
+          </button>
+        </div>
+
+        {/* Transactions Section */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold mb-4">Transactions</h2>
+          <div className="space-y-3">
+            {transactions.map((transaction) => (
+              <div key={transaction.id} className="flex justify-between items-center border rounded-lg p-4">
+                <div>
+                  <h3 className="font-medium">{transaction.address}</h3>
+                  <p className="text-sm text-gray-600 mt-1">Role: {transaction.role}</p>
+                </div>
+                <span className="px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
+                  {transaction.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
