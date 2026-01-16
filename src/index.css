@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* System Font Stack - Apple SF Pro inspired */
+  :root {
+    --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+                   system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  html {
+    font-family: var(--font-system);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply text-gray-900;
+    font-feature-settings: "kern" 1, "liga" 1;
+  }
+
+  /* Display - 32px / Large hero text */
+  .text-display {
+    font-size: 2rem;
+    line-height: 1.25;
+    font-weight: 600;
+    letter-spacing: -0.022em;
+  }
+
+  /* Title 1 - 28px / Page titles */
+  .text-title-1 {
+    font-size: 1.75rem;
+    line-height: 1.286;
+    font-weight: 600;
+    letter-spacing: -0.017em;
+  }
+
+  /* Title 2 - 22px / Section titles */
+  .text-title-2 {
+    font-size: 1.375rem;
+    line-height: 1.364;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+  }
+
+  /* Title 3 - 20px / Card titles */
+  .text-title-3 {
+    font-size: 1.25rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: -0.009em;
+  }
+
+  /* Headline - 17px / List item titles */
+  .text-headline {
+    font-size: 1.0625rem;
+    line-height: 1.412;
+    font-weight: 600;
+    letter-spacing: -0.006em;
+  }
+
+  /* Body - 17px / Main content */
+  .text-body {
+    font-size: 1.0625rem;
+    line-height: 1.471;
+    font-weight: 400;
+    letter-spacing: -0.004em;
+  }
+
+  /* Subheadline - 15px / Secondary content */
+  .text-subheadline {
+    font-size: 0.9375rem;
+    line-height: 1.467;
+    font-weight: 400;
+    letter-spacing: -0.002em;
+  }
+
+  /* Footnote - 13px / Tertiary content */
+  .text-footnote {
+    font-size: 0.8125rem;
+    line-height: 1.538;
+    font-weight: 400;
+    letter-spacing: -0.001em;
+  }
+
+  /* Caption 1 - 12px / Labels and metadata */
+  .text-caption-1 {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    font-weight: 400;
+    letter-spacing: 0em;
+  }
+
+  /* Caption 2 - 11px / Small labels */
+  .text-caption-2 {
+    font-size: 0.6875rem;
+    line-height: 1.455;
+    font-weight: 400;
+    letter-spacing: 0.006em;
+  }
+
+  /* Emphasized variants */
+  .text-body-emphasized {
+    @apply text-body;
+    font-weight: 600;
+  }
+
+  .text-subheadline-emphasized {
+    @apply text-subheadline;
+    font-weight: 600;
+  }
+
+  .text-footnote-emphasized {
+    @apply text-footnote;
+    font-weight: 600;
+  }
+
+  /* Color variations */
+  .text-primary {
+    @apply text-gray-900;
+  }
+
+  .text-secondary {
+    @apply text-gray-600;
+  }
+
+  .text-tertiary {
+    @apply text-gray-500;
+  }
+}
