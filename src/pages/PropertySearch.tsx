@@ -268,9 +268,9 @@ export default function PropertySearch() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-8">
           <h1 className="text-title-1">Property Search</h1>
           <p className="text-subheadline text-secondary mt-1">
             Search properties using RentCast MLS data
@@ -278,7 +278,7 @@ export default function PropertySearch() {
         </div>
 
         {/* Search Form */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6 mb-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6 mb-8">
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
@@ -290,7 +290,7 @@ export default function PropertySearch() {
                   value={searchAddress}
                   onChange={(e) => setSearchAddress(e.target.value)}
                   placeholder="123 Main St"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                  className="input-base w-full"
                   required
                 />
               </div>
@@ -303,7 +303,7 @@ export default function PropertySearch() {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="San Francisco"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                  className="input-base w-full"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -317,7 +317,7 @@ export default function PropertySearch() {
                     onChange={(e) => setState(e.target.value)}
                     placeholder="CA"
                     maxLength={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                    className="input-base w-full"
                   />
                 </div>
                 <div>
@@ -330,7 +330,7 @@ export default function PropertySearch() {
                     onChange={(e) => setZipCode(e.target.value)}
                     placeholder="94102"
                     maxLength={5}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                    className="input-base w-full"
                   />
                 </div>
               </div>
@@ -339,15 +339,15 @@ export default function PropertySearch() {
             <button
               type="submit"
               disabled={loading || !searchAddress.trim()}
-              className="px-6 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized motion-button"
+              className="btn-primary"
             >
               {loading ? "Searching..." : "Search Property"}
             </button>
           </form>
 
           {error && (
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-              <p className="text-footnote text-yellow-800">{error}</p>
+            <div className="mt-4 p-3 rounded-md badge-warning">
+              <p className="text-footnote">{error}</p>
             </div>
           )}
         </div>
@@ -356,7 +356,7 @@ export default function PropertySearch() {
         {property && (
           <div className="space-y-6">
             {/* Property Header */}
-            <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6">
+            <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h2 className="text-title-2">{property.address}</h2>
@@ -368,9 +368,9 @@ export default function PropertySearch() {
                   <button
                     onClick={saveProperty}
                     disabled={saving || !!savedPropertyId}
-                    className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized motion-button"
+                    className="btn-primary"
                   >
-                    {savedPropertyId ? "✓ Saved" : saving ? "Saving..." : "Save Property"}
+                    {savedPropertyId ? "Saved" : saving ? "Saving..." : "Save Property"}
                   </button>
                   <button
                     onClick={openLinkModal}
@@ -399,7 +399,7 @@ export default function PropertySearch() {
                 </div>
                 <div>
                   <div className="text-footnote text-secondary">Estimated Rent</div>
-                  <div className="text-title-3 text-green-600 mt-1">
+                  <div className="text-title-3 mt-1" style={{ color: 'var(--color-success)' }}>
                     {formatCurrency(rentalEstimate?.rent)}/mo
                   </div>
                 </div>
@@ -422,7 +422,7 @@ export default function PropertySearch() {
             </div>
 
             {/* Tabs */}
-            <div className="bg-surface-panel rounded-lg border border-surface-subtle">
+            <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm">
               <nav className="flex border-b border-surface-subtle px-6">
                 {[
                   { id: "details" as const, label: "Property Details" },
@@ -436,7 +436,7 @@ export default function PropertySearch() {
                     className={`px-4 py-3 text-subheadline-emphasized border-b-2 motion-tab ${
                       activeTab === tab.id
                         ? "border-accent-primary text-accent-primary"
-                        : "border-transparent text-gray-600 hover:text-gray-900"
+                        : "border-transparent text-secondary hover:text-primary"
                     }`}
                   >
                     {tab.label}
@@ -506,7 +506,7 @@ export default function PropertySearch() {
 
                     <div className="flex items-center gap-4">
                       <div className="text-footnote text-secondary">Confidence Score</div>
-                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--surface-subtle)' }}>
                         <div
                           className="h-full bg-accent-primary"
                           style={{ width: `${propertyValue.confidenceScore * 100}%` }}
@@ -528,7 +528,7 @@ export default function PropertySearch() {
                   <div className="space-y-6">
                     <div>
                       <div className="text-footnote text-secondary mb-2">Estimated Monthly Rent</div>
-                      <div className="text-display text-green-600">{formatCurrency(rentalEstimate.rent)}/mo</div>
+                      <div className="text-display" style={{ color: 'var(--color-success)' }}>{formatCurrency(rentalEstimate.rent)}/mo</div>
                       <div className="text-subheadline text-secondary mt-2">
                         Range: {formatCurrency(rentalEstimate.rentRangeLow)} - {formatCurrency(rentalEstimate.rentRangeHigh)}
                       </div>
@@ -536,10 +536,10 @@ export default function PropertySearch() {
 
                     <div className="flex items-center gap-4">
                       <div className="text-footnote text-secondary">Confidence Score</div>
-                      <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--surface-subtle)' }}>
                         <div
-                          className="h-full bg-green-600"
-                          style={{ width: `${rentalEstimate.confidenceScore * 100}%` }}
+                          className="h-full"
+                          style={{ backgroundColor: 'var(--color-success)', width: `${rentalEstimate.confidenceScore * 100}%` }}
                         />
                       </div>
                       <div className="text-subheadline-emphasized">{Math.round(rentalEstimate.confidenceScore * 100)}%</div>
@@ -555,7 +555,7 @@ export default function PropertySearch() {
                         </div>
                         <div className="p-4 bg-surface-muted rounded-lg">
                           <div className="text-footnote text-secondary mb-1">Annual Rent</div>
-                          <div className="text-title-3 text-green-600">
+                          <div className="text-title-3" style={{ color: 'var(--color-success)' }}>
                             {formatCurrency(rentalEstimate.rent * 12)}
                           </div>
                         </div>
@@ -637,7 +637,7 @@ export default function PropertySearch() {
                   onClick={() => setShowLinkModal(false)}
                   className="text-secondary hover:text-primary"
                 >
-                  ✕
+                  ×
                 </button>
               </div>
 
@@ -649,7 +649,7 @@ export default function PropertySearch() {
                   <select
                     value={selectedContactId}
                     onChange={(e) => setSelectedContactId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                    className="input-base w-full"
                   >
                     <option value="">-- Choose a contact --</option>
                     {contacts.map((contact) => (
@@ -667,7 +667,7 @@ export default function PropertySearch() {
                   <select
                     value={relationship}
                     onChange={(e) => setRelationship(e.target.value as any)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                    className="input-base w-full"
                   >
                     <option value="Interest">Interest</option>
                     <option value="Buyer">Buyer</option>
@@ -681,7 +681,7 @@ export default function PropertySearch() {
                   <button
                     onClick={linkToContact}
                     disabled={!selectedContactId || linking}
-                    className="flex-1 px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized motion-button"
+                    className="flex-1 btn-primary"
                   >
                     {linking ? "Linking..." : "Link Contact"}
                   </button>
@@ -690,7 +690,7 @@ export default function PropertySearch() {
                       setShowLinkModal(false);
                       setSelectedContactId("");
                     }}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-subheadline-emphasized motion-button"
+                    className="flex-1 px-4 py-2 bg-surface-muted text-primary rounded-md hover:bg-surface-subtle text-subheadline-emphasized motion-button"
                   >
                     Cancel
                   </button>
@@ -710,7 +710,7 @@ export default function PropertySearch() {
                   onClick={() => setShowTransactionModal(false)}
                   className="text-secondary hover:text-primary"
                 >
-                  ✕
+                  ×
                 </button>
               </div>
 
@@ -722,7 +722,7 @@ export default function PropertySearch() {
                   <select
                     value={selectedTransactionId}
                     onChange={(e) => setSelectedTransactionId(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                    className="input-base w-full"
                   >
                     <option value="">-- Choose a transaction --</option>
                     {transactions.map((transaction) => (
@@ -742,7 +742,7 @@ export default function PropertySearch() {
                   <button
                     onClick={linkToTransaction}
                     disabled={!selectedTransactionId || linkingTransaction}
-                    className="flex-1 px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized motion-button"
+                    className="flex-1 btn-primary"
                   >
                     {linkingTransaction ? "Linking..." : "Link Transaction"}
                   </button>
@@ -751,7 +751,7 @@ export default function PropertySearch() {
                       setShowTransactionModal(false);
                       setSelectedTransactionId("");
                     }}
-                    className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 text-subheadline-emphasized motion-button"
+                    className="flex-1 px-4 py-2 bg-surface-muted text-primary rounded-md hover:bg-surface-subtle text-subheadline-emphasized motion-button"
                   >
                     Cancel
                   </button>
