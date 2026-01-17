@@ -149,6 +149,44 @@ export default function TaskBoard() {
     }
   };
 
+  const getPriorityIcon = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return (
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+          </svg>
+        );
+      case "medium":
+        return (
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 12h14" />
+          </svg>
+        );
+      case "low":
+        return (
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getColumnStyle = (columnId: string) => {
+    switch (columnId) {
+      case "todo":
+        return "bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20";
+      case "in_progress":
+        return "bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20";
+      case "done":
+        return "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20";
+      default:
+        return "bg-surface-muted";
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
@@ -160,15 +198,13 @@ export default function TaskBoard() {
 
   return (
     <div>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-title-1">Task Board</h1>
-            <p className="text-subheadline text-secondary mt-1">
-              View-only aggregation • Edit tasks in transaction detail
-            </p>
-          </div>
+        <div className="mb-6">
+          <h1 className="text-title-1 mb-1">Task Board</h1>
+          <p className="text-subheadline text-secondary">
+            View-only aggregation • Edit tasks in transaction detail
+          </p>
         </div>
 
         {/* Error Display */}
@@ -185,51 +221,69 @@ export default function TaskBoard() {
         )}
 
         {/* Read-only Notice */}
-        <div className="mb-8 p-4 rounded-lg badge-info">
-          <p className="text-subheadline">
-            <span className="text-body-emphasized">Read-only view:</span> Tasks can only be created
-            or modified within their transaction. Click any task to navigate to its transaction.
-          </p>
+        <div className="mb-6 p-4 rounded-lg badge-info border-2">
+          <div className="flex items-start gap-3">
+            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-subheadline">
+              <span className="text-body-emphasized">Read-only view:</span> Tasks can only be created
+              or modified within their transaction. Click any task to navigate to its transaction.
+            </p>
+          </div>
         </div>
 
         {/* Kanban Board */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {columns.map((column) => (
             <div key={column.id} className="flex flex-col">
               {/* Column Header */}
-              <div className="bg-surface-panel rounded-t-lg border-x border-t border-surface-subtle shadow-sm p-4">
+              <div className={`rounded-t-xl border border-surface-subtle shadow-sm p-4 ${getColumnStyle(column.id)}`}>
                 <div className="flex justify-between items-center">
-                  <h2 className="text-title-3">{column.title}</h2>
-                  <span className="text-caption-1 px-2 py-1 rounded badge-neutral">
-                    {column.tasks.length}
-                  </span>
+                  <h2 className="text-title-3 font-semibold">{column.title}</h2>
+                  <div className="flex items-center gap-2">
+                    <span className="text-caption-1-emphasized px-2.5 py-1 rounded-full bg-surface-panel/60 backdrop-blur-sm border border-surface-subtle">
+                      {column.tasks.length}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {/* Column Content */}
-              <div className="flex-1 bg-surface-muted rounded-b-lg border-x border-b border-surface-subtle shadow-sm p-4 space-y-3 min-h-[400px]">
+              <div className="flex-1 bg-surface-muted/50 rounded-b-xl border-x border-b border-surface-subtle shadow-sm p-3 space-y-2.5 min-h-[500px]">
                 {column.tasks.length === 0 ? (
-                  <p className="text-subheadline text-secondary">No tasks</p>
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="w-12 h-12 rounded-full bg-surface-panel border border-surface-subtle flex items-center justify-center mb-3">
+                      <svg className="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                    </div>
+                    <p className="text-subheadline text-secondary">No tasks here</p>
+                    <p className="text-caption-1 text-tertiary mt-1">Tasks will appear as they're created</p>
+                  </div>
                 ) : (
                   column.tasks.map((task) => (
                     <Link
                       key={task.id}
                       to={`/transactions/${task.transactionId}`}
-                      className="block bg-surface-panel rounded-lg border border-surface-subtle p-4 hover:border-accent-primary hover:shadow-md motion-card"
+                      className="block bg-surface-panel rounded-lg border border-surface-subtle p-4 hover:border-accent-primary hover:shadow-lg hover:scale-[1.01] motion-card group"
                     >
                       {/* Task Header */}
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-body-emphasized flex-1">{task.title}</h3>
-                        <span className={`text-caption-1 px-2 py-0.5 rounded flex-shrink-0 ${getPriorityColor(task.priority)}`}>
-                          {task.priority}
+                      <div className="flex justify-between items-start gap-3 mb-3">
+                        <h3 className="text-body-emphasized flex-1 line-clamp-2 group-hover:text-accent-primary transition-colors">
+                          {task.title}
+                        </h3>
+                        <span className={`text-caption-1-emphasized px-2 py-1 rounded-md flex-shrink-0 flex items-center gap-1 ${getPriorityColor(task.priority)}`}>
+                          {getPriorityIcon(task.priority)}
+                          <span className="capitalize">{task.priority}</span>
                         </span>
                       </div>
 
                       {/* Task Meta */}
-                      <div className="space-y-2">
+                      <div className="space-y-2 pt-2 border-t border-surface-subtle/50">
                         <div className="flex items-center gap-2">
                           <svg
-                            className="w-4 h-4 text-secondary flex-shrink-0"
+                            className="w-3.5 h-3.5 text-tertiary flex-shrink-0"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -241,7 +295,7 @@ export default function TaskBoard() {
                               d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
                             />
                           </svg>
-                          <span className="text-subheadline text-secondary">
+                          <span className="text-caption-1 text-secondary">
                             {transactionNames[task.transactionId] || `Transaction ${task.transactionId}`}
                           </span>
                         </div>
@@ -249,7 +303,7 @@ export default function TaskBoard() {
                         {task.dueDate && (
                           <div className="flex items-center gap-2">
                             <svg
-                              className="w-4 h-4 text-secondary flex-shrink-0"
+                              className="w-3.5 h-3.5 text-tertiary flex-shrink-0"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -261,7 +315,7 @@ export default function TaskBoard() {
                                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                               />
                             </svg>
-                            <span className="text-subheadline text-secondary">
+                            <span className="text-caption-1 text-secondary">
                               Due {new Date(task.dueDate).toLocaleDateString()}
                             </span>
                           </div>
@@ -270,7 +324,7 @@ export default function TaskBoard() {
                         {task.assignee && (
                           <div className="flex items-center gap-2">
                             <svg
-                              className="w-4 h-4 text-secondary flex-shrink-0"
+                              className="w-3.5 h-3.5 text-tertiary flex-shrink-0"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -282,7 +336,7 @@ export default function TaskBoard() {
                                 d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                               />
                             </svg>
-                            <span className="text-subheadline text-secondary">
+                            <span className="text-caption-1 text-secondary">
                               {task.assignee.name}
                             </span>
                           </div>

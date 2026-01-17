@@ -268,17 +268,28 @@ export default function PropertySearch() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-title-1">Property Search</h1>
-          <p className="text-subheadline text-secondary mt-1">
+        <div className="mb-6">
+          <h1 className="text-title-1 mb-1">Property Search</h1>
+          <p className="text-subheadline text-secondary">
             Search properties using RentCast MLS data
           </p>
         </div>
 
         {/* Search Form */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6 mb-8">
+        <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-sm p-6 mb-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-title-3 font-semibold">Search Property</h2>
+              <p className="text-caption-1 text-secondary">Enter an address to get property details</p>
+            </div>
+          </div>
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="md:col-span-2">
@@ -339,32 +350,56 @@ export default function PropertySearch() {
             <button
               type="submit"
               disabled={loading || !searchAddress.trim()}
-              className="btn-primary"
+              className="btn-primary px-6 py-2.5 flex items-center gap-2"
             >
-              {loading ? "Searching..." : "Search Property"}
+              {loading ? (
+                <>
+                  <div className="spinner"></div>
+                  <span>Searching...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <span>Search Property</span>
+                </>
+              )}
             </button>
           </form>
 
           {error && (
-            <div className="mt-4 p-3 rounded-md badge-warning">
-              <p className="text-footnote">{error}</p>
+            <div className="mt-4 p-4 rounded-lg badge-warning border-2">
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <p className="text-subheadline">{error}</p>
+              </div>
             </div>
           )}
         </div>
 
         {/* Property Results */}
         {property && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             {/* Property Header */}
-            <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6">
-              <div className="flex items-start justify-between mb-4">
+            <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-sm p-6">
+              <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="text-title-2">{property.address}</h2>
-                  <p className="text-subheadline text-secondary mt-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                    </div>
+                    <h2 className="text-title-2 font-semibold">{property.address}</h2>
+                  </div>
+                  <p className="text-subheadline text-secondary">
                     {property.propertyType} • {property.bedrooms} bed • {property.bathrooms} bath • {formatNumber(property.squareFootage)} sqft
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 flex-wrap justify-end">
                   <button
                     onClick={saveProperty}
                     disabled={saving || !!savedPropertyId}
@@ -390,31 +425,31 @@ export default function PropertySearch() {
               </div>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-surface-subtle">
-                <div>
-                  <div className="text-footnote text-secondary">Estimated Value</div>
-                  <div className="text-title-3 text-accent-primary mt-1">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-5 border-t border-surface-subtle">
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-4 border border-surface-subtle">
+                  <div className="text-caption-1 text-secondary mb-1">Estimated Value</div>
+                  <div className="text-title-3 text-accent-primary font-semibold">
                     {formatCurrency(propertyValue?.price)}
                   </div>
                 </div>
-                <div>
-                  <div className="text-footnote text-secondary">Estimated Rent</div>
-                  <div className="text-title-3 mt-1" style={{ color: 'var(--color-success)' }}>
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-4 border border-surface-subtle">
+                  <div className="text-caption-1 text-secondary mb-1">Estimated Rent</div>
+                  <div className="text-title-3 font-semibold" style={{ color: 'var(--color-success)' }}>
                     {formatCurrency(rentalEstimate?.rent)}/mo
                   </div>
                 </div>
-                <div>
-                  <div className="text-footnote text-secondary">Last Sale</div>
-                  <div className="text-title-3 mt-1">
+                <div className="bg-surface-muted/50 rounded-lg p-4 border border-surface-subtle">
+                  <div className="text-caption-1 text-secondary mb-1">Last Sale</div>
+                  <div className="text-title-3 font-semibold">
                     {formatCurrency(property.lastSalePrice)}
                   </div>
-                  <div className="text-footnote text-secondary">
+                  <div className="text-caption-1 text-tertiary mt-0.5">
                     {property.lastSaleDate && new Date(property.lastSaleDate).toLocaleDateString()}
                   </div>
                 </div>
-                <div>
-                  <div className="text-footnote text-secondary">Year Built</div>
-                  <div className="text-title-3 mt-1">
+                <div className="bg-surface-muted/50 rounded-lg p-4 border border-surface-subtle">
+                  <div className="text-caption-1 text-secondary mb-1">Year Built</div>
+                  <div className="text-title-3 font-semibold">
                     {property.yearBuilt || "N/A"}
                   </div>
                 </div>
@@ -422,8 +457,8 @@ export default function PropertySearch() {
             </div>
 
             {/* Tabs */}
-            <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm">
-              <nav className="flex border-b border-surface-subtle px-6">
+            <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-sm">
+              <nav className="flex border-b border-surface-subtle px-6 overflow-x-auto">
                 {[
                   { id: "details" as const, label: "Property Details" },
                   { id: "value" as const, label: "Value Estimate" },
@@ -572,16 +607,22 @@ export default function PropertySearch() {
 
                 {/* Comparables Tab */}
                 {activeTab === "comps" && (
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {comparables.length === 0 ? (
-                      <div className="text-center py-8 text-subheadline text-secondary">
-                        No comparable sales found for this property.
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="w-16 h-16 rounded-full bg-surface-muted border border-surface-subtle flex items-center justify-center mb-4">
+                          <svg className="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                          </svg>
+                        </div>
+                        <p className="text-subheadline text-secondary font-medium">No comparable sales found</p>
+                        <p className="text-caption-1 text-tertiary mt-1">Try searching for a different property</p>
                       </div>
                     ) : (
                       comparables.map((comp) => (
                         <div
                           key={comp.id}
-                          className="p-4 border border-surface-subtle rounded-lg hover:border-accent-primary transition-colors"
+                          className="p-4 border border-surface-subtle rounded-lg hover:border-accent-primary hover:shadow-md motion-card"
                         >
                           <div className="flex items-start justify-between mb-3">
                             <div>
@@ -630,14 +671,16 @@ export default function PropertySearch() {
         {/* Link to Contact Modal */}
         {showLinkModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-md w-full p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-title-2">Link Property to Contact</h2>
+            <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-xl max-w-md w-full p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-title-2 font-semibold">Link Property to Contact</h2>
                 <button
                   onClick={() => setShowLinkModal(false)}
-                  className="text-secondary hover:text-primary"
+                  className="w-8 h-8 rounded-lg hover:bg-surface-muted flex items-center justify-center text-secondary hover:text-primary motion-button"
                 >
-                  ×
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
@@ -703,14 +746,16 @@ export default function PropertySearch() {
         {/* Link to Transaction Modal */}
         {showTransactionModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-md w-full p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-title-2">Link Property to Transaction</h2>
+            <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-xl max-w-md w-full p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-title-2 font-semibold">Link Property to Transaction</h2>
                 <button
                   onClick={() => setShowTransactionModal(false)}
-                  className="text-secondary hover:text-primary"
+                  className="w-8 h-8 rounded-lg hover:bg-surface-muted flex items-center justify-center text-secondary hover:text-primary motion-button"
                 >
-                  ×
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
                 </button>
               </div>
 
