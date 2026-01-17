@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import type { TransactionTask, TransactionEvent, TaskStatus, TaskPriority } from "../types/task";
 import { supabase } from "../lib/supabase";
 import { executeAutomationRules, persistAutomationActions } from "../lib/automation";
+import { useAuth } from "../contexts/AuthContext";
 
 type TabType = "timeline" | "documents" | "tasks" | "messages";
 
@@ -25,6 +26,7 @@ interface Document {
 
 export default function TransactionDetail() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>("timeline");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -648,7 +650,7 @@ export default function TransactionDetail() {
         {
           transaction_id: id,
           content: newMessage.trim(),
-          sender_name: "Agent", // In production, get from auth context
+          sender_name: user?.user_metadata?.full_name || user?.email || "Agent",
         },
       ]);
 

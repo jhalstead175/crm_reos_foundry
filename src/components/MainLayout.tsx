@@ -1,5 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -7,6 +9,9 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const navItems = [
     { path: "/", label: "Overview" },
@@ -21,6 +26,24 @@ export default function MainLayout({ children }: MainLayoutProps) {
       return location.pathname === "/";
     }
     return location.pathname.startsWith(path);
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/signin");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  const getUserInitials = () => {
+    if (!user?.user_metadata?.full_name) return "U";
+    const names = user.user_metadata.full_name.split(" ");
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return names[0][0].toUpperCase();
   };
 
   return (
@@ -67,7 +90,41 @@ export default function MainLayout({ children }: MainLayoutProps) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </button>
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 cursor-pointer"></div>
+
+            {/* User Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-white text-sm font-medium cursor-pointer hover:opacity-90 motion-button"
+              >
+                {getUserInitials()}
+              </button>
+
+              {/* Dropdown Menu */}
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-64 bg-surface-panel rounded-lg border border-surface-subtle shadow-lg py-2 z-50">
+                  <div className="px-4 py-3 border-b border-surface-subtle">
+                    <p className="text-subheadline-emphasized text-primary">
+                      {user?.user_metadata?.full_name || "User"}
+                    </p>
+                    <p className="text-caption-1 text-secondary mt-1">{user?.email}</p>
+                  </div>
+                  <Link
+                    to="/settings"
+                    onClick={() => setShowUserMenu(false)}
+                    className="block px-4 py-2 text-subheadline text-primary hover:bg-surface-muted motion-text"
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full text-left px-4 py-2 text-subheadline text-primary hover:bg-surface-muted motion-text"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
