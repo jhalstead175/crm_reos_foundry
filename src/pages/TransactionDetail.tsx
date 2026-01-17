@@ -14,6 +14,15 @@ interface Message {
   created_at: string;
 }
 
+interface Document {
+  id: string;
+  transaction_id: string;
+  name: string;
+  document_type: string;
+  status: "Pending" | "Signed" | "Reviewed";
+  created_at: string;
+}
+
 export default function TransactionDetail() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<TabType>("timeline");
@@ -29,6 +38,16 @@ export default function TransactionDetail() {
   const [newMessage, setNewMessage] = useState("");
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Document state
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [newDocument, setNewDocument] = useState({
+    name: "",
+    document_type: "Purchase Agreement",
+    status: "Pending" as "Pending" | "Signed" | "Reviewed",
+  });
+  const [uploading, setUploading] = useState(false);
 
   // Transaction state (mock for MVP - would load from DB in production)
   const [transactionStatus, setTransactionStatus] = useState("Active");
@@ -169,9 +188,19 @@ export default function TransactionDetail() {
 
         if (messagesError) throw messagesError;
 
+        // Load documents
+        const { data: documentsData, error: documentsError } = await supabase
+          .from("documents")
+          .select("*")
+          .eq("transaction_id", id)
+          .order("created_at", { ascending: false });
+
+        if (documentsError) throw documentsError;
+
         setTasks(transformedTasks);
         setEvents(transformedEvents);
         setMessages(messagesData || []);
+        setDocuments(documentsData || []);
       } catch (err) {
         console.error("Error loading transaction data:", err);
         setError("Failed to load transaction data");
@@ -375,11 +404,30 @@ export default function TransactionDetail() {
       )
       .subscribe();
 
+    // Subscribe to documents
+    const documentsChannel = supabase
+      .channel(`documents:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "documents",
+          filter: `transaction_id=eq.${id}`,
+        },
+        (payload: any) => {
+          const newDoc = payload.new as Document;
+          setDocuments((prev) => [newDoc, ...prev]);
+        }
+      )
+      .subscribe();
+
     // Cleanup on unmount
     return () => {
       eventsChannel.unsubscribe();
       tasksChannel.unsubscribe();
       messagesChannel.unsubscribe();
+      documentsChannel.unsubscribe();
     };
   }, [id]);
 
@@ -621,6 +669,43 @@ export default function TransactionDetail() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Upload document handler
+  const handleUploadDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newDocument.name.trim()) {
+      alert("Document name is required");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const { error } = await supabase.from("documents").insert([
+        {
+          transaction_id: id,
+          name: newDocument.name.trim(),
+          document_type: newDocument.document_type,
+          status: newDocument.status,
+        },
+      ]);
+
+      if (error) throw error;
+
+      // Reset form and close modal
+      setNewDocument({
+        name: "",
+        document_type: "Purchase Agreement",
+        status: "Pending",
+      });
+      setShowUploadModal(false);
+    } catch (err) {
+      console.error("Error uploading document:", err);
+      alert("Failed to upload document. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
@@ -717,7 +802,17 @@ export default function TransactionDetail() {
         {/* Tab Content */}
         <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6">
           {activeTab === "timeline" && <TimelineView events={events} />}
-          {activeTab === "documents" && <DocumentsView />}
+          {activeTab === "documents" && (
+            <DocumentsView
+              documents={documents}
+              showUploadModal={showUploadModal}
+              setShowUploadModal={setShowUploadModal}
+              newDocument={newDocument}
+              setNewDocument={setNewDocument}
+              onUploadDocument={handleUploadDocument}
+              uploading={uploading}
+            />
+          )}
           {activeTab === "tasks" && (
             <TasksView
               tasks={tasks}
@@ -823,33 +918,160 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
   );
 }
 
-function DocumentsView() {
-  const documents = [
-    { id: "1", name: "Purchase Agreement.pdf", uploadedAt: new Date().toISOString(), status: "Signed" },
-    { id: "2", name: "Inspection Report.pdf", uploadedAt: new Date().toISOString(), status: "Pending" },
-  ];
+function DocumentsView({
+  documents,
+  showUploadModal,
+  setShowUploadModal,
+  newDocument,
+  setNewDocument,
+  onUploadDocument,
+  uploading,
+}: {
+  documents: Document[];
+  showUploadModal: boolean;
+  setShowUploadModal: (show: boolean) => void;
+  newDocument: { name: string; document_type: string; status: "Pending" | "Signed" | "Reviewed" };
+  setNewDocument: (doc: { name: string; document_type: string; status: "Pending" | "Signed" | "Reviewed" }) => void;
+  onUploadDocument: (e: React.FormEvent) => void;
+  uploading: boolean;
+}) {
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case "Signed":
+        return "badge-success";
+      case "Reviewed":
+        return "badge-info";
+      case "Pending":
+        return "badge-warning";
+      default:
+        return "badge-neutral";
+    }
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-title-2">Documents</h2>
-        <button className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary">
+        <button
+          onClick={() => setShowUploadModal(true)}
+          className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
+        >
           Upload Document
         </button>
       </div>
-      {documents.map((doc) => (
-        <div key={doc.id} className="flex justify-between items-center border border-surface-subtle rounded-lg p-4 bg-surface-panel">
-          <div>
-            <h3 className="text-body-emphasized">{doc.name}</h3>
-            <p className="text-subheadline text-secondary mt-1">
-              Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
-            </p>
+
+      {/* Documents List */}
+      {documents.length === 0 ? (
+        <p className="text-subheadline text-secondary text-center py-12">
+          No documents yet. Upload your first document to get started.
+        </p>
+      ) : (
+        documents.map((doc) => (
+          <div key={doc.id} className="flex justify-between items-center border border-surface-subtle rounded-lg p-4 bg-surface-panel">
+            <div>
+              <h3 className="text-body-emphasized">{doc.name}</h3>
+              <p className="text-subheadline text-secondary mt-1">
+                {doc.document_type} • Uploaded {new Date(doc.created_at).toLocaleDateString()}
+              </p>
+            </div>
+            <span className={`px-3 py-1 text-footnote rounded-full ${getStatusBadgeClass(doc.status)}`}>
+              {doc.status}
+            </span>
           </div>
-          <span className="px-3 py-1 text-footnote rounded-full badge-info">
-            {doc.status}
-          </span>
+        ))
+      )}
+
+      {/* Upload Document Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface-panel rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-title-2">Upload Document</h2>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="text-secondary hover:text-primary"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={onUploadDocument} className="space-y-4">
+              {/* Document Name */}
+              <div>
+                <label className="block text-subheadline-emphasized text-primary mb-2">
+                  Document Name *
+                </label>
+                <input
+                  type="text"
+                  value={newDocument.name}
+                  onChange={(e) => setNewDocument({ ...newDocument, name: e.target.value })}
+                  className="input-base w-full px-3 py-2"
+                  placeholder="Purchase Agreement.pdf"
+                  required
+                />
+              </div>
+
+              {/* Document Type & Status */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Type
+                  </label>
+                  <select
+                    value={newDocument.document_type}
+                    onChange={(e) => setNewDocument({ ...newDocument, document_type: e.target.value })}
+                    className="input-base w-full px-3 py-2"
+                  >
+                    <option value="Purchase Agreement">Purchase Agreement</option>
+                    <option value="Inspection Report">Inspection Report</option>
+                    <option value="Appraisal">Appraisal</option>
+                    <option value="Title Report">Title Report</option>
+                    <option value="Disclosure">Disclosure</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={newDocument.status}
+                    onChange={(e) => setNewDocument({ ...newDocument, status: e.target.value as "Pending" | "Signed" | "Reviewed" })}
+                    className="input-base w-full px-3 py-2"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Reviewed">Reviewed</option>
+                    <option value="Signed">Signed</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Note about file upload */}
+              <p className="text-footnote text-secondary">
+                Note: For MVP, document metadata is tracked. File storage can be added with Supabase Storage.
+              </p>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={uploading || !newDocument.name.trim()}
+                  className="flex-1 btn-primary px-4 py-2"
+                >
+                  {uploading ? "Uploading..." : "Upload Document"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowUploadModal(false)}
+                  className="flex-1 px-4 py-2 bg-surface-muted text-primary rounded-md hover:bg-surface-subtle text-subheadline-emphasized motion-button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
