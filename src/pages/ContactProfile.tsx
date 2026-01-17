@@ -188,30 +188,30 @@ export default function ContactProfile() {
   const getScoreBadgeColor = (score: LeadScore) => {
     switch (score) {
       case "A":
-        return "score-a";
+        return "bg-green-100 text-green-700 border-green-200";
       case "B":
-        return "score-b";
+        return "bg-blue-100 text-blue-700 border-blue-200";
       case "C":
-        return "score-c";
+        return "bg-yellow-100 text-yellow-700 border-yellow-200";
       case "D":
-        return "score-d";
+        return "bg-orange-100 text-orange-700 border-orange-200";
       case "F":
-        return "score-f";
+        return "bg-red-100 text-red-700 border-red-200";
     }
   };
 
   const getStatusBadgeColor = (status: ContactStatus) => {
     switch (status) {
       case "Hot":
-        return "status-hot";
+        return "bg-red-100 text-red-700 border-red-200";
       case "Under Contract":
-        return "badge-info";
+        return "bg-purple-100 text-purple-700 border-purple-200";
       case "Closed":
-        return "status-closed";
+        return "bg-green-100 text-green-700 border-green-200";
       case "Dead":
-        return "badge-neutral";
+        return "bg-gray-100 text-gray-700 border-gray-200";
       default:
-        return "status-active";
+        return "bg-blue-100 text-blue-700 border-blue-200";
     }
   };
 
@@ -252,32 +252,35 @@ export default function ContactProfile() {
 
   if (loading || !contact) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 gap-3">
-        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
-        <div className="text-sm text-gray-500">Loading contact...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-gray-200 border-t-orange-500 rounded-full animate-spin"></div>
+          <div className="text-sm text-gray-500">Loading contact...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Contact Header */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6 mb-8">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-start gap-4">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold" style={{ backgroundColor: 'var(--accent-primary)' }}>
+              <div className="w-16 h-16 rounded-full flex items-center justify-center text-white text-2xl font-bold bg-orange-500">
                 {contact.name.charAt(0)}
               </div>
               <div>
-                <h1 className="text-title-1">{contact.name}</h1>
+                <h1 className="text-2xl font-bold text-gray-900">{contact.name}</h1>
                 <div className="flex items-center gap-2 mt-2">
-                  <span className={`px-2 py-1 rounded-md text-footnote-emphasized ${getScoreBadgeColor(contact.lead_score)}`}>
+                  <span className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${getScoreBadgeColor(contact.lead_score)}`}>
                     Score: {contact.lead_score}
                   </span>
-                  <span className={`px-2 py-1 rounded-md text-footnote ${getStatusBadgeColor(contact.status)}`}>
+                  <span className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${getStatusBadgeColor(contact.status)}`}>
                     {contact.status}
                   </span>
-                  <span className="px-2 py-1 rounded-md text-footnote badge-neutral">
+                  <span className="px-2.5 py-1 rounded-md text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-200">
                     {contact.source}
                   </span>
                 </div>
@@ -289,7 +292,7 @@ export default function ContactProfile() {
                   setLogType("call");
                   setShowLogForm(true);
                 }}
-                className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
+                className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium text-sm"
               >
                 Log Call
               </button>
@@ -298,7 +301,7 @@ export default function ContactProfile() {
                   setLogType("email");
                   setShowLogForm(true);
                 }}
-                className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
+                className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium text-sm"
               >
                 Log Email
               </button>
@@ -307,30 +310,29 @@ export default function ContactProfile() {
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-footnote-emphasized text-secondary">Email</label>
-              <p className="mt-1 text-subheadline text-primary">{contact.email || "Not provided"}</p>
+              <label className="block text-xs font-semibold text-gray-600">Email</label>
+              <p className="mt-1 text-sm text-gray-900">{contact.email || "Not provided"}</p>
             </div>
             <div>
-              <label className="block text-footnote-emphasized text-secondary">Phone</label>
-              <p className="mt-1 text-subheadline text-primary">{contact.phone || "Not provided"}</p>
+              <label className="block text-xs font-semibold text-gray-600">Phone</label>
+              <p className="mt-1 text-sm text-gray-900">{contact.phone || "Not provided"}</p>
             </div>
             <div>
-              <label className="block text-footnote-emphasized text-secondary">Last Contact</label>
-              <p className="mt-1 text-subheadline text-primary">{formatDateShort(contact.last_contact_date)}</p>
+              <label className="block text-xs font-semibold text-gray-600">Last Contact</label>
+              <p className="mt-1 text-sm text-gray-900">{formatDateShort(contact.last_contact_date)}</p>
             </div>
             <div>
-              <label className="block text-footnote-emphasized text-secondary">Next Follow-Up</label>
+              <label className="block text-xs font-semibold text-gray-600">Next Follow-Up</label>
               <p
-                className="mt-1 text-subheadline"
-                style={
+                className={`mt-1 text-sm ${
                   contact.next_follow_up_date && new Date(contact.next_follow_up_date) < new Date()
-                    ? { color: 'var(--color-error)', fontWeight: 600 }
-                    : { color: 'var(--text-primary)' }
-                }
+                    ? "text-red-600 font-semibold"
+                    : "text-gray-900"
+                }`}
               >
                 {formatDateShort(contact.next_follow_up_date)}
                 {contact.next_follow_up_date && new Date(contact.next_follow_up_date) < new Date() && (
-                  <span className="ml-1 text-footnote">(Overdue)</span>
+                  <span className="ml-1 text-xs">(Overdue)</span>
                 )}
               </p>
             </div>
@@ -338,13 +340,13 @@ export default function ContactProfile() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
           <button
             onClick={() => {
               setLogType("text");
               setShowLogForm(true);
             }}
-            className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
+            className="px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-orange-500 text-sm font-medium text-gray-700 transition-colors"
           >
             Log Text
           </button>
@@ -353,7 +355,7 @@ export default function ContactProfile() {
               setLogType("meeting");
               setShowLogForm(true);
             }}
-            className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
+            className="px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-orange-500 text-sm font-medium text-gray-700 transition-colors"
           >
             Log Meeting
           </button>
@@ -362,19 +364,19 @@ export default function ContactProfile() {
               setLogType("note");
               setShowLogForm(true);
             }}
-            className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
+            className="px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-orange-500 text-sm font-medium text-gray-700 transition-colors"
           >
             Add Note
           </button>
           <button
             onClick={() => setShowFollowUpForm(true)}
-            className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
+            className="px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-orange-500 text-sm font-medium text-gray-700 transition-colors"
           >
             Set Follow-Up
           </button>
           <button
             onClick={openEditForm}
-            className="px-4 py-3 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
+            className="px-4 py-3 bg-white border border-gray-200 rounded-lg hover:border-orange-500 text-sm font-medium text-gray-700 transition-colors"
           >
             Edit Contact
           </button>
@@ -382,14 +384,14 @@ export default function ContactProfile() {
 
         {/* Log Communication Form */}
         {showLogForm && (
-          <div className="bg-surface-panel border border-surface-subtle shadow-sm rounded-lg p-6 mb-8">
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-title-2">
+              <h2 className="text-xl font-bold text-gray-900">
                 Log {logType.charAt(0).toUpperCase() + logType.slice(1)}
               </h2>
               <button
                 onClick={() => setShowLogForm(false)}
-                className="text-secondary hover:text-primary text-2xl leading-none"
+                className="text-gray-400 hover:text-gray-600 text-2xl"
               >
                 ×
               </button>
@@ -398,7 +400,7 @@ export default function ContactProfile() {
             <div className="space-y-4">
               {(logType === "call" || logType === "text") && (
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Direction
                   </label>
                   <div className="flex gap-4">
@@ -410,7 +412,7 @@ export default function ContactProfile() {
                         checked={logDirection === "outbound"}
                         onChange={(e) => setLogDirection(e.target.value as "outbound")}
                       />
-                      <span className="text-subheadline">Outbound</span>
+                      <span className="text-sm text-gray-700">Outbound</span>
                     </label>
                     <label className="flex items-center gap-2">
                       <input
@@ -420,14 +422,14 @@ export default function ContactProfile() {
                         checked={logDirection === "inbound"}
                         onChange={(e) => setLogDirection(e.target.value as "inbound")}
                       />
-                      <span className="text-subheadline">Inbound</span>
+                      <span className="text-sm text-gray-700">Inbound</span>
                     </label>
                   </div>
                 </div>
               )}
 
               <div>
-                <label className="block text-subheadline-emphasized text-primary mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Notes
                 </label>
                 <textarea
@@ -435,7 +437,7 @@ export default function ContactProfile() {
                   onChange={(e) => setLogNote(e.target.value)}
                   placeholder={`What happened during this ${logType}?`}
                   rows={3}
-                  className="input-base w-full px-3 py-2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
@@ -443,7 +445,7 @@ export default function ContactProfile() {
                 <button
                   onClick={logCommunication}
                   disabled={!logNote.trim()}
-                  className="px-5 py-2.5 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized btn-primary"
+                  className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   Save
                 </button>
@@ -452,7 +454,7 @@ export default function ContactProfile() {
                     setShowLogForm(false);
                     setLogNote("");
                   }}
-                  className="px-5 py-2.5 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -463,12 +465,12 @@ export default function ContactProfile() {
 
         {/* Set Follow-Up Form */}
         {showFollowUpForm && (
-          <div className="bg-surface-panel border border-surface-subtle shadow-sm rounded-lg p-6 mb-8">
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-title-2">Set Follow-Up Date</h2>
+              <h2 className="text-xl font-bold text-gray-900">Set Follow-Up Date</h2>
               <button
                 onClick={() => setShowFollowUpForm(false)}
-                className="text-secondary hover:text-primary text-2xl leading-none"
+                className="text-gray-400 hover:text-gray-600 text-2xl"
               >
                 ×
               </button>
@@ -476,7 +478,7 @@ export default function ContactProfile() {
 
             <div className="space-y-4">
               <div>
-                <label className="block text-subheadline-emphasized text-primary mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Follow-Up Date
                 </label>
                 <input
@@ -484,9 +486,9 @@ export default function ContactProfile() {
                   value={followUpDate}
                   onChange={(e) => setFollowUpDate(e.target.value)}
                   min={new Date().toISOString().split("T")[0]}
-                  className="input-base w-full px-3 py-2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
-                <p className="mt-2 text-footnote text-secondary">
+                <p className="mt-2 text-xs text-gray-600">
                   {contact.next_follow_up_date
                     ? `Current follow-up: ${formatDateShort(contact.next_follow_up_date)}`
                     : "No follow-up date set"}
@@ -497,7 +499,7 @@ export default function ContactProfile() {
                 <button
                   onClick={setFollowUp}
                   disabled={!followUpDate}
-                  className="px-5 py-2.5 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized btn-primary"
+                  className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   Set Follow-Up
                 </button>
@@ -506,7 +508,7 @@ export default function ContactProfile() {
                     setShowFollowUpForm(false);
                     setFollowUpDate("");
                   }}
-                  className="px-5 py-2.5 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -517,12 +519,12 @@ export default function ContactProfile() {
 
         {/* Edit Contact Form */}
         {showEditForm && (
-          <div className="bg-surface-panel border border-surface-subtle shadow-sm rounded-lg p-6 mb-8">
+          <div className="bg-white border border-gray-200 shadow-sm rounded-lg p-6 mb-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-title-2">Edit Contact</h2>
+              <h2 className="text-xl font-bold text-gray-900">Edit Contact</h2>
               <button
                 onClick={() => setShowEditForm(false)}
-                className="text-secondary hover:text-primary text-2xl leading-none"
+                className="text-gray-400 hover:text-gray-600 text-2xl"
               >
                 ×
               </button>
@@ -531,39 +533,39 @@ export default function ContactProfile() {
             <div className="space-y-4">
               {/* Name */}
               <div>
-                <label className="block text-subheadline-emphasized text-primary mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Name *
                 </label>
                 <input
                   type="text"
                   value={editData.name}
                   onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                  className="input-base w-full px-3 py-2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
               {/* Email & Phone */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Email
                   </label>
                   <input
                     type="email"
                     value={editData.email}
                     onChange={(e) => setEditData({ ...editData, email: e.target.value })}
-                    className="input-base w-full px-3 py-2"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Phone
                   </label>
                   <input
                     type="tel"
                     value={editData.phone}
                     onChange={(e) => setEditData({ ...editData, phone: e.target.value })}
-                    className="input-base w-full px-3 py-2"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -571,13 +573,13 @@ export default function ContactProfile() {
               {/* Lead Score, Status, Source */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Lead Score
                   </label>
                   <select
                     value={editData.lead_score}
                     onChange={(e) => setEditData({ ...editData, lead_score: e.target.value as LeadScore })}
-                    className="input-base w-full px-3 py-2"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   >
                     <option value="A">A - Hot</option>
                     <option value="B">B - Warm</option>
@@ -587,13 +589,13 @@ export default function ContactProfile() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Status
                   </label>
                   <select
                     value={editData.status}
                     onChange={(e) => setEditData({ ...editData, status: e.target.value as ContactStatus })}
-                    className="input-base w-full px-3 py-2"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   >
                     <option value="New Lead">New Lead</option>
                     <option value="Nurturing">Nurturing</option>
@@ -604,13 +606,13 @@ export default function ContactProfile() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Source
                   </label>
                   <select
                     value={editData.source}
                     onChange={(e) => setEditData({ ...editData, source: e.target.value as ContactSource })}
-                    className="input-base w-full px-3 py-2"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   >
                     <option value="Website">Website</option>
                     <option value="Zillow">Zillow</option>
@@ -627,14 +629,14 @@ export default function ContactProfile() {
 
               {/* Notes */}
               <div>
-                <label className="block text-subheadline-emphasized text-primary mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Notes
                 </label>
                 <textarea
                   value={editData.notes}
                   onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
                   rows={4}
-                  className="input-base w-full px-3 py-2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 />
               </div>
 
@@ -642,13 +644,13 @@ export default function ContactProfile() {
                 <button
                   onClick={saveContact}
                   disabled={!editData.name.trim()}
-                  className="px-5 py-2.5 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized btn-primary"
+                  className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   Save Changes
                 </button>
                 <button
                   onClick={() => setShowEditForm(false)}
-                  className="px-5 py-2.5 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
+                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -659,37 +661,37 @@ export default function ContactProfile() {
 
         {/* Notes Section */}
         {contact.notes && (
-          <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6 mb-8">
-            <h2 className="text-title-2 mb-4">Contact Notes</h2>
-            <p className="text-body text-primary">{contact.notes}</p>
+          <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Contact Notes</h2>
+            <p className="text-sm text-gray-700">{contact.notes}</p>
           </div>
         )}
 
         {/* Transactions Section */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6 mb-8">
-          <h2 className="text-title-2 mb-4">Transactions</h2>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Transactions</h2>
           <div className="space-y-3">
             {mockTransactions.map((transaction) => (
               <Link
                 key={transaction.id}
                 to={`/transactions/${transaction.id}`}
-                className="flex items-center justify-between p-4 rounded-lg border border-surface-subtle hover:border-accent-primary motion-card"
+                className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:border-orange-500 transition-colors"
               >
                 <div>
-                  <div className="text-subheadline-emphasized text-primary">
+                  <div className="text-sm font-semibold text-gray-900">
                     {transaction.address}
                   </div>
-                  <div className="text-footnote text-secondary mt-1">
+                  <div className="text-xs text-gray-600 mt-1">
                     Role: {transaction.role}
                   </div>
                 </div>
                 <span
-                  className={`px-3 py-1 rounded-full text-footnote ${
+                  className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${
                     transaction.status === "Active"
-                      ? "status-active"
+                      ? "bg-blue-100 text-blue-700 border-blue-200"
                       : transaction.status === "Closed"
-                      ? "status-closed"
-                      : "status-pending"
+                      ? "bg-green-100 text-green-700 border-green-200"
+                      : "bg-yellow-100 text-yellow-700 border-yellow-200"
                   }`}
                 >
                   {transaction.status}
@@ -700,11 +702,11 @@ export default function ContactProfile() {
         </div>
 
         {/* Communication Timeline */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6">
-          <h2 className="text-title-2 mb-4">Communication History</h2>
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Communication History</h2>
 
           {events.length === 0 ? (
-            <div className="text-center py-12 text-subheadline text-secondary">
+            <div className="text-center py-12 text-sm text-gray-500">
               No communications logged yet. Use the buttons above to log your first interaction.
             </div>
           ) : (
@@ -712,27 +714,27 @@ export default function ContactProfile() {
               {events.map((event) => (
                 <div
                   key={event.id}
-                  className="flex gap-4 pb-4 border-b border-surface-subtle last:border-0"
+                  className="flex gap-4 pb-4 border-b border-gray-200 last:border-0"
                 >
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-footnote-emphasized badge-info flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold bg-blue-100 text-blue-700 flex-shrink-0">
                     {getEventLabel(event.type)}
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-subheadline-emphasized text-primary capitalize">
+                      <span className="text-sm font-semibold text-gray-900 capitalize">
                         {event.type}
                       </span>
                       {event.direction && (
-                        <span className="text-footnote text-secondary">
+                        <span className="text-xs text-gray-600">
                           ({event.direction})
                         </span>
                       )}
-                      <span className="text-footnote text-secondary">•</span>
-                      <span className="text-footnote text-secondary">
+                      <span className="text-xs text-gray-600">•</span>
+                      <span className="text-xs text-gray-600">
                         {formatDate(event.created_at)}
                       </span>
                     </div>
-                    <p className="text-subheadline text-secondary">
+                    <p className="text-sm text-gray-600">
                       {event.payload.note || "No notes provided"}
                     </p>
                   </div>

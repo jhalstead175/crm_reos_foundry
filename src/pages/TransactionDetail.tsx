@@ -710,23 +710,25 @@ export default function TransactionDetail() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 gap-3">
-        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
-        <div className="text-sm text-gray-500">Loading transaction...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 border-2 border-gray-200 border-t-orange-500 rounded-full animate-spin"></div>
+          <div className="text-sm text-gray-500">Loading transaction...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Error Display */}
         {error && (
-          <div className="mb-6 p-4 rounded-lg badge-error">
-            <p className="text-subheadline">{error}</p>
+          <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200">
+            <p className="text-sm text-red-700">{error}</p>
             <button
               onClick={() => setError(null)}
-              className="mt-2 text-footnote hover:opacity-80"
+              className="mt-2 text-xs text-red-600 hover:text-red-800"
             >
               Dismiss
             </button>
@@ -734,20 +736,20 @@ export default function TransactionDetail() {
         )}
 
         {/* Transaction Header */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6 mb-8">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6 mb-6">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h1 className="text-title-1">{transaction.address}</h1>
-              <p className="text-subheadline text-secondary mt-1">
+              <h1 className="text-2xl font-bold text-gray-900">{transaction.address}</h1>
+              <p className="text-sm text-gray-600 mt-1">
                 {transaction.type} • Created {new Date(transaction.createdAt).toLocaleDateString()}
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-subheadline text-secondary">Status:</span>
+              <span className="text-sm text-gray-600">Status:</span>
               <select
                 value={transaction.status}
                 onChange={(e) => handleTransactionStatusChange(e.target.value)}
-                className="px-3 py-1 text-footnote rounded-full border-0 input-base focus:outline-none status-active"
+                className="px-3 py-1.5 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               >
                 <option value="Active">Active</option>
                 <option value="Under Contract">Under Contract</option>
@@ -760,22 +762,22 @@ export default function TransactionDetail() {
           </div>
 
           {/* Primary Contact */}
-          <div className="border-t border-surface-subtle pt-4 mt-4">
+          <div className="border-t border-gray-200 pt-4 mt-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--accent-primary)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold bg-orange-500">
                 J
               </div>
               <div className="flex-1">
-                <div className="text-subheadline-emphasized text-primary">
+                <div className="text-sm font-semibold text-gray-900">
                   Primary Contact: John Doe
                 </div>
-                <div className="text-footnote text-secondary">
+                <div className="text-xs text-gray-600">
                   john.doe@example.com • (555) 123-4567
                 </div>
               </div>
               <Link
                 to="/contacts/1"
-                className="px-3 py-1 text-footnote border rounded-md hover:opacity-80 transition-opacity badge-info"
+                className="px-3 py-1.5 text-xs border border-gray-300 text-gray-700 rounded-md hover:border-gray-400 transition-colors"
               >
                 View Profile →
               </Link>
@@ -783,17 +785,16 @@ export default function TransactionDetail() {
           </div>
 
           {/* Tab Navigation */}
-          <nav className="flex gap-4 border-t pt-4 mt-4">
+          <nav className="flex gap-6 border-t border-gray-200 pt-4 mt-4">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`text-subheadline-emphasized pb-2 border-b-2 motion-tab ${
+                className={`text-sm font-semibold pb-2 border-b-2 transition-colors ${
                   activeTab === tab.id
-                    ? "border-accent-primary"
-                    : "border-transparent text-secondary hover:text-primary"
+                    ? "border-orange-500 text-orange-600"
+                    : "border-transparent text-gray-600 hover:text-gray-900"
                 }`}
-                style={activeTab === tab.id ? { color: 'var(--accent-primary)' } : undefined}
               >
                 {tab.label}
               </button>
@@ -802,7 +803,7 @@ export default function TransactionDetail() {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6">
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
           {activeTab === "timeline" && <TimelineView events={events} />}
           {activeTab === "documents" && (
             <DocumentsView
@@ -847,68 +848,68 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
   const getEventDisplay = (event: TransactionEvent) => {
     switch (event.type) {
       case "task.created":
-        return { title: `Task created: ${event.taskTitle}`, badgeText: "task", badgeClass: "badge-neutral" };
+        return { title: `Task created: ${event.taskTitle}`, badgeText: "task", badgeClass: "bg-gray-100 text-gray-700" };
       case "task.status_changed":
         return {
           title: `Task "${event.taskTitle}" moved from ${event.from} to ${event.to}`,
           badgeText: "task",
-          badgeClass: "badge-info",
+          badgeClass: "bg-blue-100 text-blue-700",
         };
       case "task.completed":
-        return { title: `Task completed: ${event.taskTitle}`, badgeText: "task", badgeClass: "badge-success" };
+        return { title: `Task completed: ${event.taskTitle}`, badgeText: "task", badgeClass: "bg-green-100 text-green-700" };
       case "task.auto_created":
         return {
           title: `System created task: ${event.taskTitle}`,
           subtitle: event.reason,
           badgeText: "automation",
-          badgeClass: "badge-info",
+          badgeClass: "bg-blue-100 text-blue-700",
         };
       case "milestone.reached":
         return {
           title: `Milestone: ${event.title}`,
           subtitle: event.description,
           badgeText: "milestone",
-          badgeClass: "badge-success",
+          badgeClass: "bg-green-100 text-green-700",
         };
       case "deadline.created":
         return {
           title: `Deadline set: ${event.title}`,
           subtitle: `Due ${new Date(event.dueDate).toLocaleDateString()}`,
           badgeText: "deadline",
-          badgeClass: "badge-warning",
+          badgeClass: "bg-yellow-100 text-yellow-700",
         };
       case "system":
-        return { title: event.title, badgeText: "system", badgeClass: "badge-neutral" };
+        return { title: event.title, badgeText: "system", badgeClass: "bg-gray-100 text-gray-700" };
       case "milestone":
-        return { title: event.title, badgeText: "milestone", badgeClass: "badge-success" };
+        return { title: event.title, badgeText: "milestone", badgeClass: "bg-green-100 text-green-700" };
       default:
-        return { title: "Unknown event", badgeText: "unknown", badgeClass: "badge-neutral" };
+        return { title: "Unknown event", badgeText: "unknown", badgeClass: "bg-gray-100 text-gray-700" };
     }
   };
 
   return (
     <div className="space-y-4">
-      <h2 className="text-title-2 mb-4">Timeline</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-4">Timeline</h2>
       {sortedEvents.length === 0 ? (
-        <p className="text-subheadline text-secondary">No events yet.</p>
+        <p className="text-sm text-gray-500">No events yet.</p>
       ) : (
         sortedEvents.map((event, index) => {
           const display = getEventDisplay(event);
           const eventId = "timestamp" in event ? event.timestamp + index : index;
 
           return (
-            <div key={eventId} className="border-l-2 border-surface-subtle pl-4 pb-4">
+            <div key={eventId} className="border-l-2 border-gray-200 pl-4 pb-4">
               <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
-                  <h3 className="text-body-emphasized">{display.title}</h3>
+                  <h3 className="text-sm font-semibold text-gray-900">{display.title}</h3>
                   {display.subtitle && (
-                    <p className="text-subheadline text-secondary mt-1">{display.subtitle}</p>
+                    <p className="text-sm text-gray-600 mt-1">{display.subtitle}</p>
                   )}
-                  <p className="text-footnote text-secondary mt-1">
+                  <p className="text-xs text-gray-500 mt-1">
                     {new Date(event.timestamp).toLocaleString()}
                   </p>
                 </div>
-                <span className={`text-caption-1 px-2 py-1 rounded flex-shrink-0 ${display.badgeClass}`}>
+                <span className={`text-xs font-semibold px-2 py-1 rounded flex-shrink-0 ${display.badgeClass}`}>
                   {display.badgeText}
                 </span>
               </div>
@@ -940,23 +941,23 @@ function DocumentsView({
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case "Signed":
-        return "badge-success";
+        return "bg-green-100 text-green-700 border border-green-200";
       case "Reviewed":
-        return "badge-info";
+        return "bg-blue-100 text-blue-700 border border-blue-200";
       case "Pending":
-        return "badge-warning";
+        return "bg-yellow-100 text-yellow-700 border border-yellow-200";
       default:
-        return "badge-neutral";
+        return "bg-gray-100 text-gray-700 border border-gray-200";
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-title-2">Documents</h2>
+        <h2 className="text-xl font-bold text-gray-900">Documents</h2>
         <button
           onClick={() => setShowUploadModal(true)}
-          className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
+          className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium text-sm"
         >
           Upload Document
         </button>
@@ -964,19 +965,19 @@ function DocumentsView({
 
       {/* Documents List */}
       {documents.length === 0 ? (
-        <p className="text-subheadline text-secondary text-center py-12">
+        <p className="text-sm text-gray-500 text-center py-12">
           No documents yet. Upload your first document to get started.
         </p>
       ) : (
         documents.map((doc) => (
-          <div key={doc.id} className="flex justify-between items-center border border-surface-subtle rounded-lg p-4 bg-surface-panel">
+          <div key={doc.id} className="flex justify-between items-center border border-gray-200 rounded-lg p-4 bg-white">
             <div>
-              <h3 className="text-body-emphasized">{doc.name}</h3>
-              <p className="text-subheadline text-secondary mt-1">
+              <h3 className="text-sm font-semibold text-gray-900">{doc.name}</h3>
+              <p className="text-sm text-gray-600 mt-1">
                 {doc.document_type} • Uploaded {new Date(doc.created_at).toLocaleDateString()}
               </p>
             </div>
-            <span className={`px-3 py-1 text-footnote rounded-full ${getStatusBadgeClass(doc.status)}`}>
+            <span className={`px-2.5 py-1 text-xs font-semibold rounded-md ${getStatusBadgeClass(doc.status)}`}>
               {doc.status}
             </span>
           </div>
@@ -986,12 +987,12 @@ function DocumentsView({
       {/* Upload Document Modal */}
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-surface-panel rounded-lg max-w-md w-full p-6">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-title-2">Upload Document</h2>
+              <h2 className="text-xl font-bold text-gray-900">Upload Document</h2>
               <button
                 onClick={() => setShowUploadModal(false)}
-                className="text-secondary hover:text-primary"
+                className="text-gray-400 hover:text-gray-600 text-2xl"
               >
                 ×
               </button>
@@ -1000,14 +1001,14 @@ function DocumentsView({
             <form onSubmit={onUploadDocument} className="space-y-4">
               {/* Document Name */}
               <div>
-                <label className="block text-subheadline-emphasized text-primary mb-2">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Document Name *
                 </label>
                 <input
                   type="text"
                   value={newDocument.name}
                   onChange={(e) => setNewDocument({ ...newDocument, name: e.target.value })}
-                  className="input-base w-full px-3 py-2"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   placeholder="Purchase Agreement.pdf"
                   required
                 />
@@ -1016,13 +1017,13 @@ function DocumentsView({
               {/* Document Type & Status */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Type
                   </label>
                   <select
                     value={newDocument.document_type}
                     onChange={(e) => setNewDocument({ ...newDocument, document_type: e.target.value })}
-                    className="input-base w-full px-3 py-2"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   >
                     <option value="Purchase Agreement">Purchase Agreement</option>
                     <option value="Inspection Report">Inspection Report</option>
@@ -1033,13 +1034,13 @@ function DocumentsView({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Status
                   </label>
                   <select
                     value={newDocument.status}
                     onChange={(e) => setNewDocument({ ...newDocument, status: e.target.value as "Pending" | "Signed" | "Reviewed" })}
-                    className="input-base w-full px-3 py-2"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   >
                     <option value="Pending">Pending</option>
                     <option value="Reviewed">Reviewed</option>
@@ -1049,7 +1050,7 @@ function DocumentsView({
               </div>
 
               {/* Note about file upload */}
-              <p className="text-footnote text-secondary">
+              <p className="text-xs text-gray-500">
                 Note: For MVP, document metadata is tracked. File storage can be added with Supabase Storage.
               </p>
 
@@ -1058,14 +1059,14 @@ function DocumentsView({
                 <button
                   type="submit"
                   disabled={uploading || !newDocument.name.trim()}
-                  className="flex-1 btn-primary px-4 py-2"
+                  className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   {uploading ? "Uploading..." : "Upload Document"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowUploadModal(false)}
-                  className="flex-1 px-4 py-2 bg-surface-muted text-primary rounded-md hover:bg-surface-subtle text-subheadline-emphasized motion-button"
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
                 >
                   Cancel
                 </button>
@@ -1104,21 +1105,21 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
       case "high":
-        return "priority-high";
+        return "bg-red-100 text-red-700 border border-red-200";
       case "medium":
-        return "priority-medium";
+        return "bg-yellow-100 text-yellow-700 border border-yellow-200";
       case "low":
-        return "priority-low";
+        return "bg-green-100 text-green-700 border border-green-200";
     }
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-title-2">Tasks</h2>
+        <h2 className="text-xl font-bold text-gray-900">Tasks</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
+          className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium text-sm"
         >
           {showAddForm ? "Cancel" : "Add Task"}
         </button>
@@ -1126,9 +1127,9 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
 
       {/* Add Task Form */}
       {showAddForm && (
-        <form onSubmit={handleSubmit} className="border border-surface-subtle rounded-lg p-4 bg-surface-muted space-y-3">
+        <form onSubmit={handleSubmit} className="border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-3">
           <div>
-            <label htmlFor="task-title" className="block text-subheadline-emphasized text-primary mb-2">
+            <label htmlFor="task-title" className="block text-sm font-semibold text-gray-700 mb-2">
               Task Title
             </label>
             <input
@@ -1137,21 +1138,21 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               placeholder="What needs to be done?"
-              className="input-base w-full px-3 py-2"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="task-priority" className="block text-subheadline-emphasized text-primary mb-2">
+              <label htmlFor="task-priority" className="block text-sm font-semibold text-gray-700 mb-2">
                 Priority
               </label>
               <select
                 id="task-priority"
                 value={newTaskPriority}
                 onChange={(e) => setNewTaskPriority(e.target.value as TaskPriority)}
-                className="input-base w-full px-3 py-2"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -1160,7 +1161,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
             </div>
 
             <div>
-              <label htmlFor="task-due-date" className="block text-subheadline-emphasized text-primary mb-2">
+              <label htmlFor="task-due-date" className="block text-sm font-semibold text-gray-700 mb-2">
                 Due Date (Optional)
               </label>
               <input
@@ -1168,14 +1169,14 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
                 type="date"
                 value={newTaskDueDate}
                 onChange={(e) => setNewTaskDueDate(e.target.value)}
-                className="input-base w-full px-3 py-2"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
+            className="w-full px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium"
           >
             Create Task
           </button>
@@ -1185,21 +1186,21 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
       {/* Task List */}
       <div className="space-y-3">
         {tasks.length === 0 ? (
-          <p className="text-subheadline text-secondary">No tasks yet. Click "Add Task" to create one.</p>
+          <p className="text-sm text-gray-500">No tasks yet. Click "Add Task" to create one.</p>
         ) : (
           tasks.map((task) => (
-            <div key={task.id} className="border border-surface-subtle rounded-lg p-4 space-y-3 bg-surface-panel">
+            <div key={task.id} className="border border-gray-200 rounded-lg p-4 space-y-3 bg-white">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className={`text-body-emphasized ${task.status === "done" ? "line-through text-secondary" : ""}`}>
+                  <h3 className={`text-sm font-semibold ${task.status === "done" ? "line-through text-gray-500" : "text-gray-900"}`}>
                     {task.title}
                   </h3>
                   <div className="flex items-center gap-3 mt-2">
-                    <span className={`text-caption-1 px-2 py-0.5 rounded ${getPriorityColor(task.priority)}`}>
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${getPriorityColor(task.priority)}`}>
                       {task.priority}
                     </span>
                     {task.dueDate && (
-                      <span className="text-subheadline text-secondary">
+                      <span className="text-sm text-gray-600">
                         Due {new Date(task.dueDate).toLocaleDateString()}
                       </span>
                     )}
@@ -1209,11 +1210,11 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
 
               {/* Status Control */}
               <div className="flex items-center gap-2">
-                <span className="text-subheadline text-secondary">Status:</span>
+                <span className="text-sm text-gray-600">Status:</span>
                 <select
                   value={task.status}
                   onChange={(e) => onStatusChange(task.id, e.target.value as TaskStatus)}
-                  className="input-base px-3 py-1 text-subheadline"
+                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
                   <option value="todo">To Do</option>
                   <option value="in_progress">In Progress</option>
@@ -1245,24 +1246,24 @@ function MessagesView({
 }) {
   return (
     <div className="space-y-4">
-      <h2 className="text-title-2 mb-4">Messages</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-4">Messages</h2>
 
       {/* Messages List */}
       <div className="space-y-3 max-h-[500px] overflow-y-auto">
         {messages.length === 0 ? (
-          <p className="text-subheadline text-secondary text-center py-12">
+          <p className="text-sm text-gray-500 text-center py-12">
             No messages yet. Start the conversation!
           </p>
         ) : (
           messages.map((msg) => (
-            <div key={msg.id} className="border border-surface-subtle rounded-lg p-4 bg-surface-panel">
+            <div key={msg.id} className="border border-gray-200 rounded-lg p-4 bg-white">
               <div className="flex justify-between items-start mb-2">
-                <span className="text-body-emphasized">{msg.sender_name}</span>
-                <span className="text-caption-1 text-tertiary">
+                <span className="text-sm font-semibold text-gray-900">{msg.sender_name}</span>
+                <span className="text-xs text-gray-500">
                   {new Date(msg.created_at).toLocaleString()}
                 </span>
               </div>
-              <p className="text-subheadline text-primary">{msg.content}</p>
+              <p className="text-sm text-gray-700">{msg.content}</p>
             </div>
           ))
         )}
@@ -1270,18 +1271,18 @@ function MessagesView({
       </div>
 
       {/* Message Input Form */}
-      <form onSubmit={onSendMessage} className="mt-4 pt-4 border-t border-surface-subtle">
+      <form onSubmit={onSendMessage} className="mt-4 pt-4 border-t border-gray-200">
         <textarea
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message..."
-          className="input-base w-full px-3 py-2 text-body"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           rows={3}
         />
         <button
           type="submit"
           disabled={sendingMessage || !newMessage.trim()}
-          className="mt-3 btn-primary px-5 py-2.5"
+          className="mt-3 px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors font-medium disabled:bg-gray-300 disabled:cursor-not-allowed"
         >
           {sendingMessage ? "Sending..." : "Send Message"}
         </button>
