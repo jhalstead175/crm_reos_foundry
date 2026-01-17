@@ -555,14 +555,14 @@ export default function TransactionDetail() {
 
   return (
     <div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Error Display */}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-subheadline text-red-800">{error}</p>
+          <div className="mb-6 p-4 rounded-lg badge-error">
+            <p className="text-subheadline">{error}</p>
             <button
               onClick={() => setError(null)}
-              className="mt-2 text-footnote text-red-600 hover:text-red-800 motion-text"
+              className="mt-2 text-footnote hover:opacity-80"
             >
               Dismiss
             </button>
@@ -570,7 +570,7 @@ export default function TransactionDetail() {
         )}
 
         {/* Transaction Header */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6 mb-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6 mb-8">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h1 className="text-title-1">{transaction.address}</h1>
@@ -583,7 +583,7 @@ export default function TransactionDetail() {
               <select
                 value={transaction.status}
                 onChange={(e) => handleTransactionStatusChange(e.target.value)}
-                className="px-3 py-1 bg-green-100 text-green-800 text-footnote rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-green-500 motion-input"
+                className="px-3 py-1 text-footnote rounded-full border-0 input-base focus:outline-none status-active"
               >
                 <option value="Active">Active</option>
                 <option value="Under Contract">Under Contract</option>
@@ -598,7 +598,7 @@ export default function TransactionDetail() {
           {/* Primary Contact */}
           <div className="border-t border-surface-subtle pt-4 mt-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-accent-primary rounded-full flex items-center justify-center text-white font-bold">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--accent-primary)' }}>
                 J
               </div>
               <div className="flex-1">
@@ -611,7 +611,7 @@ export default function TransactionDetail() {
               </div>
               <Link
                 to="/contacts/1"
-                className="px-3 py-1 text-accent-primary hover:text-blue-700 text-footnote border border-accent-primary rounded-md hover:bg-accent-soft transition-colors"
+                className="px-3 py-1 text-footnote border rounded-md hover:opacity-80 transition-opacity badge-info"
               >
                 View Profile →
               </Link>
@@ -619,16 +619,17 @@ export default function TransactionDetail() {
           </div>
 
           {/* Tab Navigation */}
-          <nav className="flex gap-4 border-t pt-4">
+          <nav className="flex gap-4 border-t pt-4 mt-4">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`text-subheadline-emphasized pb-2 border-b-2 motion-tab ${
                   activeTab === tab.id
-                    ? "border-accent-primary text-accent-primary"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                    ? "border-accent-primary"
+                    : "border-transparent text-secondary hover:text-primary"
                 }`}
+                style={activeTab === tab.id ? { color: 'var(--accent-primary)' } : undefined}
               >
                 {tab.label}
               </button>
@@ -637,7 +638,7 @@ export default function TransactionDetail() {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6">
           {activeTab === "timeline" && <TimelineView events={events} />}
           {activeTab === "documents" && <DocumentsView />}
           {activeTab === "tasks" && (
@@ -663,45 +664,42 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
   const getEventDisplay = (event: TransactionEvent) => {
     switch (event.type) {
       case "task.created":
-        return { title: `Task created: ${event.taskTitle}`, badgeText: "task", borderColor: "border-accent-muted" };
+        return { title: `Task created: ${event.taskTitle}`, badgeText: "task", badgeClass: "badge-neutral" };
       case "task.status_changed":
         return {
           title: `Task "${event.taskTitle}" moved from ${event.from} to ${event.to}`,
           badgeText: "task",
-          borderColor: "border-accent-muted",
+          badgeClass: "badge-info",
         };
       case "task.completed":
-        return { title: `Task completed: ${event.taskTitle}`, badgeText: "task", borderColor: "border-green-600" };
+        return { title: `Task completed: ${event.taskTitle}`, badgeText: "task", badgeClass: "badge-success" };
       case "task.auto_created":
         return {
-          title: `🤖 System created task: ${event.taskTitle}`,
+          title: `System created task: ${event.taskTitle}`,
           subtitle: event.reason,
           badgeText: "automation",
-          badgeColor: "bg-purple-100 text-purple-800",
-          borderColor: "border-purple-600",
+          badgeClass: "badge-info",
         };
       case "milestone.reached":
         return {
-          title: `🎯 Milestone: ${event.title}`,
+          title: `Milestone: ${event.title}`,
           subtitle: event.description,
           badgeText: "milestone",
-          badgeColor: "bg-green-100 text-green-800",
-          borderColor: "border-green-600",
+          badgeClass: "badge-success",
         };
       case "deadline.created":
         return {
-          title: `⏰ Deadline set: ${event.title}`,
+          title: `Deadline set: ${event.title}`,
           subtitle: `Due ${new Date(event.dueDate).toLocaleDateString()}`,
           badgeText: "deadline",
-          badgeColor: "bg-orange-100 text-orange-800",
-          borderColor: "border-orange-600",
+          badgeClass: "badge-warning",
         };
       case "system":
-        return { title: event.title, badgeText: "system", borderColor: "border-gray-600" };
+        return { title: event.title, badgeText: "system", badgeClass: "badge-neutral" };
       case "milestone":
-        return { title: event.title, badgeText: "milestone", borderColor: "border-green-600" };
+        return { title: event.title, badgeText: "milestone", badgeClass: "badge-success" };
       default:
-        return { title: "Unknown event", badgeText: "unknown", borderColor: "border-gray-600" };
+        return { title: "Unknown event", badgeText: "unknown", badgeClass: "badge-neutral" };
     }
   };
 
@@ -716,22 +714,18 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
           const eventId = "timestamp" in event ? event.timestamp + index : index;
 
           return (
-            <div key={eventId} className={`border-l-2 ${display.borderColor || "border-accent-soft"} pl-4 pb-4`}>
-              <div className="flex justify-between items-start">
+            <div key={eventId} className="border-l-2 border-surface-subtle pl-4 pb-4">
+              <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
                   <h3 className="text-body-emphasized">{display.title}</h3>
                   {display.subtitle && (
                     <p className="text-subheadline text-secondary mt-1">{display.subtitle}</p>
                   )}
-                  <p className="text-subheadline text-secondary mt-1">
+                  <p className="text-footnote text-secondary mt-1">
                     {new Date(event.timestamp).toLocaleString()}
                   </p>
                 </div>
-                <span
-                  className={`text-caption-1 px-2 py-1 rounded ${
-                    display.badgeColor || "bg-gray-100 text-gray-700"
-                  }`}
-                >
+                <span className={`text-caption-1 px-2 py-1 rounded flex-shrink-0 ${display.badgeClass}`}>
                   {display.badgeText}
                 </span>
               </div>
@@ -753,7 +747,7 @@ function DocumentsView() {
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-title-2">Documents</h2>
-        <button className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button">
+        <button className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary">
           Upload Document
         </button>
       </div>
@@ -765,7 +759,7 @@ function DocumentsView() {
               Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
             </p>
           </div>
-          <span className="px-3 py-1 bg-blue-100 text-blue-800 text-footnote rounded-full">
+          <span className="px-3 py-1 text-footnote rounded-full badge-info">
             {doc.status}
           </span>
         </div>
@@ -800,11 +794,11 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
       case "high":
-        return "bg-red-100 text-red-700";
+        return "priority-high";
       case "medium":
-        return "bg-yellow-100 text-yellow-700";
+        return "priority-medium";
       case "low":
-        return "bg-blue-100 text-blue-700";
+        return "priority-low";
     }
   };
 
@@ -814,7 +808,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
         <h2 className="text-title-2">Tasks</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button"
+          className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
         >
           {showAddForm ? "Cancel" : "Add Task"}
         </button>
@@ -824,7 +818,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
       {showAddForm && (
         <form onSubmit={handleSubmit} className="border border-surface-subtle rounded-lg p-4 bg-surface-muted space-y-3">
           <div>
-            <label htmlFor="task-title" className="block text-subheadline-emphasized text-primary mb-1">
+            <label htmlFor="task-title" className="block text-subheadline-emphasized text-primary mb-2">
               Task Title
             </label>
             <input
@@ -833,21 +827,21 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               placeholder="What needs to be done?"
-              className="w-full px-3 py-2 border border-surface-subtle rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+              className="input-base w-full px-3 py-2"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="task-priority" className="block text-subheadline-emphasized text-primary mb-1">
+              <label htmlFor="task-priority" className="block text-subheadline-emphasized text-primary mb-2">
                 Priority
               </label>
               <select
                 id="task-priority"
                 value={newTaskPriority}
                 onChange={(e) => setNewTaskPriority(e.target.value as TaskPriority)}
-                className="w-full px-3 py-2 border border-surface-subtle rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                className="input-base w-full px-3 py-2"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -856,7 +850,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
             </div>
 
             <div>
-              <label htmlFor="task-due-date" className="block text-subheadline-emphasized text-primary mb-1">
+              <label htmlFor="task-due-date" className="block text-subheadline-emphasized text-primary mb-2">
                 Due Date (Optional)
               </label>
               <input
@@ -864,14 +858,14 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
                 type="date"
                 value={newTaskDueDate}
                 onChange={(e) => setNewTaskDueDate(e.target.value)}
-                className="w-full px-3 py-2 border border-surface-subtle rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                className="input-base w-full px-3 py-2"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button"
+            className="w-full px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
           >
             Create Task
           </button>
@@ -887,7 +881,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
             <div key={task.id} className="border border-surface-subtle rounded-lg p-4 space-y-3 bg-surface-panel">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className={`text-body-emphasized ${task.status === "done" ? "line-through text-gray-500" : ""}`}>
+                  <h3 className={`text-body-emphasized ${task.status === "done" ? "line-through text-secondary" : ""}`}>
                     {task.title}
                   </h3>
                   <div className="flex items-center gap-3 mt-2">
@@ -909,7 +903,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
                 <select
                   value={task.status}
                   onChange={(e) => onStatusChange(task.id, e.target.value as TaskStatus)}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-subheadline focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
+                  className="input-base px-3 py-1 text-subheadline"
                 >
                   <option value="todo">To Do</option>
                   <option value="in_progress">In Progress</option>
@@ -946,13 +940,13 @@ function MessagesView() {
           </div>
         ))}
       </div>
-      <div className="mt-4 pt-4 border-t">
+      <div className="mt-4 pt-4 border-t border-surface-subtle">
         <textarea
           placeholder="Type your message..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-body motion-input"
+          className="input-base w-full px-3 py-2 text-body"
           rows={3}
         />
-        <button className="mt-2 px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button">
+        <button className="mt-3 px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary">
           Send Message
         </button>
       </div>
