@@ -151,15 +151,15 @@ export default function TaskBoard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface-app flex items-center justify-center">
+      <div className="flex items-center justify-center py-16">
         <div className="text-subheadline text-secondary">Loading tasks...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-surface-app">
-      <div className="max-w-6xl mx-auto px-6 py-8">
+    <div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>

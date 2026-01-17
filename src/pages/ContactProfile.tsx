@@ -252,15 +252,14 @@ export default function ContactProfile() {
 
   if (loading || !contact) {
     return (
-      <div className="min-h-screen bg-surface-app flex items-center justify-center">
+      <div className="flex items-center justify-center py-16">
         <div className="text-subheadline text-secondary">Loading contact...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-surface-app">
-      <div className="max-w-6xl mx-auto px-6 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Contact Header */}
         <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6 mb-6">
           <div className="flex items-start justify-between mb-6">
@@ -741,7 +740,6 @@ export default function ContactProfile() {
           )}
         </div>
       </div>
-    </div>
   );
 }
 
