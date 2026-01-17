@@ -11,6 +11,19 @@ export default function ContactsList() {
   const [filterSource, setFilterSource] = useState<ContactSource | "all">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Add Contact Modal State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newContact, setNewContact] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    lead_score: "C" as LeadScore,
+    status: "New Lead" as ContactStatus,
+    source: "Website" as ContactSource,
+    notes: "",
+  });
+  const [saving, setSaving] = useState(false);
+
   useEffect(() => {
     loadContacts();
   }, []);
@@ -31,6 +44,56 @@ export default function ContactsList() {
       setContacts(mockContacts);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddContact = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newContact.name.trim()) {
+      alert("Name is required");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const { data, error } = await supabase
+        .from("contacts")
+        .insert([
+          {
+            name: newContact.name.trim(),
+            email: newContact.email.trim() || null,
+            phone: newContact.phone.trim() || null,
+            lead_score: newContact.lead_score,
+            status: newContact.status,
+            source: newContact.source,
+            notes: newContact.notes.trim() || null,
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      // Add new contact to the list
+      setContacts((prev) => [data, ...prev]);
+
+      // Reset form and close modal
+      setNewContact({
+        name: "",
+        email: "",
+        phone: "",
+        lead_score: "C",
+        status: "New Lead",
+        source: "Website",
+        notes: "",
+      });
+      setShowAddModal(false);
+    } catch (error) {
+      console.error("Error creating contact:", error);
+      alert("Failed to create contact. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -111,7 +174,10 @@ export default function ContactsList() {
               {filteredContacts.length} of {contacts.length} contacts
             </p>
           </div>
-          <button className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary">
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
+          >
             Add Contact
           </button>
         </div>
@@ -307,6 +373,154 @@ export default function ContactsList() {
             </div>
           )}
         </div>
+
+        {/* Add Contact Modal */}
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-surface-panel rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-title-2">Add New Contact</h2>
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="text-secondary hover:text-primary"
+                >
+                  ×
+                </button>
+              </div>
+
+              <form onSubmit={handleAddContact} className="space-y-6">
+                {/* Name (Required) */}
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newContact.name}
+                    onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
+                    className="input-base w-full px-3 py-2"
+                    required
+                  />
+                </div>
+
+                {/* Email & Phone */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-subheadline-emphasized text-primary mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={newContact.email}
+                      onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
+                      className="input-base w-full px-3 py-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-subheadline-emphasized text-primary mb-2">
+                      Phone
+                    </label>
+                    <input
+                      type="tel"
+                      value={newContact.phone}
+                      onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
+                      className="input-base w-full px-3 py-2"
+                    />
+                  </div>
+                </div>
+
+                {/* Lead Score, Status, Source */}
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-subheadline-emphasized text-primary mb-2">
+                      Lead Score
+                    </label>
+                    <select
+                      value={newContact.lead_score}
+                      onChange={(e) => setNewContact({ ...newContact, lead_score: e.target.value as LeadScore })}
+                      className="input-base w-full px-3 py-2"
+                    >
+                      <option value="A">A</option>
+                      <option value="B">B</option>
+                      <option value="C">C</option>
+                      <option value="D">D</option>
+                      <option value="F">F</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-subheadline-emphasized text-primary mb-2">
+                      Status
+                    </label>
+                    <select
+                      value={newContact.status}
+                      onChange={(e) => setNewContact({ ...newContact, status: e.target.value as ContactStatus })}
+                      className="input-base w-full px-3 py-2"
+                    >
+                      <option value="New Lead">New Lead</option>
+                      <option value="Nurturing">Nurturing</option>
+                      <option value="Hot">Hot</option>
+                      <option value="Under Contract">Under Contract</option>
+                      <option value="Closed">Closed</option>
+                      <option value="Dead">Dead</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-subheadline-emphasized text-primary mb-2">
+                      Source
+                    </label>
+                    <select
+                      value={newContact.source}
+                      onChange={(e) => setNewContact({ ...newContact, source: e.target.value as ContactSource })}
+                      className="input-base w-full px-3 py-2"
+                    >
+                      <option value="Website">Website</option>
+                      <option value="Zillow">Zillow</option>
+                      <option value="Realtor.com">Realtor.com</option>
+                      <option value="Referral">Referral</option>
+                      <option value="Past Client">Past Client</option>
+                      <option value="Cold Call">Cold Call</option>
+                      <option value="Open House">Open House</option>
+                      <option value="Social Media">Social Media</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Notes
+                  </label>
+                  <textarea
+                    value={newContact.notes}
+                    onChange={(e) => setNewContact({ ...newContact, notes: e.target.value })}
+                    rows={4}
+                    className="input-base w-full px-3 py-2"
+                    placeholder="Add any relevant notes about this contact..."
+                  />
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="submit"
+                    disabled={saving || !newContact.name.trim()}
+                    className="flex-1 btn-primary px-4 py-2"
+                  >
+                    {saving ? "Creating..." : "Create Contact"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddModal(false)}
+                    className="flex-1 px-4 py-2 bg-surface-muted text-primary rounded-md hover:bg-surface-subtle text-subheadline-emphasized motion-button"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
   );
 }
