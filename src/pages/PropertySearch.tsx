@@ -268,32 +268,25 @@ export default function PropertySearch() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-title-1 mb-1">Property Search</h1>
-          <p className="text-subheadline text-secondary">
+        <div className="mb-12">
+          <h1 className="text-3xl font-semibold text-gray-900 mb-2">Property Search</h1>
+          <p className="text-gray-600">
             Search properties using RentCast MLS data
           </p>
         </div>
 
         {/* Search Form */}
-        <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-sm p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-title-3 font-semibold">Search Property</h2>
-              <p className="text-caption-1 text-secondary">Enter an address to get property details</p>
-            </div>
+        <div className="border border-gray-200 rounded-lg p-8 mb-6">
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-1">Search Property</h2>
+            <p className="text-sm text-gray-600">Enter an address to get property details</p>
           </div>
-          <form onSubmit={handleSearch} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form onSubmit={handleSearch} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
-                <label className="block text-subheadline-emphasized text-primary mb-2">
+                <label className="block text-sm font-medium text-gray-900 mb-2">
                   Street Address *
                 </label>
                 <input
@@ -301,12 +294,12 @@ export default function PropertySearch() {
                   value={searchAddress}
                   onChange={(e) => setSearchAddress(e.target.value)}
                   placeholder="123 Main St"
-                  className="input-base w-full"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
                   required
                 />
               </div>
               <div>
-                <label className="block text-subheadline-emphasized text-primary mb-2">
+                <label className="block text-sm font-medium text-gray-900 mb-2">
                   City
                 </label>
                 <input
@@ -314,12 +307,12 @@ export default function PropertySearch() {
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   placeholder="San Francisco"
-                  className="input-base w-full"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
                     State
                   </label>
                   <input
@@ -328,11 +321,11 @@ export default function PropertySearch() {
                     onChange={(e) => setState(e.target.value)}
                     placeholder="CA"
                     maxLength={2}
-                    className="input-base w-full"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
                   />
                 </div>
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
                     ZIP Code
                   </label>
                   <input
@@ -341,7 +334,7 @@ export default function PropertySearch() {
                     onChange={(e) => setZipCode(e.target.value)}
                     placeholder="94102"
                     maxLength={5}
-                    className="input-base w-full"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
                   />
                 </div>
               </div>
@@ -350,52 +343,28 @@ export default function PropertySearch() {
             <button
               type="submit"
               disabled={loading || !searchAddress.trim()}
-              className="btn-primary px-6 py-2.5 flex items-center gap-2"
+              className="w-full px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? (
-                <>
-                  <div className="spinner"></div>
-                  <span>Searching...</span>
-                </>
-              ) : (
-                <>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                  <span>Search Property</span>
-                </>
-              )}
+              {loading ? "Searching..." : "Search Property"}
             </button>
           </form>
 
           {error && (
-            <div className="mt-4 p-4 rounded-lg badge-warning border-2">
-              <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                <p className="text-subheadline">{error}</p>
-              </div>
+            <div className="mt-6 p-3 rounded-md bg-yellow-50 border border-yellow-200">
+              <p className="text-sm text-yellow-700">{error}</p>
             </div>
           )}
         </div>
 
         {/* Property Results */}
         {property && (
-          <div className="space-y-5">
+          <div className="space-y-6">
             {/* Property Header */}
-            <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-sm p-6">
-              <div className="flex items-start justify-between mb-6">
+            <div className="border border-gray-200 rounded-lg p-8">
+              <div className="flex items-start justify-between mb-8">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                      </svg>
-                    </div>
-                    <h2 className="text-title-2 font-semibold">{property.address}</h2>
-                  </div>
-                  <p className="text-subheadline text-secondary">
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">{property.address}</h2>
+                  <p className="text-sm text-gray-600">
                     {property.propertyType} • {property.bedrooms} bed • {property.bathrooms} bath • {formatNumber(property.squareFootage)} sqft
                   </p>
                 </div>
@@ -403,21 +372,21 @@ export default function PropertySearch() {
                   <button
                     onClick={saveProperty}
                     disabled={saving || !!savedPropertyId}
-                    className="btn-primary"
+                    className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {savedPropertyId ? "Saved" : saving ? "Saving..." : "Save Property"}
                   </button>
                   <button
                     onClick={openLinkModal}
                     disabled={!savedPropertyId}
-                    className="px-4 py-2 bg-surface-panel border border-surface-subtle rounded-md hover:border-accent-primary disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized motion-button"
+                    className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Link to Contact
                   </button>
                   <button
                     onClick={openTransactionModal}
                     disabled={!savedPropertyId}
-                    className="px-4 py-2 bg-surface-panel border border-surface-subtle rounded-md hover:border-accent-primary disabled:opacity-50 disabled:cursor-not-allowed text-subheadline-emphasized motion-button"
+                    className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Link to Transaction
                   </button>
@@ -425,31 +394,31 @@ export default function PropertySearch() {
               </div>
 
               {/* Quick Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-5 border-t border-surface-subtle">
-                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg p-4 border border-surface-subtle">
-                  <div className="text-caption-1 text-secondary mb-1">Estimated Value</div>
-                  <div className="text-title-3 text-accent-primary font-semibold">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-6 border-t border-gray-200">
+                <div className="border border-gray-200 rounded-lg p-6">
+                  <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Estimated Value</div>
+                  <div className="text-2xl font-semibold text-gray-900">
                     {formatCurrency(propertyValue?.price)}
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg p-4 border border-surface-subtle">
-                  <div className="text-caption-1 text-secondary mb-1">Estimated Rent</div>
-                  <div className="text-title-3 font-semibold" style={{ color: 'var(--color-success)' }}>
+                <div className="border border-gray-200 rounded-lg p-6">
+                  <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Estimated Rent</div>
+                  <div className="text-2xl font-semibold text-gray-900">
                     {formatCurrency(rentalEstimate?.rent)}/mo
                   </div>
                 </div>
-                <div className="bg-surface-muted/50 rounded-lg p-4 border border-surface-subtle">
-                  <div className="text-caption-1 text-secondary mb-1">Last Sale</div>
-                  <div className="text-title-3 font-semibold">
+                <div className="border border-gray-200 rounded-lg p-6">
+                  <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Last Sale</div>
+                  <div className="text-2xl font-semibold text-gray-900">
                     {formatCurrency(property.lastSalePrice)}
                   </div>
-                  <div className="text-caption-1 text-tertiary mt-0.5">
+                  <div className="text-xs text-gray-500 mt-1">
                     {property.lastSaleDate && new Date(property.lastSaleDate).toLocaleDateString()}
                   </div>
                 </div>
-                <div className="bg-surface-muted/50 rounded-lg p-4 border border-surface-subtle">
-                  <div className="text-caption-1 text-secondary mb-1">Year Built</div>
-                  <div className="text-title-3 font-semibold">
+                <div className="border border-gray-200 rounded-lg p-6">
+                  <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Year Built</div>
+                  <div className="text-2xl font-semibold text-gray-900">
                     {property.yearBuilt || "N/A"}
                   </div>
                 </div>
@@ -457,8 +426,8 @@ export default function PropertySearch() {
             </div>
 
             {/* Tabs */}
-            <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-sm">
-              <nav className="flex border-b border-surface-subtle px-6 overflow-x-auto">
+            <div className="border border-gray-200 rounded-lg">
+              <nav className="flex border-b border-gray-200 px-6 -mb-px overflow-x-auto">
                 {[
                   { id: "details" as const, label: "Property Details" },
                   { id: "value" as const, label: "Value Estimate" },
@@ -468,10 +437,10 @@ export default function PropertySearch() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-3 text-subheadline-emphasized border-b-2 motion-tab ${
+                    className={`py-4 px-4 text-sm border-b-2 transition-colors ${
                       activeTab === tab.id
-                        ? "border-accent-primary text-accent-primary"
-                        : "border-transparent text-secondary hover:text-primary"
+                        ? "border-gray-900 text-gray-900 font-medium"
+                        : "border-transparent text-gray-600 hover:text-gray-900"
                     }`}
                   >
                     {tab.label}
@@ -479,45 +448,45 @@ export default function PropertySearch() {
                 ))}
               </nav>
 
-              <div className="p-6">
+              <div className="p-8">
                 {/* Details Tab */}
                 {activeTab === "details" && (
                   <div className="space-y-6">
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
                       <div>
-                        <div className="text-footnote text-secondary">Bedrooms</div>
-                        <div className="text-subheadline-emphasized mt-1">{property.bedrooms || "N/A"}</div>
+                        <div className="text-xs text-gray-500 mb-1">Bedrooms</div>
+                        <div className="text-sm font-medium text-gray-900">{property.bedrooms || "N/A"}</div>
                       </div>
                       <div>
-                        <div className="text-footnote text-secondary">Bathrooms</div>
-                        <div className="text-subheadline-emphasized mt-1">{property.bathrooms || "N/A"}</div>
+                        <div className="text-xs text-gray-500 mb-1">Bathrooms</div>
+                        <div className="text-sm font-medium text-gray-900">{property.bathrooms || "N/A"}</div>
                       </div>
                       <div>
-                        <div className="text-footnote text-secondary">Square Footage</div>
-                        <div className="text-subheadline-emphasized mt-1">{formatNumber(property.squareFootage)}</div>
+                        <div className="text-xs text-gray-500 mb-1">Square Footage</div>
+                        <div className="text-sm font-medium text-gray-900">{formatNumber(property.squareFootage)}</div>
                       </div>
                       <div>
-                        <div className="text-footnote text-secondary">Lot Size</div>
-                        <div className="text-subheadline-emphasized mt-1">{formatNumber(property.lotSize)} sqft</div>
+                        <div className="text-xs text-gray-500 mb-1">Lot Size</div>
+                        <div className="text-sm font-medium text-gray-900">{formatNumber(property.lotSize)} sqft</div>
                       </div>
                       <div>
-                        <div className="text-footnote text-secondary">Property Type</div>
-                        <div className="text-subheadline-emphasized mt-1">{property.propertyType || "N/A"}</div>
+                        <div className="text-xs text-gray-500 mb-1">Property Type</div>
+                        <div className="text-sm font-medium text-gray-900">{property.propertyType || "N/A"}</div>
                       </div>
                       <div>
-                        <div className="text-footnote text-secondary">County</div>
-                        <div className="text-subheadline-emphasized mt-1">{property.county || "N/A"}</div>
+                        <div className="text-xs text-gray-500 mb-1">County</div>
+                        <div className="text-sm font-medium text-gray-900">{property.county || "N/A"}</div>
                       </div>
                     </div>
 
                     {property.features && property.features.length > 0 && (
                       <div>
-                        <div className="text-footnote text-secondary mb-2">Features</div>
+                        <div className="text-xs text-gray-500 mb-2">Features</div>
                         <div className="flex flex-wrap gap-2">
                           {property.features.map((feature, idx) => (
                             <span
                               key={idx}
-                              className="px-3 py-1 bg-surface-muted text-primary rounded-full text-footnote"
+                              className="px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-xs"
                             >
                               {feature}
                             </span>
@@ -532,26 +501,26 @@ export default function PropertySearch() {
                 {activeTab === "value" && propertyValue && (
                   <div className="space-y-6">
                     <div>
-                      <div className="text-footnote text-secondary mb-2">Estimated Value</div>
-                      <div className="text-display text-accent-primary">{formatCurrency(propertyValue.price)}</div>
-                      <div className="text-subheadline text-secondary mt-2">
+                      <div className="text-xs text-gray-500 mb-2">Estimated Value</div>
+                      <div className="text-4xl font-semibold text-gray-900">{formatCurrency(propertyValue.price)}</div>
+                      <div className="text-sm text-gray-600 mt-2">
                         Range: {formatCurrency(propertyValue.priceRangeLow)} - {formatCurrency(propertyValue.priceRangeHigh)}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <div className="text-footnote text-secondary">Confidence Score</div>
-                      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--surface-subtle)' }}>
+                      <div className="text-xs text-gray-500">Confidence Score</div>
+                      <div className="flex-1 h-2 rounded-full overflow-hidden bg-gray-200">
                         <div
-                          className="h-full bg-accent-primary"
+                          className="h-full bg-gray-900"
                           style={{ width: `${propertyValue.confidenceScore * 100}%` }}
                         />
                       </div>
-                      <div className="text-subheadline-emphasized">{Math.round(propertyValue.confidenceScore * 100)}%</div>
+                      <div className="text-sm font-medium text-gray-900">{Math.round(propertyValue.confidenceScore * 100)}%</div>
                     </div>
 
-                    <div className="p-4 bg-surface-muted rounded-lg">
-                      <p className="text-footnote text-secondary">
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-xs text-gray-600">
                         This automated valuation model (AVM) is based on recent comparable sales, property characteristics, and local market trends. The actual market value may vary.
                       </p>
                     </div>
@@ -562,43 +531,43 @@ export default function PropertySearch() {
                 {activeTab === "rental" && rentalEstimate && (
                   <div className="space-y-6">
                     <div>
-                      <div className="text-footnote text-secondary mb-2">Estimated Monthly Rent</div>
-                      <div className="text-display" style={{ color: 'var(--color-success)' }}>{formatCurrency(rentalEstimate.rent)}/mo</div>
-                      <div className="text-subheadline text-secondary mt-2">
+                      <div className="text-xs text-gray-500 mb-2">Estimated Monthly Rent</div>
+                      <div className="text-4xl font-semibold text-gray-900">{formatCurrency(rentalEstimate.rent)}/mo</div>
+                      <div className="text-sm text-gray-600 mt-2">
                         Range: {formatCurrency(rentalEstimate.rentRangeLow)} - {formatCurrency(rentalEstimate.rentRangeHigh)}
                       </div>
                     </div>
 
                     <div className="flex items-center gap-4">
-                      <div className="text-footnote text-secondary">Confidence Score</div>
-                      <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--surface-subtle)' }}>
+                      <div className="text-xs text-gray-500">Confidence Score</div>
+                      <div className="flex-1 h-2 rounded-full overflow-hidden bg-gray-200">
                         <div
-                          className="h-full"
-                          style={{ backgroundColor: 'var(--color-success)', width: `${rentalEstimate.confidenceScore * 100}%` }}
+                          className="h-full bg-gray-900"
+                          style={{ width: `${rentalEstimate.confidenceScore * 100}%` }}
                         />
                       </div>
-                      <div className="text-subheadline-emphasized">{Math.round(rentalEstimate.confidenceScore * 100)}%</div>
+                      <div className="text-sm font-medium text-gray-900">{Math.round(rentalEstimate.confidenceScore * 100)}%</div>
                     </div>
 
                     {propertyValue && (
                       <div className="grid grid-cols-2 gap-4">
-                        <div className="p-4 bg-surface-muted rounded-lg">
-                          <div className="text-footnote text-secondary mb-1">Gross Yield</div>
-                          <div className="text-title-3 text-accent-primary">
+                        <div className="p-6 border border-gray-200 rounded-lg">
+                          <div className="text-xs text-gray-500 mb-1">Gross Yield</div>
+                          <div className="text-2xl font-semibold text-gray-900">
                             {((rentalEstimate.rent * 12 / propertyValue.price) * 100).toFixed(2)}%
                           </div>
                         </div>
-                        <div className="p-4 bg-surface-muted rounded-lg">
-                          <div className="text-footnote text-secondary mb-1">Annual Rent</div>
-                          <div className="text-title-3" style={{ color: 'var(--color-success)' }}>
+                        <div className="p-6 border border-gray-200 rounded-lg">
+                          <div className="text-xs text-gray-500 mb-1">Annual Rent</div>
+                          <div className="text-2xl font-semibold text-gray-900">
                             {formatCurrency(rentalEstimate.rent * 12)}
                           </div>
                         </div>
                       </div>
                     )}
 
-                    <div className="p-4 bg-surface-muted rounded-lg">
-                      <p className="text-footnote text-secondary">
+                    <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <p className="text-xs text-gray-600">
                         Rental estimate based on comparable properties, local market data, and property characteristics. Actual rental income may vary based on condition, amenities, and current market demand.
                       </p>
                     </div>
@@ -607,55 +576,50 @@ export default function PropertySearch() {
 
                 {/* Comparables Tab */}
                 {activeTab === "comps" && (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {comparables.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-12 text-center">
-                        <div className="w-16 h-16 rounded-full bg-surface-muted border border-surface-subtle flex items-center justify-center mb-4">
-                          <svg className="w-8 h-8 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                          </svg>
-                        </div>
-                        <p className="text-subheadline text-secondary font-medium">No comparable sales found</p>
-                        <p className="text-caption-1 text-tertiary mt-1">Try searching for a different property</p>
+                        <p className="text-sm text-gray-500">No comparable sales found</p>
+                        <p className="text-xs text-gray-400 mt-1">Try searching for a different property</p>
                       </div>
                     ) : (
                       comparables.map((comp) => (
                         <div
                           key={comp.id}
-                          className="p-4 border border-surface-subtle rounded-lg hover:border-accent-primary hover:shadow-md motion-card"
+                          className="p-6 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                         >
-                          <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-start justify-between mb-4">
                             <div>
-                              <div className="text-subheadline-emphasized text-primary">{comp.address}</div>
-                              <div className="text-footnote text-secondary mt-1">
+                              <div className="text-sm font-medium text-gray-900">{comp.address}</div>
+                              <div className="text-xs text-gray-500 mt-1">
                                 {comp.distance} miles away
                               </div>
                             </div>
                             <div className="text-right">
-                              <div className="text-title-3 text-accent-primary">
+                              <div className="text-lg font-semibold text-gray-900">
                                 {formatCurrency(comp.lastSalePrice)}
                               </div>
-                              <div className="text-footnote text-secondary">
+                              <div className="text-xs text-gray-500">
                                 {comp.lastSaleDate && new Date(comp.lastSaleDate).toLocaleDateString()}
                               </div>
                             </div>
                           </div>
-                          <div className="grid grid-cols-4 gap-4 text-center">
+                          <div className="grid grid-cols-4 gap-4 text-center pt-4 border-t border-gray-200">
                             <div>
-                              <div className="text-footnote text-secondary">Beds</div>
-                              <div className="text-subheadline-emphasized">{comp.bedrooms}</div>
+                              <div className="text-xs text-gray-500">Beds</div>
+                              <div className="text-sm font-medium text-gray-900 mt-1">{comp.bedrooms}</div>
                             </div>
                             <div>
-                              <div className="text-footnote text-secondary">Baths</div>
-                              <div className="text-subheadline-emphasized">{comp.bathrooms}</div>
+                              <div className="text-xs text-gray-500">Baths</div>
+                              <div className="text-sm font-medium text-gray-900 mt-1">{comp.bathrooms}</div>
                             </div>
                             <div>
-                              <div className="text-footnote text-secondary">Sqft</div>
-                              <div className="text-subheadline-emphasized">{formatNumber(comp.squareFootage)}</div>
+                              <div className="text-xs text-gray-500">Sqft</div>
+                              <div className="text-sm font-medium text-gray-900 mt-1">{formatNumber(comp.squareFootage)}</div>
                             </div>
                             <div>
-                              <div className="text-footnote text-secondary">Built</div>
-                              <div className="text-subheadline-emphasized">{comp.yearBuilt || "N/A"}</div>
+                              <div className="text-xs text-gray-500">Built</div>
+                              <div className="text-sm font-medium text-gray-900 mt-1">{comp.yearBuilt || "N/A"}</div>
                             </div>
                           </div>
                         </div>
@@ -671,12 +635,12 @@ export default function PropertySearch() {
         {/* Link to Contact Modal */}
         {showLinkModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-xl max-w-md w-full p-6">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-title-2 font-semibold">Link Property to Contact</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Link Property to Contact</h2>
                 <button
                   onClick={() => setShowLinkModal(false)}
-                  className="w-8 h-8 rounded-lg hover:bg-surface-muted flex items-center justify-center text-secondary hover:text-primary motion-button"
+                  className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -684,15 +648,15 @@ export default function PropertySearch() {
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
                     Select Contact
                   </label>
                   <select
                     value={selectedContactId}
                     onChange={(e) => setSelectedContactId(e.target.value)}
-                    className="input-base w-full"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
                   >
                     <option value="">-- Choose a contact --</option>
                     {contacts.map((contact) => (
@@ -704,13 +668,13 @@ export default function PropertySearch() {
                 </div>
 
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
                     Relationship
                   </label>
                   <select
                     value={relationship}
                     onChange={(e) => setRelationship(e.target.value as any)}
-                    className="input-base w-full"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
                   >
                     <option value="Interest">Interest</option>
                     <option value="Buyer">Buyer</option>
@@ -724,7 +688,7 @@ export default function PropertySearch() {
                   <button
                     onClick={linkToContact}
                     disabled={!selectedContactId || linking}
-                    className="flex-1 btn-primary"
+                    className="flex-1 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {linking ? "Linking..." : "Link Contact"}
                   </button>
@@ -733,7 +697,7 @@ export default function PropertySearch() {
                       setShowLinkModal(false);
                       setSelectedContactId("");
                     }}
-                    className="flex-1 px-4 py-2 bg-surface-muted text-primary rounded-md hover:bg-surface-subtle text-subheadline-emphasized motion-button"
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:border-gray-400 transition-colors"
                   >
                     Cancel
                   </button>
@@ -746,12 +710,12 @@ export default function PropertySearch() {
         {/* Link to Transaction Modal */}
         {showTransactionModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-surface-panel rounded-xl border border-surface-subtle shadow-xl max-w-md w-full p-6">
+            <div className="bg-white rounded-lg border border-gray-200 shadow-xl max-w-md w-full p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-title-2 font-semibold">Link Property to Transaction</h2>
+                <h2 className="text-xl font-semibold text-gray-900">Link Property to Transaction</h2>
                 <button
                   onClick={() => setShowTransactionModal(false)}
-                  className="w-8 h-8 rounded-lg hover:bg-surface-muted flex items-center justify-center text-secondary hover:text-primary motion-button"
+                  className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -759,15 +723,15 @@ export default function PropertySearch() {
                 </button>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
                     Select Transaction
                   </label>
                   <select
                     value={selectedTransactionId}
                     onChange={(e) => setSelectedTransactionId(e.target.value)}
-                    className="input-base w-full"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
                   >
                     <option value="">-- Choose a transaction --</option>
                     {transactions.map((transaction) => (
@@ -777,7 +741,7 @@ export default function PropertySearch() {
                     ))}
                   </select>
                   {transactions.length === 0 && (
-                    <p className="mt-2 text-footnote text-secondary">
+                    <p className="mt-2 text-xs text-gray-500">
                       No transactions found. Create a transaction first.
                     </p>
                   )}
@@ -787,7 +751,7 @@ export default function PropertySearch() {
                   <button
                     onClick={linkToTransaction}
                     disabled={!selectedTransactionId || linkingTransaction}
-                    className="flex-1 btn-primary"
+                    className="flex-1 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     {linkingTransaction ? "Linking..." : "Link Transaction"}
                   </button>
@@ -796,7 +760,7 @@ export default function PropertySearch() {
                       setShowTransactionModal(false);
                       setSelectedTransactionId("");
                     }}
-                    className="flex-1 px-4 py-2 bg-surface-muted text-primary rounded-md hover:bg-surface-subtle text-subheadline-emphasized motion-button"
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:border-gray-400 transition-colors"
                   >
                     Cancel
                   </button>

@@ -53,17 +53,17 @@ export default function MainLayout({ children }: MainLayoutProps) {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-2">
-              <span className="text-lg font-semibold text-gray-900">REOS</span>
+            <Link to="/" className="flex items-center">
+              <span className="text-xl font-semibold text-gray-900">REOS</span>
             </Link>
 
             {/* User Menu */}
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
+                className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 transition-colors"
               >
-                <div className="w-7 h-7 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-medium">
+                <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-medium">
                   {getUserInitials()}
                 </div>
               </button>
@@ -74,18 +74,18 @@ export default function MainLayout({ children }: MainLayoutProps) {
                     <p className="text-sm font-medium text-gray-900 truncate">
                       {user?.user_metadata?.full_name || "User"}
                     </p>
-                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    <p className="text-xs text-gray-500 truncate mt-0.5">{user?.email}</p>
                   </div>
                   <Link
                     to="/settings"
                     onClick={() => setShowUserMenu(false)}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Settings
                   </Link>
                   <button
                     onClick={handleSignOut}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                   >
                     Sign Out
                   </button>
@@ -95,12 +95,12 @@ export default function MainLayout({ children }: MainLayoutProps) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex gap-6 -mb-px">
+          <nav className="flex gap-8 -mb-px">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`py-4 text-sm border-b-2 transition-colors ${
+                className={`py-4 text-sm border-b-2 transition-colors whitespace-nowrap ${
                   isActive(item.path)
                     ? "border-gray-900 text-gray-900 font-medium"
                     : "border-transparent text-gray-600 hover:text-gray-900"

@@ -6,10 +6,10 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface-app flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="spinner-lg"></div>
-          <div className="text-subheadline text-secondary">Loading...</div>
+          <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+          <div className="text-sm text-gray-500">Loading...</div>
         </div>
       </div>
     );

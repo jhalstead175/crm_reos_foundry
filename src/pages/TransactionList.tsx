@@ -123,9 +123,9 @@ export default function TransactionList() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-3">
-        <div className="spinner-lg"></div>
-        <div className="text-subheadline text-secondary">Loading transactions</div>
+      <div className="flex flex-col items-center justify-center py-32 gap-3">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+        <div className="text-sm text-gray-500">Loading transactions...</div>
       </div>
     );
   }
@@ -173,11 +173,12 @@ export default function TransactionList() {
 
       {/* Transactions List */}
       {filteredTransactions.length === 0 ? (
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-12 text-center">
-          <p className="text-subheadline text-secondary">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-16 text-center">
+          <p className="text-sm text-gray-500 mb-1">No transactions found</p>
+          <p className="text-xs text-gray-400">
             {searchQuery || filterStatus !== "all"
-              ? "No transactions found. Try adjusting your filters."
-              : "No transactions yet. Create your first transaction to get started."}
+              ? "Try adjusting your filters."
+              : "Create your first transaction to get started."}
           </p>
         </div>
       ) : (

@@ -157,9 +157,9 @@ export default function ContactsList() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 gap-3">
-        <div className="spinner-lg"></div>
-        <div className="text-subheadline text-secondary">Loading contacts</div>
+      <div className="flex flex-col items-center justify-center py-32 gap-3">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+        <div className="text-sm text-gray-500">Loading contacts...</div>
       </div>
     );
   }
@@ -291,8 +291,13 @@ export default function ContactsList() {
         {/* Contacts Table */}
         <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm overflow-hidden">
           {filteredContacts.length === 0 ? (
-            <div className="p-8 text-center text-subheadline text-secondary">
-              No contacts found. {searchQuery || filterScore !== "all" || filterStatus !== "all" ? "Try adjusting your filters." : "Add your first contact to get started."}
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <p className="text-sm text-gray-500 mb-1">No contacts found</p>
+              <p className="text-xs text-gray-400">
+                {searchQuery || filterScore !== "all" || filterStatus !== "all" || filterSource !== "all"
+                  ? "Try adjusting your filters."
+                  : "Add your first contact to get started."}
+              </p>
             </div>
           ) : (
             <div className="overflow-x-auto">

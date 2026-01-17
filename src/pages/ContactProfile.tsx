@@ -252,8 +252,9 @@ export default function ContactProfile() {
 
   if (loading || !contact) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <div className="text-subheadline text-secondary">Loading contact...</div>
+      <div className="flex flex-col items-center justify-center py-32 gap-3">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+        <div className="text-sm text-gray-500">Loading contact...</div>
       </div>
     );
   }
