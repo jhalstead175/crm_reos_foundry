@@ -139,13 +139,13 @@ export default function TaskBoard() {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
-        return "bg-red-100 text-red-700";
+        return "priority-high";
       case "medium":
-        return "bg-yellow-100 text-yellow-700";
+        return "priority-medium";
       case "low":
-        return "bg-blue-100 text-blue-700";
+        return "priority-low";
       default:
-        return "bg-gray-100 text-gray-700";
+        return "badge-neutral";
     }
   };
 
@@ -159,9 +159,9 @@ export default function TaskBoard() {
 
   return (
     <div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-title-1">Task Board</h1>
             <p className="text-subheadline text-secondary mt-1">
@@ -172,11 +172,11 @@ export default function TaskBoard() {
 
         {/* Error Display */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-subheadline text-red-800">{error}</p>
+          <div className="mb-6 p-4 rounded-lg badge-error">
+            <p className="text-subheadline">{error}</p>
             <button
               onClick={() => setError(null)}
-              className="mt-2 text-footnote text-red-600 hover:text-red-800 motion-text"
+              className="mt-2 text-footnote hover:opacity-80"
             >
               Dismiss
             </button>
@@ -184,8 +184,8 @@ export default function TaskBoard() {
         )}
 
         {/* Read-only Notice */}
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-subheadline text-primary">
+        <div className="mb-8 p-4 rounded-lg badge-info">
+          <p className="text-subheadline">
             <span className="text-body-emphasized">Read-only view:</span> Tasks can only be created
             or modified within their transaction. Click any task to navigate to its transaction.
           </p>
@@ -196,17 +196,17 @@ export default function TaskBoard() {
           {columns.map((column) => (
             <div key={column.id} className="flex flex-col">
               {/* Column Header */}
-              <div className="bg-surface-panel rounded-t-lg border-x border-t border-surface-subtle p-4">
+              <div className="bg-surface-panel rounded-t-lg border-x border-t border-surface-subtle shadow-sm p-4">
                 <div className="flex justify-between items-center">
                   <h2 className="text-title-3">{column.title}</h2>
-                  <span className="text-caption-1 px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                  <span className="text-caption-1 px-2 py-1 rounded badge-neutral">
                     {column.tasks.length}
                   </span>
                 </div>
               </div>
 
               {/* Column Content */}
-              <div className="flex-1 bg-surface-muted rounded-b-lg border-x border-b border-surface-subtle p-4 space-y-3 min-h-[400px]">
+              <div className="flex-1 bg-surface-muted rounded-b-lg border-x border-b border-surface-subtle shadow-sm p-4 space-y-3 min-h-[400px]">
                 {column.tasks.length === 0 ? (
                   <p className="text-subheadline text-secondary">No tasks</p>
                 ) : (
@@ -219,11 +219,7 @@ export default function TaskBoard() {
                       {/* Task Header */}
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="text-body-emphasized flex-1">{task.title}</h3>
-                        <span
-                          className={`text-caption-1 px-2 py-0.5 rounded ${getPriorityColor(
-                            task.priority
-                          )}`}
-                        >
+                        <span className={`text-caption-1 px-2 py-0.5 rounded flex-shrink-0 ${getPriorityColor(task.priority)}`}>
                           {task.priority}
                         </span>
                       </div>
@@ -232,7 +228,7 @@ export default function TaskBoard() {
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">
                           <svg
-                            className="w-4 h-4 text-gray-500"
+                            className="w-4 h-4 text-secondary flex-shrink-0"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -252,7 +248,7 @@ export default function TaskBoard() {
                         {task.dueDate && (
                           <div className="flex items-center gap-2">
                             <svg
-                              className="w-4 h-4 text-gray-500"
+                              className="w-4 h-4 text-secondary flex-shrink-0"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -273,7 +269,7 @@ export default function TaskBoard() {
                         {task.assignee && (
                           <div className="flex items-center gap-2">
                             <svg
-                              className="w-4 h-4 text-gray-500"
+                              className="w-4 h-4 text-secondary flex-shrink-0"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
