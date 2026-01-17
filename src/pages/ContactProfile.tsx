@@ -744,6 +744,7 @@ export default function ContactProfile() {
           )}
         </div>
       </div>
+    </div>
   );
 }
 
