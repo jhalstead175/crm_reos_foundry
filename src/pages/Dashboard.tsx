@@ -79,9 +79,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-8">
           <h1 className="text-title-1">Dashboard</h1>
           <p className="text-subheadline text-secondary mt-1">
             Your CRM command center
@@ -89,7 +89,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-surface-panel rounded-lg border border-surface-subtle p-4">
             <div className="text-footnote-emphasized text-secondary uppercase tracking-wide mb-1">
               Total Contacts
@@ -100,28 +100,28 @@ export default function Dashboard() {
             <div className="text-footnote-emphasized text-secondary uppercase tracking-wide mb-1">
               Due Today
             </div>
-            <div className="text-title-1 text-red-600">{todayFollowUps.length}</div>
+            <div className="text-title-1" style={{ color: 'var(--color-error)' }}>{todayFollowUps.length}</div>
           </div>
           <div className="bg-surface-panel rounded-lg border border-surface-subtle p-4">
             <div className="text-footnote-emphasized text-secondary uppercase tracking-wide mb-1">
               Hot Leads
             </div>
-            <div className="text-title-1 text-orange-600">{hotLeads.length}</div>
+            <div className="text-title-1" style={{ color: 'var(--color-warning)' }}>{hotLeads.length}</div>
           </div>
           <div className="bg-surface-panel rounded-lg border border-surface-subtle p-4">
             <div className="text-footnote-emphasized text-secondary uppercase tracking-wide mb-1">
               This Week
             </div>
-            <div className="text-title-1 text-green-600">{thisWeekActivity}</div>
+            <div className="text-title-1" style={{ color: 'var(--color-success)' }}>{thisWeekActivity}</div>
             <div className="text-footnote text-secondary">contacts touched</div>
           </div>
         </div>
 
         {/* Main Widgets */}
-        <div className="space-y-6">
+        <div className="space-y-8">
           {/* Today's Follow-Ups */}
-          <div className="bg-surface-panel rounded-lg border border-surface-subtle">
-            <div className="border-b border-surface-subtle p-4">
+          <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm">
+            <div className="border-b border-surface-subtle px-6 py-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-title-2">Today's Follow-Ups</h2>
@@ -131,16 +131,17 @@ export default function Dashboard() {
                 </div>
                 <Link
                   to="/contacts"
-                  className="text-subheadline text-accent-primary hover:text-blue-700"
+                  className="text-subheadline hover:underline"
+                  style={{ color: 'var(--accent-primary)' }}
                 >
                   View All →
                 </Link>
               </div>
             </div>
-            <div className="p-4">
+            <div className="p-6">
               {todayFollowUps.length === 0 ? (
-                <div className="text-center py-8 text-subheadline text-secondary">
-                  🎉 No follow-ups due today! You're all caught up.
+                <div className="text-center py-12 text-subheadline text-secondary">
+                  No follow-ups due today. You're all caught up.
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -148,10 +149,10 @@ export default function Dashboard() {
                     <Link
                       key={contact.id}
                       to={`/contacts/${contact.id}`}
-                      className="flex items-center justify-between p-3 rounded-lg border border-surface-subtle hover:border-accent-primary transition-colors"
+                      className="flex items-center justify-between p-4 rounded-lg border border-surface-subtle hover:border-accent-primary motion-card"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-accent-primary rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--accent-primary)' }}>
                           {contact.name.charAt(0)}
                         </div>
                         <div>
@@ -165,15 +166,15 @@ export default function Dashboard() {
                       </div>
                       <div className="text-right">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="px-2 py-0.5 bg-green-100 text-green-800 rounded text-footnote">
+                          <span className={`px-2 py-0.5 rounded text-footnote ${contact.lead_score === 'A' ? 'badge-success' : contact.lead_score === 'B' ? 'badge-info' : 'badge-warning'}`}>
                             {contact.lead_score}
                           </span>
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-footnote">
+                          <span className="px-2 py-0.5 rounded text-footnote badge-neutral">
                             {contact.status}
                           </span>
                         </div>
-                        <div className="text-footnote text-red-600 font-semibold">
-                          Due: {formatDate(contact.next_follow_up_date)} ⚠️
+                        <div className="text-footnote font-semibold" style={{ color: 'var(--color-error)' }}>
+                          Due: {formatDate(contact.next_follow_up_date)}
                         </div>
                       </div>
                     </Link>
@@ -182,7 +183,8 @@ export default function Dashboard() {
                     <div className="text-center pt-2">
                       <Link
                         to="/contacts"
-                        className="text-subheadline text-accent-primary hover:text-blue-700"
+                        className="text-subheadline hover:underline"
+                        style={{ color: 'var(--accent-primary)' }}
                       >
                         +{todayFollowUps.length - 5} more
                       </Link>
@@ -194,8 +196,8 @@ export default function Dashboard() {
           </div>
 
           {/* Hot Leads */}
-          <div className="bg-surface-panel rounded-lg border border-surface-subtle">
-            <div className="border-b border-surface-subtle p-4">
+          <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm">
+            <div className="border-b border-surface-subtle px-6 py-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-title-2">Hot Leads</h2>
@@ -205,15 +207,16 @@ export default function Dashboard() {
                 </div>
                 <Link
                   to="/contacts"
-                  className="text-subheadline text-accent-primary hover:text-blue-700"
+                  className="text-subheadline hover:underline"
+                  style={{ color: 'var(--accent-primary)' }}
                 >
                   View All →
                 </Link>
               </div>
             </div>
-            <div className="p-4">
+            <div className="p-6">
               {hotLeads.length === 0 ? (
-                <div className="text-center py-8 text-subheadline text-secondary">
+                <div className="text-center py-12 text-subheadline text-secondary">
                   No hot leads right now. Focus on nurturing your pipeline.
                 </div>
               ) : (
@@ -222,10 +225,10 @@ export default function Dashboard() {
                     <Link
                       key={contact.id}
                       to={`/contacts/${contact.id}`}
-                      className="flex items-center justify-between p-3 rounded-lg border border-surface-subtle hover:border-accent-primary transition-colors"
+                      className="flex items-center justify-between p-4 rounded-lg border border-surface-subtle hover:border-accent-primary motion-card"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--color-error)' }}>
                           {contact.name.charAt(0)}
                         </div>
                         <div>
@@ -251,7 +254,8 @@ export default function Dashboard() {
                     <div className="text-center pt-2">
                       <Link
                         to="/contacts"
-                        className="text-subheadline text-accent-primary hover:text-blue-700"
+                        className="text-subheadline hover:underline"
+                        style={{ color: 'var(--accent-primary)' }}
                       >
                         +{hotLeads.length - 5} more
                       </Link>
@@ -263,8 +267,8 @@ export default function Dashboard() {
           </div>
 
           {/* Need Attention */}
-          <div className="bg-surface-panel rounded-lg border border-surface-subtle">
-            <div className="border-b border-surface-subtle p-4">
+          <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm">
+            <div className="border-b border-surface-subtle px-6 py-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-title-2">Need Attention</h2>
@@ -274,15 +278,16 @@ export default function Dashboard() {
                 </div>
                 <Link
                   to="/contacts"
-                  className="text-subheadline text-accent-primary hover:text-blue-700"
+                  className="text-subheadline hover:underline"
+                  style={{ color: 'var(--accent-primary)' }}
                 >
                   View All →
                 </Link>
               </div>
             </div>
-            <div className="p-4">
+            <div className="p-6">
               {needAttention.length === 0 ? (
-                <div className="text-center py-8 text-subheadline text-secondary">
+                <div className="text-center py-12 text-subheadline text-secondary">
                   Great job! You're staying in touch with all your contacts.
                 </div>
               ) : (
@@ -291,10 +296,10 @@ export default function Dashboard() {
                     <Link
                       key={contact.id}
                       to={`/contacts/${contact.id}`}
-                      className="flex items-center justify-between p-3 rounded-lg border border-surface-subtle hover:border-accent-primary transition-colors"
+                      className="flex items-center justify-between p-4 rounded-lg border border-surface-subtle hover:border-accent-primary motion-card"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center text-white font-bold">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--color-neutral)' }}>
                           {contact.name.charAt(0)}
                         </div>
                         <div>
@@ -308,14 +313,14 @@ export default function Dashboard() {
                       </div>
                       <div className="text-right">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded text-footnote">
+                          <span className={`px-2 py-0.5 rounded text-footnote ${contact.lead_score === 'A' ? 'badge-success' : contact.lead_score === 'B' ? 'badge-info' : 'badge-warning'}`}>
                             {contact.lead_score}
                           </span>
-                          <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded text-footnote">
+                          <span className="px-2 py-0.5 rounded text-footnote badge-neutral">
                             {contact.status}
                           </span>
                         </div>
-                        <div className="text-footnote text-orange-600">
+                        <div className="text-footnote" style={{ color: 'var(--color-warning)' }}>
                           Last contact: {formatDate(contact.last_contact_date)}
                         </div>
                       </div>
@@ -325,7 +330,8 @@ export default function Dashboard() {
                     <div className="text-center pt-2">
                       <Link
                         to="/contacts"
-                        className="text-subheadline text-accent-primary hover:text-blue-700"
+                        className="text-subheadline hover:underline"
+                        style={{ color: 'var(--accent-primary)' }}
                       >
                         +{needAttention.length - 5} more
                       </Link>
@@ -338,22 +344,22 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-6 flex gap-3">
+        <div className="mt-8 flex gap-3">
           <Link
             to="/contacts"
-            className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button"
+            className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
           >
             View All Contacts
           </Link>
           <Link
             to="/transactions"
-            className="px-4 py-2 bg-surface-panel border border-surface-subtle rounded-md hover:border-accent-primary text-subheadline-emphasized motion-button"
+            className="px-5 py-2.5 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
           >
             View Transactions
           </Link>
           <Link
             to="/tasks"
-            className="px-4 py-2 bg-surface-panel border border-surface-subtle rounded-md hover:border-accent-primary text-subheadline-emphasized motion-button"
+            className="px-5 py-2.5 bg-surface-panel border border-surface-subtle rounded-lg hover:border-accent-primary text-subheadline-emphasized motion-button"
           >
             View Tasks
           </Link>
