@@ -17,13 +17,15 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { InspectionFooter } from "./components/InspectionFooter";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ToastProvider } from "./contexts/ToastContext";
 
 export default function App() {
   return (
     <BrowserRouter>
       <ErrorBoundary>
-        <AuthProvider>
-          <Routes>
+        <ToastProvider>
+          <AuthProvider>
+            <Routes>
           {/* Public routes without layout */}
           <Route path="/about" element={<LandingPage />} />
           <Route path="/signin" element={<SignIn />} />
@@ -111,10 +113,11 @@ export default function App() {
             }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
+            </Routes>
 
-          <InspectionFooter />
-        </AuthProvider>
+            <InspectionFooter />
+          </AuthProvider>
+        </ToastProvider>
       </ErrorBoundary>
     </BrowserRouter>
   );
