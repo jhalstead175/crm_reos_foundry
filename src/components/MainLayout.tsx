@@ -1,5 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import type { ReactNode } from "react";
+import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -7,9 +9,12 @@ interface MainLayoutProps {
 
 export default function MainLayout({ children }: MainLayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
 
   const navItems = [
-    { path: "/", label: "Overview" },
+    { path: "/", label: "Dashboard" },
     { path: "/contacts", label: "Contacts" },
     { path: "/transactions", label: "Transactions" },
     { path: "/properties", label: "Properties" },
@@ -23,84 +28,93 @@ export default function MainLayout({ children }: MainLayoutProps) {
     return location.pathname.startsWith(path);
   };
 
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate("/signin");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
+  const getUserInitials = () => {
+    if (!user?.user_metadata?.full_name) return "U";
+    const names = user.user_metadata.full_name.split(" ");
+    if (names.length >= 2) {
+      return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+    }
+    return names[0][0].toUpperCase();
+  };
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Top Header Bar */}
-      <div className="border-b border-gray-200">
-        <div className="flex items-center justify-between h-16 px-6">
-          {/* Left side - Logo and Project Name */}
-          <div className="flex items-center gap-4">
+      {/* Top Header */}
+      <header className="border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex items-center justify-between h-16">
+            {/* Logo */}
             <Link to="/" className="flex items-center">
-              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2L2 19h20L12 2z" />
-              </svg>
+              <span className="text-xl font-semibold text-gray-900">REOS</span>
             </Link>
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-purple-400 to-pink-400"></div>
-              <span className="text-sm font-medium">REOS CRM</span>
-              <span className="text-xs text-gray-500 border border-gray-300 rounded px-1.5 py-0.5">Pro</span>
-            </div>
-          </div>
 
-          {/* Right side - Actions */}
-          <div className="flex items-center gap-3">
+            {/* User Menu */}
             <div className="relative">
-              <input
-                type="text"
-                placeholder="Find..."
-                className="w-64 h-8 pl-8 pr-10 text-sm border border-gray-300 rounded-md focus:outline-none focus:border-gray-400"
-              />
-              <svg className="absolute left-2.5 top-2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <kbd className="absolute right-2 top-1.5 text-xs text-gray-500 font-mono">F</kbd>
-            </div>
-            <button className="text-sm text-gray-700 hover:text-black">Feedback</button>
-            <button className="relative">
-              <svg className="w-5 h-5 text-gray-700 hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
-            </button>
-            <button>
-              <svg className="w-5 h-5 text-gray-700 hover:text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </button>
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 cursor-pointer"></div>
-          </div>
-        </div>
+              <button
+                onClick={() => setShowUserMenu(!showUserMenu)}
+                className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900 transition-colors"
+              >
+                <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-xs font-medium">
+                  {getUserInitials()}
+                </div>
+              </button>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-6 px-6">
-          {navItems.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className={`py-3 text-sm border-b-2 transition-colors ${
-                isActive(item.path)
-                  ? "border-black text-black font-medium"
-                  : "border-transparent text-gray-600 hover:text-black"
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <Link
-            to="/settings"
-            className={`py-3 text-sm border-b-2 transition-colors ${
-              location.pathname === "/settings"
-                ? "border-black text-black font-medium"
-                : "border-transparent text-gray-600 hover:text-black"
-            }`}
-          >
-            Settings
-          </Link>
+              {showUserMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-50">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {user?.user_metadata?.full_name || "User"}
+                    </p>
+                    <p className="text-xs text-gray-500 truncate mt-0.5">{user?.email}</p>
+                  </div>
+                  <Link
+                    to="/settings"
+                    onClick={() => setShowUserMenu(false)}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex gap-8 -mb-px">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`py-4 text-sm border-b-2 transition-colors whitespace-nowrap ${
+                  isActive(item.path)
+                    ? "border-gray-900 text-gray-900 font-medium"
+                    : "border-transparent text-gray-600 hover:text-gray-900"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
         </div>
-      </div>
+      </header>
 
       {/* Main Content */}
-      <main className="bg-gray-50">{children}</main>
+      <main className="bg-white">{children}</main>
     </div>
   );
 }

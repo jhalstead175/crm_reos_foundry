@@ -2,7 +2,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
 import LandingPage from "./pages/LandingPage";
-import Login from "./pages/Login";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
 import TransactionList from "./pages/TransactionList";
 import TransactionDetail from "./pages/TransactionDetail";
 import ContactsList from "./pages/ContactsList";
@@ -12,29 +13,112 @@ import Settings from "./pages/Settings";
 import TaskBoard from "./pages/TaskBoard";
 
 import MainLayout from "./components/MainLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { InspectionFooter } from "./components/InspectionFooter";
+import { AuthProvider } from "./contexts/AuthContext";
+import { ToastProvider } from "./contexts/ToastContext";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        {/* Public routes without layout */}
-        <Route path="/about" element={<LandingPage />} />
-        <Route path="/login" element={<Login />} />
+      <ErrorBoundary>
+        <ToastProvider>
+          <AuthProvider>
+            <Routes>
+          {/* Public routes without layout */}
+          <Route path="/about" element={<LandingPage />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
 
-        {/* Protected routes with layout */}
-        <Route path="/" element={<MainLayout><Dashboard /></MainLayout>} />
-        <Route path="/transactions" element={<MainLayout><TransactionList /></MainLayout>} />
-        <Route path="/transactions/:id" element={<MainLayout><TransactionDetail /></MainLayout>} />
-        <Route path="/contacts" element={<MainLayout><ContactsList /></MainLayout>} />
-        <Route path="/contacts/:id" element={<MainLayout><ContactProfile /></MainLayout>} />
-        <Route path="/properties" element={<MainLayout><PropertySearch /></MainLayout>} />
-        <Route path="/tasks" element={<MainLayout><TaskBoard /></MainLayout>} />
-        <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Protected routes with layout */}
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Dashboard />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/transactions"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <TransactionList />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/transactions/:id"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <TransactionDetail />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contacts"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ContactsList />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/contacts/:id"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ContactProfile />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/properties"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <PropertySearch />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tasks"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <TaskBoard />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Settings />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
 
-      <InspectionFooter />
+            <InspectionFooter />
+          </AuthProvider>
+        </ToastProvider>
+      </ErrorBoundary>
     </BrowserRouter>
   );
 }

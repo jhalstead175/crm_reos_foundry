@@ -1,13 +1,32 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { TransactionTask, TransactionEvent, TaskStatus, TaskPriority } from "../types/task";
 import { supabase } from "../lib/supabase";
 import { executeAutomationRules, persistAutomationActions } from "../lib/automation";
+import { useAuth } from "../contexts/AuthContext";
 
 type TabType = "timeline" | "documents" | "tasks" | "messages";
 
+interface Message {
+  id: string;
+  transaction_id: string;
+  content: string;
+  sender_name: string;
+  created_at: string;
+}
+
+interface Document {
+  id: string;
+  transaction_id: string;
+  name: string;
+  document_type: string;
+  status: "Pending" | "Signed" | "Reviewed";
+  created_at: string;
+}
+
 export default function TransactionDetail() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>("timeline");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,6 +34,22 @@ export default function TransactionDetail() {
   // Task and event state
   const [tasks, setTasks] = useState<TransactionTask[]>([]);
   const [events, setEvents] = useState<TransactionEvent[]>([]);
+
+  // Message state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Document state
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [newDocument, setNewDocument] = useState({
+    name: "",
+    document_type: "Purchase Agreement",
+    status: "Pending" as "Pending" | "Signed" | "Reviewed",
+  });
+  const [uploading, setUploading] = useState(false);
 
   // Transaction state (mock for MVP - would load from DB in production)
   const [transactionStatus, setTransactionStatus] = useState("Active");
@@ -146,8 +181,28 @@ export default function TransactionDetail() {
           }
         });
 
+        // Load messages
+        const { data: messagesData, error: messagesError } = await supabase
+          .from("messages")
+          .select("*")
+          .eq("transaction_id", id)
+          .order("created_at", { ascending: true });
+
+        if (messagesError) throw messagesError;
+
+        // Load documents
+        const { data: documentsData, error: documentsError } = await supabase
+          .from("documents")
+          .select("*")
+          .eq("transaction_id", id)
+          .order("created_at", { ascending: false });
+
+        if (documentsError) throw documentsError;
+
         setTasks(transformedTasks);
         setEvents(transformedEvents);
+        setMessages(messagesData || []);
+        setDocuments(documentsData || []);
       } catch (err) {
         console.error("Error loading transaction data:", err);
         setError("Failed to load transaction data");
@@ -333,10 +388,48 @@ export default function TransactionDetail() {
       )
       .subscribe();
 
+    // Subscribe to messages
+    const messagesChannel = supabase
+      .channel(`messages:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `transaction_id=eq.${id}`,
+        },
+        (payload: any) => {
+          const newMsg = payload.new as Message;
+          setMessages((prev) => [...prev, newMsg]);
+        }
+      )
+      .subscribe();
+
+    // Subscribe to documents
+    const documentsChannel = supabase
+      .channel(`documents:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "documents",
+          filter: `transaction_id=eq.${id}`,
+        },
+        (payload: any) => {
+          const newDoc = payload.new as Document;
+          setDocuments((prev) => [newDoc, ...prev]);
+        }
+      )
+      .subscribe();
+
     // Cleanup on unmount
     return () => {
       eventsChannel.unsubscribe();
       tasksChannel.unsubscribe();
+      messagesChannel.unsubscribe();
+      documentsChannel.unsubscribe();
     };
   }, [id]);
 
@@ -545,24 +638,95 @@ export default function TransactionDetail() {
     }
   };
 
+  // Send message handler
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newMessage.trim()) return;
+
+    setSendingMessage(true);
+    try {
+      const { error } = await supabase.from("messages").insert([
+        {
+          transaction_id: id,
+          content: newMessage.trim(),
+          sender_name: user?.user_metadata?.full_name || user?.email || "Agent",
+        },
+      ]);
+
+      if (error) throw error;
+
+      // Clear input
+      setNewMessage("");
+    } catch (err) {
+      console.error("Error sending message:", err);
+      setError("Failed to send message");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
+  // Upload document handler
+  const handleUploadDocument = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newDocument.name.trim()) {
+      alert("Document name is required");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const { error } = await supabase.from("documents").insert([
+        {
+          transaction_id: id,
+          name: newDocument.name.trim(),
+          document_type: newDocument.document_type,
+          status: newDocument.status,
+        },
+      ]);
+
+      if (error) throw error;
+
+      // Reset form and close modal
+      setNewDocument({
+        name: "",
+        document_type: "Purchase Agreement",
+        status: "Pending",
+      });
+      setShowUploadModal(false);
+    } catch (err) {
+      console.error("Error uploading document:", err);
+      alert("Failed to upload document. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <div className="text-subheadline text-secondary">Loading transaction...</div>
+      <div className="flex flex-col items-center justify-center py-32 gap-3">
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+        <div className="text-sm text-gray-500">Loading transaction...</div>
       </div>
     );
   }
 
   return (
     <div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Error Display */}
         {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-subheadline text-red-800">{error}</p>
+          <div className="mb-6 p-4 rounded-lg badge-error">
+            <p className="text-subheadline">{error}</p>
             <button
               onClick={() => setError(null)}
-              className="mt-2 text-footnote text-red-600 hover:text-red-800 motion-text"
+              className="mt-2 text-footnote hover:opacity-80"
             >
               Dismiss
             </button>
@@ -570,7 +734,7 @@ export default function TransactionDetail() {
         )}
 
         {/* Transaction Header */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6 mb-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6 mb-8">
           <div className="flex justify-between items-start mb-4">
             <div>
               <h1 className="text-title-1">{transaction.address}</h1>
@@ -583,7 +747,7 @@ export default function TransactionDetail() {
               <select
                 value={transaction.status}
                 onChange={(e) => handleTransactionStatusChange(e.target.value)}
-                className="px-3 py-1 bg-green-100 text-green-800 text-footnote rounded-full border-0 focus:outline-none focus:ring-2 focus:ring-green-500 motion-input"
+                className="px-3 py-1 text-footnote rounded-full border-0 input-base focus:outline-none status-active"
               >
                 <option value="Active">Active</option>
                 <option value="Under Contract">Under Contract</option>
@@ -598,7 +762,7 @@ export default function TransactionDetail() {
           {/* Primary Contact */}
           <div className="border-t border-surface-subtle pt-4 mt-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-accent-primary rounded-full flex items-center justify-center text-white font-bold">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: 'var(--accent-primary)' }}>
                 J
               </div>
               <div className="flex-1">
@@ -611,7 +775,7 @@ export default function TransactionDetail() {
               </div>
               <Link
                 to="/contacts/1"
-                className="px-3 py-1 text-accent-primary hover:text-blue-700 text-footnote border border-accent-primary rounded-md hover:bg-accent-soft transition-colors"
+                className="px-3 py-1 text-footnote border rounded-md hover:opacity-80 transition-opacity badge-info"
               >
                 View Profile →
               </Link>
@@ -619,16 +783,17 @@ export default function TransactionDetail() {
           </div>
 
           {/* Tab Navigation */}
-          <nav className="flex gap-4 border-t pt-4">
+          <nav className="flex gap-4 border-t pt-4 mt-4">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`text-subheadline-emphasized pb-2 border-b-2 motion-tab ${
                   activeTab === tab.id
-                    ? "border-accent-primary text-accent-primary"
-                    : "border-transparent text-gray-600 hover:text-gray-900"
+                    ? "border-accent-primary"
+                    : "border-transparent text-secondary hover:text-primary"
                 }`}
+                style={activeTab === tab.id ? { color: 'var(--accent-primary)' } : undefined}
               >
                 {tab.label}
               </button>
@@ -637,9 +802,19 @@ export default function TransactionDetail() {
         </div>
 
         {/* Tab Content */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle p-6">
+        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6">
           {activeTab === "timeline" && <TimelineView events={events} />}
-          {activeTab === "documents" && <DocumentsView />}
+          {activeTab === "documents" && (
+            <DocumentsView
+              documents={documents}
+              showUploadModal={showUploadModal}
+              setShowUploadModal={setShowUploadModal}
+              newDocument={newDocument}
+              setNewDocument={setNewDocument}
+              onUploadDocument={handleUploadDocument}
+              uploading={uploading}
+            />
+          )}
           {activeTab === "tasks" && (
             <TasksView
               tasks={tasks}
@@ -647,7 +822,16 @@ export default function TransactionDetail() {
               onStatusChange={handleStatusChange}
             />
           )}
-          {activeTab === "messages" && <MessagesView />}
+          {activeTab === "messages" && (
+            <MessagesView
+              messages={messages}
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              onSendMessage={handleSendMessage}
+              sendingMessage={sendingMessage}
+              messagesEndRef={messagesEndRef}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -663,45 +847,42 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
   const getEventDisplay = (event: TransactionEvent) => {
     switch (event.type) {
       case "task.created":
-        return { title: `Task created: ${event.taskTitle}`, badgeText: "task", borderColor: "border-accent-muted" };
+        return { title: `Task created: ${event.taskTitle}`, badgeText: "task", badgeClass: "badge-neutral" };
       case "task.status_changed":
         return {
           title: `Task "${event.taskTitle}" moved from ${event.from} to ${event.to}`,
           badgeText: "task",
-          borderColor: "border-accent-muted",
+          badgeClass: "badge-info",
         };
       case "task.completed":
-        return { title: `Task completed: ${event.taskTitle}`, badgeText: "task", borderColor: "border-green-600" };
+        return { title: `Task completed: ${event.taskTitle}`, badgeText: "task", badgeClass: "badge-success" };
       case "task.auto_created":
         return {
-          title: `🤖 System created task: ${event.taskTitle}`,
+          title: `System created task: ${event.taskTitle}`,
           subtitle: event.reason,
           badgeText: "automation",
-          badgeColor: "bg-purple-100 text-purple-800",
-          borderColor: "border-purple-600",
+          badgeClass: "badge-info",
         };
       case "milestone.reached":
         return {
-          title: `🎯 Milestone: ${event.title}`,
+          title: `Milestone: ${event.title}`,
           subtitle: event.description,
           badgeText: "milestone",
-          badgeColor: "bg-green-100 text-green-800",
-          borderColor: "border-green-600",
+          badgeClass: "badge-success",
         };
       case "deadline.created":
         return {
-          title: `⏰ Deadline set: ${event.title}`,
+          title: `Deadline set: ${event.title}`,
           subtitle: `Due ${new Date(event.dueDate).toLocaleDateString()}`,
           badgeText: "deadline",
-          badgeColor: "bg-orange-100 text-orange-800",
-          borderColor: "border-orange-600",
+          badgeClass: "badge-warning",
         };
       case "system":
-        return { title: event.title, badgeText: "system", borderColor: "border-gray-600" };
+        return { title: event.title, badgeText: "system", badgeClass: "badge-neutral" };
       case "milestone":
-        return { title: event.title, badgeText: "milestone", borderColor: "border-green-600" };
+        return { title: event.title, badgeText: "milestone", badgeClass: "badge-success" };
       default:
-        return { title: "Unknown event", badgeText: "unknown", borderColor: "border-gray-600" };
+        return { title: "Unknown event", badgeText: "unknown", badgeClass: "badge-neutral" };
     }
   };
 
@@ -716,22 +897,18 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
           const eventId = "timestamp" in event ? event.timestamp + index : index;
 
           return (
-            <div key={eventId} className={`border-l-2 ${display.borderColor || "border-accent-soft"} pl-4 pb-4`}>
-              <div className="flex justify-between items-start">
+            <div key={eventId} className="border-l-2 border-surface-subtle pl-4 pb-4">
+              <div className="flex justify-between items-start gap-4">
                 <div className="flex-1">
                   <h3 className="text-body-emphasized">{display.title}</h3>
                   {display.subtitle && (
                     <p className="text-subheadline text-secondary mt-1">{display.subtitle}</p>
                   )}
-                  <p className="text-subheadline text-secondary mt-1">
+                  <p className="text-footnote text-secondary mt-1">
                     {new Date(event.timestamp).toLocaleString()}
                   </p>
                 </div>
-                <span
-                  className={`text-caption-1 px-2 py-1 rounded ${
-                    display.badgeColor || "bg-gray-100 text-gray-700"
-                  }`}
-                >
+                <span className={`text-caption-1 px-2 py-1 rounded flex-shrink-0 ${display.badgeClass}`}>
                   {display.badgeText}
                 </span>
               </div>
@@ -743,33 +920,160 @@ function TimelineView({ events }: { events: TransactionEvent[] }) {
   );
 }
 
-function DocumentsView() {
-  const documents = [
-    { id: "1", name: "Purchase Agreement.pdf", uploadedAt: new Date().toISOString(), status: "Signed" },
-    { id: "2", name: "Inspection Report.pdf", uploadedAt: new Date().toISOString(), status: "Pending" },
-  ];
+function DocumentsView({
+  documents,
+  showUploadModal,
+  setShowUploadModal,
+  newDocument,
+  setNewDocument,
+  onUploadDocument,
+  uploading,
+}: {
+  documents: Document[];
+  showUploadModal: boolean;
+  setShowUploadModal: (show: boolean) => void;
+  newDocument: { name: string; document_type: string; status: "Pending" | "Signed" | "Reviewed" };
+  setNewDocument: (doc: { name: string; document_type: string; status: "Pending" | "Signed" | "Reviewed" }) => void;
+  onUploadDocument: (e: React.FormEvent) => void;
+  uploading: boolean;
+}) {
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case "Signed":
+        return "badge-success";
+      case "Reviewed":
+        return "badge-info";
+      case "Pending":
+        return "badge-warning";
+      default:
+        return "badge-neutral";
+    }
+  };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-title-2">Documents</h2>
-        <button className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button">
+        <button
+          onClick={() => setShowUploadModal(true)}
+          className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
+        >
           Upload Document
         </button>
       </div>
-      {documents.map((doc) => (
-        <div key={doc.id} className="flex justify-between items-center border border-surface-subtle rounded-lg p-4 bg-surface-panel">
-          <div>
-            <h3 className="text-body-emphasized">{doc.name}</h3>
-            <p className="text-subheadline text-secondary mt-1">
-              Uploaded {new Date(doc.uploadedAt).toLocaleDateString()}
-            </p>
+
+      {/* Documents List */}
+      {documents.length === 0 ? (
+        <p className="text-subheadline text-secondary text-center py-12">
+          No documents yet. Upload your first document to get started.
+        </p>
+      ) : (
+        documents.map((doc) => (
+          <div key={doc.id} className="flex justify-between items-center border border-surface-subtle rounded-lg p-4 bg-surface-panel">
+            <div>
+              <h3 className="text-body-emphasized">{doc.name}</h3>
+              <p className="text-subheadline text-secondary mt-1">
+                {doc.document_type} • Uploaded {new Date(doc.created_at).toLocaleDateString()}
+              </p>
+            </div>
+            <span className={`px-3 py-1 text-footnote rounded-full ${getStatusBadgeClass(doc.status)}`}>
+              {doc.status}
+            </span>
           </div>
-          <span className="px-3 py-1 bg-blue-100 text-blue-800 text-footnote rounded-full">
-            {doc.status}
-          </span>
+        ))
+      )}
+
+      {/* Upload Document Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface-panel rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-title-2">Upload Document</h2>
+              <button
+                onClick={() => setShowUploadModal(false)}
+                className="text-secondary hover:text-primary"
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={onUploadDocument} className="space-y-4">
+              {/* Document Name */}
+              <div>
+                <label className="block text-subheadline-emphasized text-primary mb-2">
+                  Document Name *
+                </label>
+                <input
+                  type="text"
+                  value={newDocument.name}
+                  onChange={(e) => setNewDocument({ ...newDocument, name: e.target.value })}
+                  className="input-base w-full px-3 py-2"
+                  placeholder="Purchase Agreement.pdf"
+                  required
+                />
+              </div>
+
+              {/* Document Type & Status */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Type
+                  </label>
+                  <select
+                    value={newDocument.document_type}
+                    onChange={(e) => setNewDocument({ ...newDocument, document_type: e.target.value })}
+                    className="input-base w-full px-3 py-2"
+                  >
+                    <option value="Purchase Agreement">Purchase Agreement</option>
+                    <option value="Inspection Report">Inspection Report</option>
+                    <option value="Appraisal">Appraisal</option>
+                    <option value="Title Report">Title Report</option>
+                    <option value="Disclosure">Disclosure</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-subheadline-emphasized text-primary mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={newDocument.status}
+                    onChange={(e) => setNewDocument({ ...newDocument, status: e.target.value as "Pending" | "Signed" | "Reviewed" })}
+                    className="input-base w-full px-3 py-2"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Reviewed">Reviewed</option>
+                    <option value="Signed">Signed</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Note about file upload */}
+              <p className="text-footnote text-secondary">
+                Note: For MVP, document metadata is tracked. File storage can be added with Supabase Storage.
+              </p>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={uploading || !newDocument.name.trim()}
+                  className="flex-1 btn-primary px-4 py-2"
+                >
+                  {uploading ? "Uploading..." : "Upload Document"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowUploadModal(false)}
+                  className="flex-1 px-4 py-2 bg-surface-muted text-primary rounded-md hover:bg-surface-subtle text-subheadline-emphasized motion-button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      ))}
+      )}
     </div>
   );
 }
@@ -800,11 +1104,11 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
   const getPriorityColor = (priority: TaskPriority) => {
     switch (priority) {
       case "high":
-        return "bg-red-100 text-red-700";
+        return "priority-high";
       case "medium":
-        return "bg-yellow-100 text-yellow-700";
+        return "priority-medium";
       case "low":
-        return "bg-blue-100 text-blue-700";
+        return "priority-low";
     }
   };
 
@@ -814,7 +1118,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
         <h2 className="text-title-2">Tasks</h2>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
-          className="px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button"
+          className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
         >
           {showAddForm ? "Cancel" : "Add Task"}
         </button>
@@ -824,7 +1128,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
       {showAddForm && (
         <form onSubmit={handleSubmit} className="border border-surface-subtle rounded-lg p-4 bg-surface-muted space-y-3">
           <div>
-            <label htmlFor="task-title" className="block text-subheadline-emphasized text-primary mb-1">
+            <label htmlFor="task-title" className="block text-subheadline-emphasized text-primary mb-2">
               Task Title
             </label>
             <input
@@ -833,21 +1137,21 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
               placeholder="What needs to be done?"
-              className="w-full px-3 py-2 border border-surface-subtle rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+              className="input-base w-full px-3 py-2"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label htmlFor="task-priority" className="block text-subheadline-emphasized text-primary mb-1">
+              <label htmlFor="task-priority" className="block text-subheadline-emphasized text-primary mb-2">
                 Priority
               </label>
               <select
                 id="task-priority"
                 value={newTaskPriority}
                 onChange={(e) => setNewTaskPriority(e.target.value as TaskPriority)}
-                className="w-full px-3 py-2 border border-surface-subtle rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                className="input-base w-full px-3 py-2"
               >
                 <option value="low">Low</option>
                 <option value="medium">Medium</option>
@@ -856,7 +1160,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
             </div>
 
             <div>
-              <label htmlFor="task-due-date" className="block text-subheadline-emphasized text-primary mb-1">
+              <label htmlFor="task-due-date" className="block text-subheadline-emphasized text-primary mb-2">
                 Due Date (Optional)
               </label>
               <input
@@ -864,14 +1168,14 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
                 type="date"
                 value={newTaskDueDate}
                 onChange={(e) => setNewTaskDueDate(e.target.value)}
-                className="w-full px-3 py-2 border border-surface-subtle rounded-md focus:outline-none focus:ring-2 focus:ring-accent-primary motion-input"
+                className="input-base w-full px-3 py-2"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button"
+            className="w-full px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
           >
             Create Task
           </button>
@@ -887,7 +1191,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
             <div key={task.id} className="border border-surface-subtle rounded-lg p-4 space-y-3 bg-surface-panel">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h3 className={`text-body-emphasized ${task.status === "done" ? "line-through text-gray-500" : ""}`}>
+                  <h3 className={`text-body-emphasized ${task.status === "done" ? "line-through text-secondary" : ""}`}>
                     {task.title}
                   </h3>
                   <div className="flex items-center gap-3 mt-2">
@@ -909,7 +1213,7 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
                 <select
                   value={task.status}
                   onChange={(e) => onStatusChange(task.id, e.target.value as TaskStatus)}
-                  className="px-3 py-1 border border-gray-300 rounded-md text-subheadline focus:outline-none focus:ring-2 focus:ring-blue-500 motion-input"
+                  className="input-base px-3 py-1 text-subheadline"
                 >
                   <option value="todo">To Do</option>
                   <option value="in_progress">In Progress</option>
@@ -924,38 +1228,64 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
   );
 }
 
-function MessagesView() {
-  const messages = [
-    { id: "1", from: "Agent", content: "Welcome to your transaction!", timestamp: new Date().toISOString() },
-    { id: "2", from: "Client", content: "Thank you! Looking forward to working with you.", timestamp: new Date().toISOString() },
-  ];
-
+function MessagesView({
+  messages,
+  newMessage,
+  setNewMessage,
+  onSendMessage,
+  sendingMessage,
+  messagesEndRef,
+}: {
+  messages: Message[];
+  newMessage: string;
+  setNewMessage: (value: string) => void;
+  onSendMessage: (e: React.FormEvent) => void;
+  sendingMessage: boolean;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-title-2 mb-4">Messages</h2>
-      <div className="space-y-3">
-        {messages.map((msg) => (
-          <div key={msg.id} className="border border-surface-subtle rounded-lg p-4 bg-surface-panel">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-body-emphasized">{msg.from}</span>
-              <span className="text-caption-1 text-tertiary">
-                {new Date(msg.timestamp).toLocaleString()}
-              </span>
+
+      {/* Messages List */}
+      <div className="space-y-3 max-h-[500px] overflow-y-auto">
+        {messages.length === 0 ? (
+          <p className="text-subheadline text-secondary text-center py-12">
+            No messages yet. Start the conversation!
+          </p>
+        ) : (
+          messages.map((msg) => (
+            <div key={msg.id} className="border border-surface-subtle rounded-lg p-4 bg-surface-panel">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-body-emphasized">{msg.sender_name}</span>
+                <span className="text-caption-1 text-tertiary">
+                  {new Date(msg.created_at).toLocaleString()}
+                </span>
+              </div>
+              <p className="text-subheadline text-primary">{msg.content}</p>
             </div>
-            <p className="text-subheadline text-primary">{msg.content}</p>
-          </div>
-        ))}
+          ))
+        )}
+        <div ref={messagesEndRef} />
       </div>
-      <div className="mt-4 pt-4 border-t">
+
+      {/* Message Input Form */}
+      <form onSubmit={onSendMessage} className="mt-4 pt-4 border-t border-surface-subtle">
         <textarea
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-body motion-input"
+          className="input-base w-full px-3 py-2 text-body"
           rows={3}
         />
-        <button className="mt-2 px-4 py-2 bg-accent-primary text-white rounded-md hover:bg-gray-800 text-subheadline-emphasized motion-button">
-          Send Message
+        <button
+          type="submit"
+          disabled={sendingMessage || !newMessage.trim()}
+          className="mt-3 btn-primary px-5 py-2.5"
+        >
+          {sendingMessage ? "Sending..." : "Send Message"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }
