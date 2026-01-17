@@ -102,12 +102,6 @@ export default function ContactsList() {
     F: contacts.filter((c) => c.lead_score === "F").length,
   };
 
-  const statusBreakdown = {
-    hot: contacts.filter((c) => c.status === "Hot").length,
-    nurturing: contacts.filter((c) => c.status === "Nurturing").length,
-    newLead: contacts.filter((c) => c.status === "New Lead").length,
-  };
-
   // Filter and search logic
   const filteredContacts = contacts.filter((contact) => {
     const matchesScore = filterScore === "all" || contact.lead_score === filterScore;
