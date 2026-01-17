@@ -151,8 +151,9 @@ export default function TaskBoard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <div className="text-subheadline text-secondary">Loading tasks...</div>
+      <div className="flex flex-col items-center justify-center py-16 gap-3">
+        <div className="spinner-lg"></div>
+        <div className="text-subheadline text-secondary">Loading tasks</div>
       </div>
     );
   }

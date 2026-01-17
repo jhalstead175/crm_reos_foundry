@@ -427,6 +427,29 @@
     transition-timing-function: var(--motion-ease-out);
   }
 
+  /* Loading spinner - CSS only */
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--surface-subtle);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    animation: spinner-rotate 0.6s linear infinite;
+  }
+
+  .spinner-lg {
+    width: 32px;
+    height: 32px;
+    border-width: 3px;
+  }
+
+  @keyframes spinner-rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   /* Respect reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
     .motion-button,
@@ -442,6 +465,12 @@
 
     .motion-card:hover {
       transform: none;
+    }
+
+    .spinner {
+      animation: none;
+      border-top-color: var(--accent-primary);
+      opacity: 0.6;
     }
   }
 }
