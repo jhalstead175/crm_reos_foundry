@@ -40,7 +40,6 @@ export default function ContactsList() {
       setContacts(data || []);
     } catch (error) {
       console.error("Error loading contacts:", error);
-      // For demo mode, load mock data
       setContacts(mockContacts);
     } finally {
       setLoading(false);
@@ -75,10 +74,7 @@ export default function ContactsList() {
 
       if (error) throw error;
 
-      // Add new contact to the list
       setContacts((prev) => [data, ...prev]);
-
-      // Reset form and close modal
       setNewContact({
         name: "",
         email: "",
@@ -95,6 +91,21 @@ export default function ContactsList() {
     } finally {
       setSaving(false);
     }
+  };
+
+  // Calculate metrics
+  const scoreBreakdown = {
+    A: contacts.filter((c) => c.lead_score === "A").length,
+    B: contacts.filter((c) => c.lead_score === "B").length,
+    C: contacts.filter((c) => c.lead_score === "C").length,
+    D: contacts.filter((c) => c.lead_score === "D").length,
+    F: contacts.filter((c) => c.lead_score === "F").length,
+  };
+
+  const statusBreakdown = {
+    hot: contacts.filter((c) => c.status === "Hot").length,
+    nurturing: contacts.filter((c) => c.status === "Nurturing").length,
+    newLead: contacts.filter((c) => c.status === "New Lead").length,
   };
 
   // Filter and search logic
@@ -114,30 +125,30 @@ export default function ContactsList() {
   const getScoreBadgeColor = (score: LeadScore) => {
     switch (score) {
       case "A":
-        return "score-a";
+        return "bg-green-100 text-green-700 border-green-200";
       case "B":
-        return "score-b";
+        return "bg-blue-100 text-blue-700 border-blue-200";
       case "C":
-        return "score-c";
+        return "bg-yellow-100 text-yellow-700 border-yellow-200";
       case "D":
-        return "score-d";
+        return "bg-orange-100 text-orange-700 border-orange-200";
       case "F":
-        return "score-f";
+        return "bg-red-100 text-red-700 border-red-200";
     }
   };
 
   const getStatusBadgeColor = (status: ContactStatus) => {
     switch (status) {
       case "Hot":
-        return "status-hot";
+        return "bg-red-100 text-red-700 border-red-200";
       case "Under Contract":
-        return "badge-info";
+        return "bg-purple-100 text-purple-700 border-purple-200";
       case "Closed":
-        return "status-closed";
+        return "bg-green-100 text-green-700 border-green-200";
       case "Dead":
-        return "badge-neutral";
+        return "bg-gray-100 text-gray-700 border-gray-200";
       default:
-        return "status-active";
+        return "bg-blue-100 text-blue-700 border-blue-200";
     }
   };
 
@@ -158,52 +169,79 @@ export default function ContactsList() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-32 gap-3">
-        <div className="w-8 h-8 border-2 border-gray-200 border-t-gray-900 rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-2 border-gray-200 border-t-orange-500 rounded-full animate-spin"></div>
         <div className="text-sm text-gray-500">Loading contacts...</div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-title-1">Contacts</h1>
-            <p className="text-subheadline text-secondary mt-1">
-              {filteredContacts.length} of {contacts.length} contacts
-            </p>
-          </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary"
-          >
-            Add Contact
-          </button>
-        </div>
-
-        {/* Filters & Search */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            {/* Search */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Top Stats Bar */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <label className="block text-footnote-emphasized text-secondary mb-2">Search</label>
+              <h1 className="text-2xl font-bold text-gray-900">Contacts</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                {contacts.length} total contacts • {filteredContacts.length} shown
+              </p>
+            </div>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              Add Contact
+            </button>
+          </div>
+
+          {/* Lead Score Breakdown */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div className="text-center p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="text-3xl font-bold text-green-600 mb-1">{scoreBreakdown.A}</div>
+              <div className="text-xs text-gray-600 uppercase tracking-wide">A Leads</div>
+            </div>
+            <div className="text-center p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="text-3xl font-bold text-blue-600 mb-1">{scoreBreakdown.B}</div>
+              <div className="text-xs text-gray-600 uppercase tracking-wide">B Leads</div>
+            </div>
+            <div className="text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="text-3xl font-bold text-yellow-600 mb-1">{scoreBreakdown.C}</div>
+              <div className="text-xs text-gray-600 uppercase tracking-wide">C Leads</div>
+            </div>
+            <div className="text-center p-4 bg-orange-50 border border-orange-200 rounded-lg">
+              <div className="text-3xl font-bold text-orange-600 mb-1">{scoreBreakdown.D}</div>
+              <div className="text-xs text-gray-600 uppercase tracking-wide">D Leads</div>
+            </div>
+            <div className="text-center p-4 bg-red-50 border border-red-200 rounded-lg">
+              <div className="text-3xl font-bold text-red-600 mb-1">{scoreBreakdown.F}</div>
+              <div className="text-xs text-gray-600 uppercase tracking-wide">F Leads</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Filters */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-2">Search</label>
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Name, email, phone..."
-                className="input-base w-full px-3 py-2 text-subheadline"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               />
             </div>
 
-            {/* Score Filter */}
             <div>
-              <label className="block text-footnote-emphasized text-secondary mb-2">Lead Score</label>
+              <label className="block text-xs font-medium text-gray-700 mb-2">Lead Score</label>
               <select
                 value={filterScore}
                 onChange={(e) => setFilterScore(e.target.value as LeadScore | "all")}
-                className="input-base w-full px-3 py-2 text-subheadline"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               >
                 <option value="all">All Scores</option>
                 <option value="A">A - Hot</option>
@@ -214,13 +252,12 @@ export default function ContactsList() {
               </select>
             </div>
 
-            {/* Status Filter */}
             <div>
-              <label className="block text-footnote-emphasized text-secondary mb-2">Status</label>
+              <label className="block text-xs font-medium text-gray-700 mb-2">Status</label>
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value as ContactStatus | "all")}
-                className="input-base w-full px-3 py-2 text-subheadline"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               >
                 <option value="all">All Statuses</option>
                 <option value="New Lead">New Lead</option>
@@ -232,13 +269,12 @@ export default function ContactsList() {
               </select>
             </div>
 
-            {/* Source Filter */}
             <div>
-              <label className="block text-footnote-emphasized text-secondary mb-2">Source</label>
+              <label className="block text-xs font-medium text-gray-700 mb-2">Source</label>
               <select
                 value={filterSource}
                 onChange={(e) => setFilterSource(e.target.value as ContactSource | "all")}
-                className="input-base w-full px-3 py-2 text-subheadline"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
               >
                 <option value="all">All Sources</option>
                 <option value="Website">Website</option>
@@ -255,22 +291,24 @@ export default function ContactsList() {
           </div>
 
           {/* Quick Filters */}
-          <div className="flex gap-2 mt-6 pt-4 border-t border-surface-subtle">
+          <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200">
             <button
               onClick={() => {
                 setFilterScore("A");
                 setFilterStatus("all");
+                setFilterSource("all");
               }}
-              className="px-3 py-1.5 text-footnote badge-success rounded-md hover:opacity-80 transition-opacity"
+              className="px-3 py-1.5 text-xs font-medium bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors"
             >
-              A Leads
+              A Leads Only
             </button>
             <button
               onClick={() => {
                 setFilterStatus("Hot");
                 setFilterScore("all");
+                setFilterSource("all");
               }}
-              className="px-3 py-1.5 text-footnote badge-error rounded-md hover:opacity-80 transition-opacity"
+              className="px-3 py-1.5 text-xs font-medium bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors"
             >
               Hot Status
             </button>
@@ -281,7 +319,7 @@ export default function ContactsList() {
                 setFilterSource("all");
                 setSearchQuery("");
               }}
-              className="px-3 py-1.5 text-footnote badge-neutral rounded-md hover:opacity-80 transition-opacity"
+              className="px-3 py-1.5 text-xs font-medium bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
             >
               Clear All
             </button>
@@ -289,7 +327,7 @@ export default function ContactsList() {
         </div>
 
         {/* Contacts Table */}
-        <div className="bg-surface-panel rounded-lg border border-surface-subtle shadow-sm overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
           {filteredContacts.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <p className="text-sm text-gray-500 mb-1">No contacts found</p>
@@ -302,71 +340,65 @@ export default function ContactsList() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-surface-muted border-b border-surface-subtle">
+                <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-footnote-emphasized text-secondary uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Name
                     </th>
-                    <th className="px-6 py-3 text-left text-footnote-emphasized text-secondary uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Score
                     </th>
-                    <th className="px-6 py-3 text-left text-footnote-emphasized text-secondary uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-footnote-emphasized text-secondary uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Source
                     </th>
-                    <th className="px-6 py-3 text-left text-footnote-emphasized text-secondary uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Last Contact
                     </th>
-                    <th className="px-6 py-3 text-left text-footnote-emphasized text-secondary uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Follow Up
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-surface-subtle">
+                <tbody className="divide-y divide-gray-200">
                   {filteredContacts.map((contact) => (
-                    <tr
-                      key={contact.id}
-                      className="hover:bg-surface-muted transition-colors"
-                    >
+                    <tr key={contact.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4">
                         <Link
                           to={`/contacts/${contact.id}`}
-                          className="block hover:text-accent-primary transition-colors"
+                          className="block hover:text-orange-500 transition-colors"
                         >
-                          <div className="text-subheadline-emphasized text-primary">
-                            {contact.name}
-                          </div>
-                          <div className="text-footnote text-secondary mt-0.5">
+                          <div className="text-sm font-medium text-gray-900">{contact.name}</div>
+                          <div className="text-xs text-gray-500 mt-0.5">
                             {contact.email || contact.phone || "No contact info"}
                           </div>
                         </Link>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-footnote-emphasized ${getScoreBadgeColor(contact.lead_score)}`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border ${getScoreBadgeColor(contact.lead_score)}`}>
                           {contact.lead_score}
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-md text-footnote ${getStatusBadgeColor(contact.status)}`}>
+                        <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium border ${getStatusBadgeColor(contact.status)}`}>
                           {contact.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-subheadline text-secondary">
+                      <td className="px-6 py-4 text-sm text-gray-600">
                         {contact.source}
                       </td>
-                      <td className="px-6 py-4 text-subheadline text-secondary">
+                      <td className="px-6 py-4 text-sm text-gray-600">
                         {formatDate(contact.last_contact_date)}
                       </td>
                       <td className="px-6 py-4">
                         <span
-                          className="text-subheadline"
-                          style={
+                          className={`text-sm font-medium ${
                             isFollowUpOverdue(contact.next_follow_up_date)
-                              ? { color: 'var(--color-error)', fontWeight: 600 }
-                              : { color: 'var(--text-secondary)' }
-                          }
+                              ? "text-red-600"
+                              : "text-gray-600"
+                          }`}
                         >
                           {formatDate(contact.next_follow_up_date)}
                         </span>
@@ -378,155 +410,139 @@ export default function ContactsList() {
             </div>
           )}
         </div>
+      </div>
 
-        {/* Add Contact Modal */}
-        {showAddModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-surface-panel rounded-lg max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-title-2">Add New Contact</h2>
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="text-secondary hover:text-primary"
-                >
-                  ×
-                </button>
+      {/* Add Contact Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg border border-gray-200 max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-900">Add New Contact</h2>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-600 hover:text-gray-900"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleAddContact} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">Name *</label>
+                <input
+                  type="text"
+                  value={newContact.name}
+                  onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                  required
+                />
               </div>
 
-              <form onSubmit={handleAddContact} className="space-y-6">
-                {/* Name (Required) */}
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
-                    Name *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Email</label>
                   <input
-                    type="text"
-                    value={newContact.name}
-                    onChange={(e) => setNewContact({ ...newContact, name: e.target.value })}
-                    className="input-base w-full px-3 py-2"
-                    required
+                    type="email"
+                    value={newContact.email}
+                    onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                   />
                 </div>
-
-                {/* Email & Phone */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-subheadline-emphasized text-primary mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      value={newContact.email}
-                      onChange={(e) => setNewContact({ ...newContact, email: e.target.value })}
-                      className="input-base w-full px-3 py-2"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-subheadline-emphasized text-primary mb-2">
-                      Phone
-                    </label>
-                    <input
-                      type="tel"
-                      value={newContact.phone}
-                      onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
-                      className="input-base w-full px-3 py-2"
-                    />
-                  </div>
-                </div>
-
-                {/* Lead Score, Status, Source */}
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-subheadline-emphasized text-primary mb-2">
-                      Lead Score
-                    </label>
-                    <select
-                      value={newContact.lead_score}
-                      onChange={(e) => setNewContact({ ...newContact, lead_score: e.target.value as LeadScore })}
-                      className="input-base w-full px-3 py-2"
-                    >
-                      <option value="A">A</option>
-                      <option value="B">B</option>
-                      <option value="C">C</option>
-                      <option value="D">D</option>
-                      <option value="F">F</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-subheadline-emphasized text-primary mb-2">
-                      Status
-                    </label>
-                    <select
-                      value={newContact.status}
-                      onChange={(e) => setNewContact({ ...newContact, status: e.target.value as ContactStatus })}
-                      className="input-base w-full px-3 py-2"
-                    >
-                      <option value="New Lead">New Lead</option>
-                      <option value="Nurturing">Nurturing</option>
-                      <option value="Hot">Hot</option>
-                      <option value="Under Contract">Under Contract</option>
-                      <option value="Closed">Closed</option>
-                      <option value="Dead">Dead</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-subheadline-emphasized text-primary mb-2">
-                      Source
-                    </label>
-                    <select
-                      value={newContact.source}
-                      onChange={(e) => setNewContact({ ...newContact, source: e.target.value as ContactSource })}
-                      className="input-base w-full px-3 py-2"
-                    >
-                      <option value="Website">Website</option>
-                      <option value="Zillow">Zillow</option>
-                      <option value="Realtor.com">Realtor.com</option>
-                      <option value="Referral">Referral</option>
-                      <option value="Past Client">Past Client</option>
-                      <option value="Cold Call">Cold Call</option>
-                      <option value="Open House">Open House</option>
-                      <option value="Social Media">Social Media</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Notes */}
                 <div>
-                  <label className="block text-subheadline-emphasized text-primary mb-2">
-                    Notes
-                  </label>
-                  <textarea
-                    value={newContact.notes}
-                    onChange={(e) => setNewContact({ ...newContact, notes: e.target.value })}
-                    rows={4}
-                    className="input-base w-full px-3 py-2"
-                    placeholder="Add any relevant notes about this contact..."
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Phone</label>
+                  <input
+                    type="tel"
+                    value={newContact.phone}
+                    onChange={(e) => setNewContact({ ...newContact, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                   />
                 </div>
+              </div>
 
-                {/* Buttons */}
-                <div className="flex gap-3 pt-4">
-                  <button
-                    type="submit"
-                    disabled={saving || !newContact.name.trim()}
-                    className="flex-1 btn-primary px-4 py-2"
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Lead Score</label>
+                  <select
+                    value={newContact.lead_score}
+                    onChange={(e) => setNewContact({ ...newContact, lead_score: e.target.value as LeadScore })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
                   >
-                    {saving ? "Creating..." : "Create Contact"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddModal(false)}
-                    className="flex-1 px-4 py-2 bg-surface-muted text-primary rounded-md hover:bg-surface-subtle text-subheadline-emphasized motion-button"
-                  >
-                    Cancel
-                  </button>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="F">F</option>
+                  </select>
                 </div>
-              </form>
-            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Status</label>
+                  <select
+                    value={newContact.status}
+                    onChange={(e) => setNewContact({ ...newContact, status: e.target.value as ContactStatus })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                  >
+                    <option value="New Lead">New Lead</option>
+                    <option value="Nurturing">Nurturing</option>
+                    <option value="Hot">Hot</option>
+                    <option value="Under Contract">Under Contract</option>
+                    <option value="Closed">Closed</option>
+                    <option value="Dead">Dead</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">Source</label>
+                  <select
+                    value={newContact.source}
+                    onChange={(e) => setNewContact({ ...newContact, source: e.target.value as ContactSource })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                  >
+                    <option value="Website">Website</option>
+                    <option value="Zillow">Zillow</option>
+                    <option value="Realtor.com">Realtor.com</option>
+                    <option value="Referral">Referral</option>
+                    <option value="Past Client">Past Client</option>
+                    <option value="Cold Call">Cold Call</option>
+                    <option value="Open House">Open House</option>
+                    <option value="Social Media">Social Media</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-900 mb-2">Notes</label>
+                <textarea
+                  value={newContact.notes}
+                  onChange={(e) => setNewContact({ ...newContact, notes: e.target.value })}
+                  rows={4}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500"
+                  placeholder="Add any relevant notes about this contact..."
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="submit"
+                  disabled={saving || !newContact.name.trim()}
+                  className="flex-1 px-4 py-2 bg-orange-500 text-white text-sm font-medium rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {saving ? "Creating..." : "Create Contact"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:border-gray-400 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
-        )}
-      </div>
+        </div>
+      )}
+    </div>
   );
 }
 
