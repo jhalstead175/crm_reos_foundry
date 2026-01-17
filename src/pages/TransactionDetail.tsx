@@ -1,10 +1,18 @@
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { TransactionTask, TransactionEvent, TaskStatus, TaskPriority } from "../types/task";
 import { supabase } from "../lib/supabase";
 import { executeAutomationRules, persistAutomationActions } from "../lib/automation";
 
 type TabType = "timeline" | "documents" | "tasks" | "messages";
+
+interface Message {
+  id: string;
+  transaction_id: string;
+  content: string;
+  sender_name: string;
+  created_at: string;
+}
 
 export default function TransactionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -15,6 +23,12 @@ export default function TransactionDetail() {
   // Task and event state
   const [tasks, setTasks] = useState<TransactionTask[]>([]);
   const [events, setEvents] = useState<TransactionEvent[]>([]);
+
+  // Message state
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Transaction state (mock for MVP - would load from DB in production)
   const [transactionStatus, setTransactionStatus] = useState("Active");
@@ -146,8 +160,18 @@ export default function TransactionDetail() {
           }
         });
 
+        // Load messages
+        const { data: messagesData, error: messagesError } = await supabase
+          .from("messages")
+          .select("*")
+          .eq("transaction_id", id)
+          .order("created_at", { ascending: true });
+
+        if (messagesError) throw messagesError;
+
         setTasks(transformedTasks);
         setEvents(transformedEvents);
+        setMessages(messagesData || []);
       } catch (err) {
         console.error("Error loading transaction data:", err);
         setError("Failed to load transaction data");
@@ -333,10 +357,29 @@ export default function TransactionDetail() {
       )
       .subscribe();
 
+    // Subscribe to messages
+    const messagesChannel = supabase
+      .channel(`messages:${id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `transaction_id=eq.${id}`,
+        },
+        (payload: any) => {
+          const newMsg = payload.new as Message;
+          setMessages((prev) => [...prev, newMsg]);
+        }
+      )
+      .subscribe();
+
     // Cleanup on unmount
     return () => {
       eventsChannel.unsubscribe();
       tasksChannel.unsubscribe();
+      messagesChannel.unsubscribe();
     };
   }, [id]);
 
@@ -545,6 +588,39 @@ export default function TransactionDetail() {
     }
   };
 
+  // Send message handler
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newMessage.trim()) return;
+
+    setSendingMessage(true);
+    try {
+      const { error } = await supabase.from("messages").insert([
+        {
+          transaction_id: id,
+          content: newMessage.trim(),
+          sender_name: "Agent", // In production, get from auth context
+        },
+      ]);
+
+      if (error) throw error;
+
+      // Clear input
+      setNewMessage("");
+    } catch (err) {
+      console.error("Error sending message:", err);
+      setError("Failed to send message");
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
@@ -649,7 +725,16 @@ export default function TransactionDetail() {
               onStatusChange={handleStatusChange}
             />
           )}
-          {activeTab === "messages" && <MessagesView />}
+          {activeTab === "messages" && (
+            <MessagesView
+              messages={messages}
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              onSendMessage={handleSendMessage}
+              sendingMessage={sendingMessage}
+              messagesEndRef={messagesEndRef}
+            />
+          )}
         </div>
       </div>
     </div>
@@ -919,38 +1004,64 @@ function TasksView({ tasks, onAddTask, onStatusChange }: TasksViewProps) {
   );
 }
 
-function MessagesView() {
-  const messages = [
-    { id: "1", from: "Agent", content: "Welcome to your transaction!", timestamp: new Date().toISOString() },
-    { id: "2", from: "Client", content: "Thank you! Looking forward to working with you.", timestamp: new Date().toISOString() },
-  ];
-
+function MessagesView({
+  messages,
+  newMessage,
+  setNewMessage,
+  onSendMessage,
+  sendingMessage,
+  messagesEndRef,
+}: {
+  messages: Message[];
+  newMessage: string;
+  setNewMessage: (value: string) => void;
+  onSendMessage: (e: React.FormEvent) => void;
+  sendingMessage: boolean;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
+}) {
   return (
     <div className="space-y-4">
       <h2 className="text-title-2 mb-4">Messages</h2>
-      <div className="space-y-3">
-        {messages.map((msg) => (
-          <div key={msg.id} className="border border-surface-subtle rounded-lg p-4 bg-surface-panel">
-            <div className="flex justify-between items-start mb-2">
-              <span className="text-body-emphasized">{msg.from}</span>
-              <span className="text-caption-1 text-tertiary">
-                {new Date(msg.timestamp).toLocaleString()}
-              </span>
+
+      {/* Messages List */}
+      <div className="space-y-3 max-h-[500px] overflow-y-auto">
+        {messages.length === 0 ? (
+          <p className="text-subheadline text-secondary text-center py-12">
+            No messages yet. Start the conversation!
+          </p>
+        ) : (
+          messages.map((msg) => (
+            <div key={msg.id} className="border border-surface-subtle rounded-lg p-4 bg-surface-panel">
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-body-emphasized">{msg.sender_name}</span>
+                <span className="text-caption-1 text-tertiary">
+                  {new Date(msg.created_at).toLocaleString()}
+                </span>
+              </div>
+              <p className="text-subheadline text-primary">{msg.content}</p>
             </div>
-            <p className="text-subheadline text-primary">{msg.content}</p>
-          </div>
-        ))}
+          ))
+        )}
+        <div ref={messagesEndRef} />
       </div>
-      <div className="mt-4 pt-4 border-t border-surface-subtle">
+
+      {/* Message Input Form */}
+      <form onSubmit={onSendMessage} className="mt-4 pt-4 border-t border-surface-subtle">
         <textarea
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message..."
           className="input-base w-full px-3 py-2 text-body"
           rows={3}
         />
-        <button className="mt-3 px-5 py-2.5 text-white rounded-lg text-subheadline-emphasized btn-primary">
-          Send Message
+        <button
+          type="submit"
+          disabled={sendingMessage || !newMessage.trim()}
+          className="mt-3 btn-primary px-5 py-2.5"
+        >
+          {sendingMessage ? "Sending..." : "Send Message"}
         </button>
-      </div>
+      </form>
     </div>
   );
 }
