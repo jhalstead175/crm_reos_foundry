@@ -11,22 +11,26 @@ import PropertySearch from "./pages/PropertySearch";
 import Settings from "./pages/Settings";
 import TaskBoard from "./pages/TaskBoard";
 
+import MainLayout from "./components/MainLayout";
 import { InspectionFooter } from "./components/InspectionFooter";
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
+        {/* Public routes without layout */}
         <Route path="/about" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/transactions" element={<TransactionList />} />
-        <Route path="/transactions/:id" element={<TransactionDetail />} />
-        <Route path="/contacts" element={<ContactsList />} />
-        <Route path="/contacts/:id" element={<ContactProfile />} />
-        <Route path="/properties" element={<PropertySearch />} />
-        <Route path="/tasks" element={<TaskBoard />} />
-        <Route path="/settings" element={<Settings />} />
+
+        {/* Protected routes with layout */}
+        <Route path="/" element={<MainLayout><Dashboard /></MainLayout>} />
+        <Route path="/transactions" element={<MainLayout><TransactionList /></MainLayout>} />
+        <Route path="/transactions/:id" element={<MainLayout><TransactionDetail /></MainLayout>} />
+        <Route path="/contacts" element={<MainLayout><ContactsList /></MainLayout>} />
+        <Route path="/contacts/:id" element={<MainLayout><ContactProfile /></MainLayout>} />
+        <Route path="/properties" element={<MainLayout><PropertySearch /></MainLayout>} />
+        <Route path="/tasks" element={<MainLayout><TaskBoard /></MainLayout>} />
+        <Route path="/settings" element={<MainLayout><Settings /></MainLayout>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 

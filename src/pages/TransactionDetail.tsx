@@ -547,15 +547,15 @@ export default function TransactionDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-surface-app flex items-center justify-center">
+      <div className="flex items-center justify-center py-16">
         <div className="text-subheadline text-secondary">Loading transaction...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-surface-app">
-      <div className="max-w-6xl mx-auto px-6 py-8">
+    <div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Error Display */}
         {error && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
